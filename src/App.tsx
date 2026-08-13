@@ -19,8 +19,10 @@ import { RuleSheetPage } from './pages/RuleSheetPage'
 import { CustomGamePage } from './pages/CustomGamePage'
 
 export default function App() {
+  // GitHub Pages sirve la app bajo /mesa/; el dev server y Vercel, bajo /.
+  // BASE_URL lo resuelve Vite en tiempo de compilación.
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
         <GroupProvider>
           <GamesProvider>

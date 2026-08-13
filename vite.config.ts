@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// GitHub Pages publica el sitio en un subdirectorio (/mesa/), mientras que el
+// servidor de desarrollo y Vercel lo sirven en la raíz. El workflow de Pages
+// exporta BASE_PATH=/mesa/; en cualquier otro sitio se queda en '/'.
+const base = process.env.BASE_PATH ?? '/'
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -19,7 +25,8 @@ export default defineConfig({
         background_color: '#f7f6f3',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: base,
+        scope: base,
         lang: 'es',
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },

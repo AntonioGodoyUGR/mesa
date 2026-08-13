@@ -7,6 +7,13 @@ import react from '@vitejs/plugin-react'
  */
 export default defineConfig({
   plugins: [react()],
+  // Los tests recorren la app en modo demostración, con los datos de mentira
+  // de `api.demo.ts`. Si Vite cargase el `.env` real, `isSupabaseConfigured`
+  // daría true y las pruebas acabarían llamando a Supabase de verdad.
+  define: {
+    'import.meta.env.VITE_SUPABASE_URL': '""',
+    'import.meta.env.VITE_SUPABASE_ANON_KEY': '""',
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
