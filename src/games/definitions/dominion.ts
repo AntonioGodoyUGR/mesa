@@ -1,0 +1,127 @@
+import type { GameDefinition } from '../types'
+
+export const dominion: GameDefinition = {
+  slug: 'dominion',
+  name: 'Dominion',
+  icon: '👑',
+  tagline: 'Construye tu mazo y llénalo de provincias',
+  theme: {
+    primary: '#6b4f2a',
+    accent: '#3d7a4d',
+    surface: '#f6f1e8',
+  },
+  minPlayers: 2,
+  maxPlayers: 4,
+  scoreLabel: 'Puntos de victoria',
+  scoreLabelShort: 'PV',
+  totalMode: 'explicit',
+  winnerRule: 'highest',
+
+  fields: [
+    {
+      key: 'points',
+      label: 'Puntos de victoria',
+      short: 'PV',
+      icon: '👑',
+      type: 'number',
+      points: 1,
+      isTotal: true,
+      showInSummary: true,
+      hint: 'Cuenta todo tu mazo al final, incluidas las maldiciones',
+    },
+    {
+      key: 'provinces',
+      label: 'Provincias',
+      short: 'Provincias',
+      icon: '🏰',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 12,
+      showInSummary: true,
+      hint: '6 puntos cada una',
+    },
+    {
+      key: 'duchies',
+      label: 'Ducados',
+      short: 'Ducados',
+      icon: '🏯',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 12,
+      hint: '3 puntos cada uno',
+    },
+    {
+      key: 'estates',
+      label: 'Fincas',
+      short: 'Fincas',
+      icon: '🏡',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 24,
+      hint: '1 punto cada una',
+    },
+    {
+      key: 'curses',
+      label: 'Maldiciones',
+      short: 'Maldiciones',
+      icon: '☠️',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 30,
+      hint: '−1 punto cada una',
+    },
+  ],
+
+  rules: {
+    players: '2–4 jugadores',
+    duration: '30–45 min',
+    setup: [
+      'Elegid diez montones de cartas de Reino: hay repartos recomendados en el reglamento o podéis sortearlos.',
+      'Pon los montones de tesoro (Cobre, Plata, Oro) y de victoria (Finca, Ducado, Provincia).',
+      'Con 2 jugadores hay 8 cartas de cada tipo de victoria; con 3 o 4, doce.',
+      'Cada jugador empieza con un mazo de 7 Cobres y 3 Fincas, lo baraja y roba 5 cartas.',
+      'Prepara las Maldiciones si alguna carta de Reino las usa.',
+    ],
+    turn: [
+      {
+        name: '1. Acción',
+        detail: 'Juegas una carta de Acción de tu mano y haces lo que diga (muchas dan más acciones).',
+      },
+      {
+        name: '2. Compra',
+        detail:
+          'Juegas los tesoros de tu mano y compras una carta de un montón, que va directa a tu pila de descartes.',
+      },
+      {
+        name: '3. Limpieza',
+        detail:
+          'Descarta lo que te quede en la mano y lo jugado, y roba cinco cartas nuevas. Cuando el mazo se agota, barajas los descartes.',
+      },
+    ],
+    scoring: [
+      { what: 'Finca', points: '1 punto' },
+      { what: 'Ducado', points: '3 puntos' },
+      { what: 'Provincia', points: '6 puntos' },
+      { what: 'Colonia (expansión)', points: '10 puntos' },
+      { what: 'Maldición', points: '−1 punto' },
+      { what: 'Jardines y similares', points: 'Según su texto' },
+    ],
+    endCondition:
+      'La partida acaba cuando se agota el montón de Provincias o cuando se vacían tres montones cualesquiera. Cada jugador junta todo su mazo —mano, descartes y cartas en juego— y suma sus puntos. En caso de empate gana quien haya jugado menos turnos.',
+    reminders: [
+      'Cada turno tienes una acción y una compra, salvo que las cartas te den más.',
+      'Las cartas de victoria son cartas muertas mientras juegas: ocupan mano y no hacen nada.',
+      'Las cartas compradas van a los descartes, no a la mano: tardan una vuelta en aparecer.',
+      'Lo que no gastes no se acumula: monedas, acciones y compras se pierden al acabar el turno.',
+      'Un ataque no afecta a quien tenga una carta de reacción como el Foso, si la enseña.',
+    ],
+    officialLink: {
+      label: 'Web oficial (Rio Grande Games)',
+      url: 'https://www.riograndegames.com/games/dominion/',
+    },
+  },
+}

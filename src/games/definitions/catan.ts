@@ -1,0 +1,158 @@
+import type { GameDefinition } from '../types'
+
+export const catan: GameDefinition = {
+  slug: 'catan',
+  name: 'Catán',
+  icon: '🌾',
+  tagline: 'Coloniza la isla y llega a 10 puntos de victoria',
+  theme: {
+    primary: '#c9622f',
+    accent: '#e8b84a',
+    surface: '#fdf3e7',
+  },
+  minPlayers: 3,
+  maxPlayers: 6,
+  scoreLabel: 'Puntos de victoria',
+  scoreLabelShort: 'PV',
+  totalMode: 'computed',
+  winnerRule: 'highest',
+  targetScore: 10,
+
+  fields: [
+    {
+      key: 'settlements',
+      label: 'Pueblos',
+      icon: '🏠',
+      type: 'counter',
+      points: 1,
+      group: 'Construcciones',
+      min: 0,
+      max: 5,
+      showInSummary: true,
+      hint: '1 PV cada uno',
+    },
+    {
+      key: 'cities',
+      label: 'Ciudades',
+      icon: '🏙️',
+      type: 'counter',
+      points: 2,
+      group: 'Construcciones',
+      min: 0,
+      max: 4,
+      showInSummary: true,
+      hint: '2 PV cada una',
+    },
+    {
+      key: 'dev_points',
+      label: 'Puntos de cartas de desarrollo',
+      short: 'Cartas PV',
+      icon: '🃏',
+      type: 'counter',
+      points: 1,
+      group: 'Cartas',
+      min: 0,
+      max: 5,
+      hint: '1 PV cada carta de punto de victoria',
+    },
+    {
+      key: 'longest_road',
+      label: 'Camino más largo',
+      icon: '🛤️',
+      type: 'toggle',
+      points: 2,
+      group: 'Cartas',
+      uniquePerMatch: true,
+      showInSummary: true,
+      hint: '+2 PV · 5 tramos continuos mínimo',
+    },
+    {
+      key: 'largest_army',
+      label: 'Ejército más grande',
+      icon: '⚔️',
+      type: 'toggle',
+      points: 2,
+      group: 'Cartas',
+      uniquePerMatch: true,
+      showInSummary: true,
+      hint: '+2 PV · 3 caballeros mínimo',
+    },
+    {
+      key: 'knights',
+      label: 'Caballeros jugados',
+      short: 'Caballeros',
+      icon: '🛡️',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 14,
+      hint: 'No suma PV, se guarda como estadística',
+    },
+    {
+      key: 'roads',
+      label: 'Carreteras',
+      icon: '🛣️',
+      type: 'counter',
+      group: 'Registro',
+      min: 0,
+      max: 15,
+      hint: 'No suma PV, se guarda como estadística',
+    },
+  ],
+
+  rules: {
+    players: '3–4 jugadores (hasta 6 con la ampliación)',
+    duration: '60–90 min',
+    setup: [
+      'Monta los 19 hexágonos al azar dentro del marco de mar.',
+      'Reparte las fichas de número en espiral desde una esquina; el desierto se queda sin número.',
+      'Coloca el ladrón en el desierto.',
+      'Cada jugador coge sus 5 pueblos, 4 ciudades y 15 carreteras.',
+      'Por orden de turno cada uno coloca 1 pueblo + 1 carretera; después, en orden inverso, el segundo pueblo + carretera.',
+      'Recibes una materia por cada hexágono que toque tu segundo pueblo.',
+    ],
+    turn: [
+      {
+        name: '1. Tirar los dados',
+        detail:
+          'Producen todos los hexágonos con ese número: 1 materia por pueblo adyacente, 2 por ciudad. Produce todo el mundo, no solo quien tira.',
+      },
+      {
+        name: '2. Si sale un 7',
+        detail:
+          'Quien tenga más de 7 cartas descarta la mitad (redondeando hacia abajo). Mueves el ladrón a otro hexágono y robas una carta al azar a un jugador que tenga construcción allí. El hexágono con el ladrón deja de producir.',
+      },
+      {
+        name: '3. Comerciar',
+        detail:
+          'Con los demás jugadores en los términos que queráis, o con la banca 4:1 (3:1 o 2:1 si tienes el puerto correspondiente).',
+      },
+      {
+        name: '4. Construir',
+        detail:
+          'Tantas construcciones como puedas pagar, en cualquier orden. También puedes comprar cartas de desarrollo.',
+      },
+    ],
+    scoring: [
+      { what: 'Carretera · 🌲 + 🧱', points: '0 PV' },
+      { what: 'Pueblo · 🌲 + 🧱 + 🌾 + 🐑', points: '1 PV' },
+      { what: 'Ciudad (sustituye a un pueblo) · 2🌾 + 3⛰️', points: '2 PV' },
+      { what: 'Carta de desarrollo · 🌾 + 🐑 + ⛰️', points: '0 o 1 PV' },
+      { what: 'Camino más largo · 5+ tramos continuos', points: '2 PV' },
+      { what: 'Ejército más grande · 3+ caballeros jugados', points: '2 PV' },
+    ],
+    endCondition:
+      'Gana quien llegue a 10 puntos de victoria durante su propio turno. Las cartas de PV ocultas se revelan justo en ese momento.',
+    reminders: [
+      'Regla de la distancia: entre dos pueblos debe haber siempre al menos un cruce libre.',
+      'Solo puedes construir conectando con tu propia red de carreteras.',
+      'Una carta de desarrollo por turno, y nunca la que acabas de comprar (las de PV no se juegan, cuentan siempre).',
+      'El ladrón tiene que moverse a un hexágono distinto del que ocupaba.',
+      'El camino más largo y el ejército más grande cambian de dueño si otro te supera; empatar no basta.',
+    ],
+    officialLink: {
+      label: 'Reglamento oficial (Catan GmbH)',
+      url: 'https://www.catan.com/understand-catan/game-rules',
+    },
+  },
+}

@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Sistema visual de Mesa.
+   Los colores de marca son neutros a propósito: cada juego aporta el
+   suyo a través de `GameDefinition.theme`, aplicado en línea.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #f7f6f3;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1efea;
+  --color-border: #e3ded5;
+  --color-text: #1c1a17;
+  --color-muted: #6f6a61;
+  --color-brand: #b8562f;
+  --color-brand-soft: #fbeee7;
+  --color-accent: #e0a458;
+  --color-success: #2f7d55;
+  --color-danger: #b4392f;
+
+  --font-sans: 'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system,
+    sans-serif;
+
+  --radius-card: 1rem;
+}
+
+.dark {
+  --color-bg: #121316;
+  --color-surface: #1b1d21;
+  --color-surface-2: #24262c;
+  --color-border: #32353c;
+  --color-text: #f0ede8;
+  --color-muted: #9c968c;
+  --color-brand: #e07a4c;
+  --color-brand-soft: #2d211c;
+  --color-accent: #e0a458;
+  --color-success: #4ea87a;
+  --color-danger: #e0685c;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  /* Evita el rebote elástico raro dentro de la app envuelta en Capacitor. */
+  overscroll-behavior-y: none;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Respeta las zonas seguras del móvil (notch y barra de gestos). */
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Números alineados en las tablas de puntuación. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: filter 0.15s ease, background-color 0.15s ease;
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  .btn-primary:not(:disabled):hover {
+    filter: brightness(1.08);
+  }
+
+  .btn-ghost {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .btn-ghost:not(:disabled):hover {
+    background: var(--color-surface-2);
+  }
+
+  .input {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem;
+    color: var(--color-text);
+    font-family: inherit;
+  }
+
+  .input:focus {
+    outline: 2px solid var(--color-brand);
+    outline-offset: -1px;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: 0.375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

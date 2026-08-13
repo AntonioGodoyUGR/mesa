@@ -1,0 +1,218 @@
+import type { User } from '@supabase/supabase-js'
+import { supabase } from './supabase'
+import { toDefinition } from '../games/custom'
+import type { MesaApi } from './api'
+import type {
+  Group,
+  GroupMember,
+  MatchWithPlayers,
+  Player,
+  SessionUser,
+} from './types'
+
+function toSessionUser(user: User | null): SessionUser | null {
+  if (!user) return null
+  return {
+    id: user.id,
+    email: user.email ?? null,
+    displayName:
+      (user.user_metadata?.display_name as string | undefined) ||
+      user.email?.split('@')[0] ||
+      'Jugador',
+  }
+}
+
+/** Traduce los errores de Postgres a algo legible en pantalla. */
+function fail(message: string, error: { message: string } | null): never {
+  throw new Error(error?.message ? `${message}: ${error.message}` : message)
+}
+
+export const supabaseApi: MesaApi = {
+  async getUser() {
+    const { data } = await supabase.auth.getUser()
+    return toSessionUser(data.user)
+  },
+
+  onUserChange(callback) {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      callback(toSessionUser(session?.user ?? null))
+    })
+    return () => data.subscription.unsubscribe()
+  },
+
+  async signIn(email, password) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) fail('No se ha podido iniciar sesión', error)
+  },
+
+  async signUp(email, password, displayName) {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName.trim() } },
+    })
+    if (error) fail('No se ha podido crear la cuenta', error)
+  },
+
+  async signOut() {
+    await supabase.auth.signOut()
+  },
+
+  async listGroups() {
+    const { data, error } = await supabase
+      .from('groups')
+      .select('*')
+      .order('created_at', { ascending: true })
+    if (error) fail('No se han podido cargar los grupos', error)
+    return (data ?? []) as Group[]
+  },
+
+  async createGroup(name) {
+    const { data: groupId, error } = await supabase.rpc('create_group', { p_name: name })
+    if (error) fail('No se ha podido crear el grupo', error)
+
+    const { data, error: readError } = await supabase
+      .from('groups')
+      .select('*')
+      .eq('id', groupId as string)
+      .single()
+    if (readError) fail('Grupo creado pero no se ha podido leer', readError)
+    return data as Group
+  },
+
+  async joinGroup(code) {
+    const { data: groupId, error } = await supabase.rpc('join_group', { p_code: code })
+    if (error) fail('No se ha podido unir al grupo', error)
+
+    const { data, error: readError } = await supabase
+      .from('groups')
+      .select('*')
+      .eq('id', groupId as string)
+      .single()
+    if (readError) fail('Te has unido pero no se ha podido leer el grupo', readError)
+    return data as Group
+  },
+
+  async listMembers(groupId) {
+    const { data, error } = await supabase
+      .from('group_members')
+      .select('group_id, user_id, role, profile:profiles(id, display_name, avatar_url)')
+      .eq('group_id', groupId)
+    if (error) fail('No se han podido cargar los miembros', error)
+    return (data ?? []) as unknown as GroupMember[]
+  },
+
+  async listPlayers(groupId) {
+    const { data, error } = await supabase
+      .from('players')
+      .select('*')
+      .eq('group_id', groupId)
+      .order('display_name')
+    if (error) fail('No se han podido cargar los jugadores', error)
+    return (data ?? []) as Player[]
+  },
+
+  async addPlayer(groupId, displayName) {
+    const { data, error } = await supabase
+      .from('players')
+      .insert({ group_id: groupId, display_name: displayName.trim() })
+      .select()
+      .single()
+    if (error) {
+      if (error.code === '23505') {
+        throw new Error(`Ya hay un jugador llamado «${displayName.trim()}» en el grupo`)
+      }
+      fail('No se ha podido añadir el jugador', error)
+    }
+    return data as Player
+  },
+
+  async renamePlayer(playerId, displayName) {
+    const { error } = await supabase
+      .from('players')
+      .update({ display_name: displayName.trim() })
+      .eq('id', playerId)
+    if (error) fail('No se ha podido renombrar al jugador', error)
+  },
+
+  async listMatches(groupId) {
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*, match_players(*, player:players(*))')
+      .eq('group_id', groupId)
+      .order('played_at', { ascending: false })
+      .order('created_at', { ascending: false })
+    if (error) fail('No se han podido cargar las partidas', error)
+
+    return ((data ?? []) as unknown as MatchWithPlayers[]).map((match) => ({
+      ...match,
+      match_players: [...match.match_players].sort((a, b) => a.rank - b.rank || a.seat - b.seat),
+    }))
+  },
+
+  async saveMatch(input) {
+    // Una sola llamada: el servidor valida el grupo, exige al menos un jugador
+    // con cuenta, recalcula los totales y reparte las posiciones de forma atómica.
+    const { data, error } = await supabase.rpc('save_match', {
+      p_group_id: input.groupId,
+      p_game_slug: input.gameSlug,
+      p_played_at: input.playedAt,
+      p_notes: input.notes ?? null,
+      p_players: input.players.map((player) => ({
+        player_id: player.playerId,
+        seat: player.seat,
+        scores: player.scores,
+      })),
+      p_winner_player_id: input.winnerPlayerId ?? null,
+    })
+    if (error) fail('No se ha podido guardar la partida', error)
+    return data as string
+  },
+
+  async deleteMatch(matchId) {
+    const { error } = await supabase.from('matches').delete().eq('id', matchId)
+    if (error) fail('No se ha podido borrar la partida', error)
+  },
+
+  async listGames(groupId) {
+    // Solo los del grupo: el catálogo integrado ya viaja dentro del bundle.
+    const { data, error } = await supabase
+      .from('games')
+      .select('slug, image_url, group_id, created_by, definition')
+      .eq('group_id', groupId)
+      .order('name')
+    if (error) fail('No se han podido cargar los juegos del grupo', error)
+    return (data ?? []).map(toDefinition)
+  },
+
+  async saveCustomGame(input) {
+    // El servidor escribe `games` y `game_score_fields` en la misma transacción:
+    // sin la segunda, `compute_match_total` daría cero al guardar una partida.
+    const { data, error } = await supabase.rpc('save_custom_game', {
+      p_group_id: input.groupId,
+      p_definition: input.definition,
+      p_slug: input.slug ?? null,
+    })
+    if (error) fail('No se ha podido guardar el juego', error)
+    return data as string
+  },
+
+  async deleteCustomGame(slug) {
+    const { error } = await supabase.rpc('delete_custom_game', { p_slug: slug })
+    if (error) fail('No se ha podido borrar el juego', error)
+  },
+
+  async uploadGameImage(groupId, file) {
+    // La carpeta es el id del grupo: es lo que comprueba la policy del bucket.
+    const extension = file.type === 'image/webp' ? 'webp' : 'jpg'
+    const path = `${groupId}/${crypto.randomUUID()}.${extension}`
+
+    const { error } = await supabase.storage
+      .from('game-images')
+      .upload(path, file, { contentType: file.type || 'image/webp', upsert: false })
+    if (error) fail('No se ha podido subir la imagen', error)
+
+    const { data } = supabase.storage.from('game-images').getPublicUrl(path)
+    return data.publicUrl
+  },
+}

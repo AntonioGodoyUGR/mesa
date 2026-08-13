@@ -1,0 +1,248 @@
+import { useMemo, useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { applyUniqueField, emptyScores, validateScores } from '../games/registry'
+import type { ScoreValues } from '../games/types'
+import { PlayerPicker } from '../components/PlayerPicker'
+import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
+import { ErrorNote, Spinner } from '../components/ui'
+import { useGames } from '../context/GamesContext'
+import { useGroup } from '../context/GroupContext'
+import { api, queryKeys } from '../lib/api'
+
+function today(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+/**
+ * Alta de una partida en dos pasos: quién jugó y cuánto hizo cada uno.
+ * Todo lo específico del juego sale de su definición.
+ */
+export function NewMatchPage() {
+  const { slug } = useParams()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { group, players } = useGroup()
+  const { getGame, loading } = useGames()
+  const game = getGame(slug)
+
+  const [step, setStep] = useState<1 | 2>(1)
+  const [selected, setSelected] = useState<string[]>([])
+  const [scoresById, setScoresById] = useState<Record<string, ScoreValues>>({})
+  const [playedAt, setPlayedAt] = useState(today)
+  const [notes, setNotes] = useState('')
+  const [winnerPlayerId, setWinnerPlayerId] = useState<string | null>(null)
+
+  const save = useMutation({
+    mutationFn: (input: Parameters<typeof api.saveMatch>[0]) => api.saveMatch(input),
+    onSuccess: async (matchId) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.matches(group!.id) })
+      navigate(`/partidas/${matchId}`, { replace: true })
+    },
+  })
+
+  const rows: ScoreRow[] = useMemo(
+    () =>
+      selected.map((playerId) => {
+        const player = players.find((candidate) => candidate.id === playerId)
+        return {
+          playerId,
+          name: player?.display_name ?? 'Jugador',
+          registered: !!player?.user_id,
+          scores: scoresById[playerId] ?? {},
+        }
+      }),
+    [selected, players, scoresById],
+  )
+
+  const issues = useMemo(
+    () => (game ? validateScores(game, rows) : []),
+    [game, rows],
+  )
+
+  // Los juegos del grupo llegan por red: hasta que no están no se sabe si el slug existe.
+  if (loading) return <Spinner />
+  if (!game) return <Navigate to="/" replace />
+  if (!group) return null
+
+  const hasRegistered = rows.some((row) => row.registered)
+  const countOk =
+    selected.length >= game.minPlayers && selected.length <= game.maxPlayers
+
+  function togglePlayer(playerId: string) {
+    if (selected.includes(playerId)) {
+      setSelected(selected.filter((id) => id !== playerId))
+    } else {
+      if (selected.length >= game!.maxPlayers) return
+      setSelected([...selected, playerId])
+      if (!scoresById[playerId]) {
+        setScoresById({ ...scoresById, [playerId]: emptyScores(game!) })
+      }
+    }
+    setWinnerPlayerId(null)
+  }
+
+  function changeField(rowIndex: number, fieldKey: string, value: number | boolean) {
+    const field = game!.fields.find((candidate) => candidate.key === fieldKey)
+
+    // Las cartas únicas (Camino más largo…) se le quitan al resto al asignarlas.
+    if (field?.uniquePerMatch) {
+      const updated = applyUniqueField(
+        game!,
+        selected.map((id) => scoresById[id] ?? {}),
+        fieldKey,
+        rowIndex,
+        !!value,
+      )
+      setScoresById((current) => {
+        const next = { ...current }
+        selected.forEach((id, index) => {
+          next[id] = updated[index]
+        })
+        return next
+      })
+      return
+    }
+
+    const playerId = selected[rowIndex]
+    setScoresById((current) => ({
+      ...current,
+      [playerId]: { ...current[playerId], [fieldKey]: value },
+    }))
+  }
+
+  function submit() {
+    save.mutate({
+      groupId: group!.id,
+      gameSlug: game!.slug,
+      playedAt,
+      notes: notes.trim() || null,
+      players: selected.map((playerId, seat) => ({
+        playerId,
+        seat,
+        scores: scoresById[playerId] ?? {},
+      })),
+      winnerPlayerId,
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <header className="flex items-center gap-3">
+        <span className="text-3xl leading-none" aria-hidden="true">
+          {game.icon}
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-bold tracking-tight">{game.name}</h1>
+          <p className="text-sm text-[var(--color-muted)]">
+            {step === 1 ? 'Paso 1 · ¿Quién jugó?' : `Paso 2 · ${game.scoreLabel}`}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="btn btn-ghost ml-auto shrink-0 px-3 py-1.5 text-sm"
+          onClick={() => (step === 1 ? navigate('/') : setStep(1))}
+        >
+          {step === 1 ? 'Cancelar' : 'Atrás'}
+        </button>
+      </header>
+
+      {step === 1 && (
+        <>
+          <PlayerPicker
+            players={players}
+            selected={selected}
+            onToggle={togglePlayer}
+            maxPlayers={game.maxPlayers}
+            onAddGuest={async (name) => {
+              const player = await api.addPlayer(group.id, name)
+              await queryClient.invalidateQueries({
+                queryKey: queryKeys.players(group.id),
+              })
+              return player
+            }}
+          />
+
+          <p className="text-sm text-[var(--color-muted)]">
+            {game.name} se juega de {game.minPlayers} a {game.maxPlayers} jugadores. Has
+            elegido {selected.length}.
+          </p>
+
+          {selected.length > 0 && !hasRegistered && (
+            <p className="rounded-xl border border-[var(--color-accent)]/50 bg-[var(--color-accent)]/10 px-3 py-2 text-sm">
+              Al menos uno de los jugadores tiene que tener cuenta. Los demás pueden ser
+              invitados.
+            </p>
+          )}
+
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!countOk || !hasRegistered}
+            onClick={() => setStep(2)}
+          >
+            Apuntar puntuaciones
+          </button>
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          <ScoreSheet
+            game={game}
+            rows={rows}
+            onFieldChange={changeField}
+            winnerPlayerId={winnerPlayerId}
+            onPickWinner={(playerId) =>
+              setWinnerPlayerId((current) => (current === playerId ? null : playerId))
+            }
+          />
+
+          <section className="card flex flex-col gap-3 p-4">
+            <label className="flex flex-col gap-1">
+              <span className="label">Fecha</span>
+              <input
+                className="input"
+                type="date"
+                value={playedAt}
+                max={today()}
+                onChange={(event) => setPlayedAt(event.target.value)}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="label">Notas (opcional)</span>
+              <input
+                className="input"
+                placeholder="La partida del puerto…"
+                value={notes}
+                maxLength={200}
+                onChange={(event) => setNotes(event.target.value)}
+              />
+            </label>
+          </section>
+
+          {issues.map((issue) => (
+            <p
+              key={`${issue.playerIndex}-${issue.fieldKey}-${issue.message}`}
+              className="rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]"
+            >
+              {issue.message}
+            </p>
+          ))}
+
+          <ErrorNote error={save.error} />
+
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={issues.length > 0 || save.isPending}
+            onClick={submit}
+          >
+            {save.isPending ? 'Guardando…' : 'Guardar partida'}
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
