@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* ------------------------------------------------------------------
-   Sistema visual de Mesa — estética «arcade», paleta cian.
+   Sistema visual de Table Tracker — estética «arcade», paleta cian.
 
    Tres reglas lo explican casi todo:
      · el contorno es de 2 px y del color del texto, no un gris suave;

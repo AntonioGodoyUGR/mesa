@@ -1,7 +1,7 @@
 import { computeTotal, emptyScores, getGame, requireGame } from '../games/registry'
 import { customSlug } from '../games/custom'
 import type { GameDefinition, ScoreValues } from '../games/types'
-import type { MesaApi } from './api'
+import type { TableTrackerApi } from './api'
 import type {
   Group,
   GroupMember,
@@ -240,7 +240,7 @@ function hydrate(match: Match): MatchWithPlayers {
   return { ...match, match_players: players }
 }
 
-export const demoApi: MesaApi = {
+export const demoApi: TableTrackerApi = {
   async getUser() {
     return delay(db().user)
   },

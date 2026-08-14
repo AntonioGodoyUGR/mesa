@@ -1,4 +1,4 @@
-# Mesa — instrucciones de trabajo
+# Table Tracker — instrucciones de trabajo
 
 Marcador de juegos de mesa: React 19 + TypeScript + Vite + Tailwind v4, datos en Supabase,
 PWA. El `README.md` explica **qué** es la app y **por qué** está montada así; este fichero
@@ -24,7 +24,7 @@ Un push a `main` despliega a GitHub Pages sin más pasos
    lo que esa definición declare. Si te encuentras escribiendo `if (slug === 'catan')` en
    un componente, la solución está en la definición o en `src/games/types.ts`.
 
-2. **Todo dato pasa por `MesaApi`** (`src/lib/api.ts`). Hay dos implementaciones y ambas
+2. **Todo dato pasa por `TableTrackerApi`** (`src/lib/api.ts`). Hay dos implementaciones y ambas
    son obligatorias: `api.supabase.ts` (real) y `api.demo.ts` (en memoria, persistida en
    `localStorage`). **Un método nuevo en la interfaz se implementa en las dos**, o el modo
    demostración —que es lo que usan los tests y la primera visita de cualquiera— se rompe.

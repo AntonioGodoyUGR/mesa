@@ -1,4 +1,4 @@
-# 🎯 Mesa — marcador de juegos de mesa
+# 🎲 Table Tracker — marcador de juegos de mesa
 
 Apunta el resultado de vuestras partidas, mira el histórico de cada jugador (incluido el
 cara a cara contigo), lleva tu biblioteca de juegos (lo que tienes y lo que quieres) y ten
@@ -45,7 +45,7 @@ src/games/          El motor: la definición de cada juego y los cálculos
   registry.ts         Junta las dos capas + computeTotal, rankPlayers, validateScores…
   custom.ts           Juegos del grupo: slugs c-, plantilla y validación
 src/lib/            Datos y estadísticas
-  api.ts              Interfaz MesaApi; elige implementación real o de demostración
+  api.ts              Interfaz TableTrackerApi; elige implementación real o de demostración
   api.supabase.ts     La real
   api.demo.ts         En memoria, para probar sin backend
   stats.ts            Estadísticas y cara a cara, calculadas en el cliente
@@ -135,7 +135,7 @@ toda la app. Se llega desde la chuleta de reglas y desde el título de cualquier
 
 ### Dados y temporizadores
 
-Mesa no lleva la partida, pero sí sustituye al dado que se ha perdido y al reloj de arena
+Table Tracker no lleva la partida, pero sí sustituye al dado que se ha perdido y al reloj de arena
 que nadie encuentra. Un juego declara sus accesorios en `tools`, dentro de su propia
 `GameDefinition`:
 
@@ -252,7 +252,7 @@ Pendiente de instalar **JDK 21** y **Android Studio** en esta máquina. Después
 
 ```bash
 npm i @capacitor/core @capacitor/cli @capacitor/android
-npx cap init Mesa app.mesa.marcador --web-dir=dist
+npx cap init "Table Tracker" app.mesa.marcador --web-dir=dist
 npm run build && npx cap add android && npx cap sync android
 npx cap open android
 ```

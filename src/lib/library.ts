@@ -2,7 +2,7 @@
  * Biblioteca personal: qué juegos tienes comprados y cuáles quieres.
  *
  * Aquí solo hay funciones puras sobre las entradas y el catálogo; quién las lee o
- * las escribe es cosa de `MesaApi`. Igual que el resto del motor, no conoce ningún
+ * las escribe es cosa de `TableTrackerApi`. Igual que el resto del motor, no conoce ningún
  * juego en concreto: un juego creado por un grupo se marca exactamente igual.
  */
 import type { GameDefinition } from '../games/types'

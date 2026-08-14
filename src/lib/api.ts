@@ -23,7 +23,7 @@ import type {
  *   · `supabaseApi` — la real.
  *   · `demoApi`     — datos en memoria, para probar la interfaz sin backend.
  */
-export interface MesaApi {
+export interface TableTrackerApi {
   getUser(): Promise<SessionUser | null>
   onUserChange(callback: (user: SessionUser | null) => void): () => void
   signIn(email: string, password: string): Promise<void>
@@ -68,7 +68,7 @@ export interface MesaApi {
   setLibraryStatus(gameSlug: string, status: LibraryStatus | null): Promise<void>
 }
 
-export const api: MesaApi = isSupabaseConfigured ? supabaseApi : demoApi
+export const api: TableTrackerApi = isSupabaseConfigured ? supabaseApi : demoApi
 
 /** `true` cuando la app funciona con datos de mentira en memoria. */
 export const isDemoMode = !isSupabaseConfigured

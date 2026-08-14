@@ -1,5 +1,5 @@
 -- =============================================================================
--- Mesa — almacenamiento de portadas de juegos
+-- Table Tracker — almacenamiento de portadas de juegos
 -- Ejecutar en: Supabase Dashboard → SQL Editor → New query (después de schema.sql)
 --
 -- Las imágenes de los juegos que crean los usuarios van a un bucket público:

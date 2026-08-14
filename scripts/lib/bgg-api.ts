@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const BASE = 'https://boardgamegeek.com/xmlapi2'
-const USER_AGENT = 'MesaBoardGameTracker/1.0 (https://github.com/; contacto en el repo)'
+const USER_AGENT = 'TableTracker/1.0 (https://github.com/; contacto en el repo)'
 /** BGG recomienda un máximo de una petición cada dos segundos. */
 export const BGG_PAUSE_MS = 2000
 

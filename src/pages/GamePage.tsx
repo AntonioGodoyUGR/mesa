@@ -22,7 +22,7 @@ import {
 } from '../lib/stats'
 
 /**
- * La ficha de un juego: qué es, cómo se os da y cómo se le da al resto de Mesa.
+ * La ficha de un juego: qué es, cómo se os da y cómo se le da al resto de Table Tracker.
  *
  * Es ruta pública, como la chuleta de reglas: sin sesión se ve la parte de arriba
  * y las estadísticas globales, y las tuyas invitan a entrar. Las de tu grupo salen

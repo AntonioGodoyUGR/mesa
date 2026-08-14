@@ -57,7 +57,7 @@ const force = process.argv.includes('--force')
 /** Mismo tamaño y calidad que `resizeToWebp` en `src/lib/image.ts`. */
 const SIZE = 512
 const QUALITY = 82
-const USER_AGENT = 'MesaBoardGameTracker/1.0 (https://github.com/; contacto en el repo)'
+const USER_AGENT = 'TableTracker/1.0 (https://github.com/; contacto en el repo)'
 
 type Source = 'manual' | 'bgg' | 'wikidata' | 'wikipedia'
 

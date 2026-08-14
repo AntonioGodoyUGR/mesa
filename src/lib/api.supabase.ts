@@ -1,7 +1,7 @@
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { toDefinition } from '../games/custom'
-import type { MesaApi } from './api'
+import type { TableTrackerApi } from './api'
 import type {
   Group,
   GroupMember,
@@ -28,7 +28,7 @@ function fail(message: string, error: { message: string } | null): never {
   throw new Error(error?.message ? `${message}: ${error.message}` : message)
 }
 
-export const supabaseApi: MesaApi = {
+export const supabaseApi: TableTrackerApi = {
   async getUser() {
     const { data } = await supabase.auth.getUser()
     return toSessionUser(data.user)

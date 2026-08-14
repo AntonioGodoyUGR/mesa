@@ -13,7 +13,7 @@ import { normalise, slugToTitle, type GameEntry } from './games'
 
 const ENDPOINT = 'https://query.wikidata.org/sparql'
 /** Wikimedia exige un agente que identifique a quien llama. */
-const USER_AGENT = 'MesaBoardGameTracker/1.0 (https://github.com/; contacto en el repo)'
+const USER_AGENT = 'TableTracker/1.0 (https://github.com/; contacto en el repo)'
 
 interface Binding {
   value: string

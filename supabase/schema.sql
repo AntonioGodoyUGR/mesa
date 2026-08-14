@@ -1,5 +1,5 @@
 -- =============================================================================
--- Mesa — esquema Supabase
+-- Table Tracker — esquema Supabase
 -- Ejecutar en: Supabase Dashboard → SQL Editor → New query
 -- Después ejecutar `supabase/seed_games.sql` (lo genera `npm run seed:games`).
 --
@@ -701,7 +701,7 @@ $$;
 -- normal nunca vería más allá de las tuyas. Esta función es `security definer`
 -- a propósito: se salta la RLS para contar, pero devuelve ÚNICAMENTE agregados
 -- —cuántas partidas, cuántos grupos, medias— y ni un nombre, ni un id de grupo,
--- ni uno de jugador. Es lo que permite enseñar «así se juega a esto en Mesa» sin
+-- ni uno de jugador. Es lo que permite enseñar «así se juega a esto en Table Tracker» sin
 -- filtrar nada de nadie.
 --
 -- La ejecuta también `anon`: la ficha de un juego se consulta sin sesión, igual
