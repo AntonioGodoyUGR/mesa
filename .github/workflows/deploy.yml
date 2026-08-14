@@ -30,14 +30,14 @@ jobs:
 
       - run: npm run build
         env:
-          # Pages sirve el sitio bajo /mesa/, no en la raíz del dominio.
-          BASE_PATH: /mesa/
+          # Pages sirve el sitio bajo /table-tracker/, no en la raíz del dominio.
+          BASE_PATH: /table-tracker/
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       # Pages no admite rewrites: ante una URL desconocida devuelve 404.html.
       # Sirviendo ahí una copia de index.html, React Router recoge la ruta y
-      # /mesa/partidas funciona igual al recargar que al navegar.
+      # /table-tracker/partidas funciona igual al recargar que al navegar.
       - run: cp dist/index.html dist/404.html
 
       - uses: actions/configure-pages@v5

@@ -3,7 +3,7 @@
  *
  * Las imágenes viven en `public/covers/` y `covers.generated.ts` guarda su ruta relativa
  * («covers/azul.webp»), no absoluta, porque la app se publica en dos sitios con base
- * distinta: en la raíz (Vercel y el servidor de desarrollo) y en `/mesa/` (GitHub Pages,
+ * distinta: en la raíz (Vercel y el servidor de desarrollo) y en `/table-tracker/` (GitHub Pages,
  * ver `BASE_PATH` en `vite.config.ts`). El prefijo correcto lo sabe Vite en
  * `import.meta.env.BASE_URL`, y es esta función la que lo pone.
  *
@@ -16,7 +16,7 @@ export { COVERS } from './covers.generated'
 export type { Cover } from './covers.generated'
 
 /**
- * BASE_URL siempre acaba en barra ('/' o '/mesa/'), y el fichero nunca empieza por una.
+ * BASE_URL siempre acaba en barra ('/' o '/table-tracker/'), y el fichero nunca empieza por una.
  * Fuera de Vite —`scripts/seed-games.ts` importa el registro desde Node— no hay
  * `import.meta.env`, y ahí la base da igual: lo que se genere no se sirve a nadie.
  */

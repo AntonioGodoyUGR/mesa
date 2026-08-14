@@ -252,7 +252,7 @@ Pendiente de instalar **JDK 21** y **Android Studio** en esta máquina. Después
 
 ```bash
 npm i @capacitor/core @capacitor/cli @capacitor/android
-npx cap init "Table Tracker" app.mesa.marcador --web-dir=dist
+npx cap init "Table Tracker" app.tabletracker.marcador --web-dir=dist
 npm run build && npx cap add android && npx cap sync android
 npx cap open android
 ```

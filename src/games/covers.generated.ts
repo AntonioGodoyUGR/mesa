@@ -5,7 +5,7 @@
  * Portada de cada juego integrado. El fichero está en `public/covers/` y la ruta es
  * relativa a la base del sitio: úsala siempre con `coverUrl()` de `src/games/covers.ts`,
  * que le pone delante `import.meta.env.BASE_URL` (en GitHub Pages el sitio cuelga de
- * `/mesa/`, así que una ruta absoluta no valdría).
+ * `/table-tracker/`, así que una ruta absoluta no valdría).
  *
  * Los juegos que no salen aquí no tienen portada conocida y se pintan con su icono.
  *

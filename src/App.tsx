@@ -22,7 +22,7 @@ import { GamePage } from './pages/GamePage'
 import { LibraryPage } from './pages/LibraryPage'
 
 export default function App() {
-  // GitHub Pages sirve la app bajo /mesa/; el dev server y Vercel, bajo /.
+  // GitHub Pages sirve la app bajo /table-tracker/; el dev server y Vercel, bajo /.
   // BASE_URL lo resuelve Vite en tiempo de compilación.
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>

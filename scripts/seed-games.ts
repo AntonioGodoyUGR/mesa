@@ -82,7 +82,7 @@ function fieldRow(game: GameDefinition, field: ScoreField, index: number): strin
 
 /**
  * Las portadas integradas viven en `public/covers/` y su ruta depende de dónde esté
- * publicada la app: en la raíz (Vercel) o bajo `/mesa/` (GitHub Pages). Guardarla en la
+ * publicada la app: en la raíz (Vercel) o bajo `/table-tracker/` (GitHub Pages). Guardarla en la
  * base de datos ataría las filas a un despliegue concreto, así que se quita: la app ya
  * resuelve la portada por su cuenta desde `covers.generated.ts`, que viaja en el bundle.
  * En `games.image_url` solo acaban URLs absolutas, que son las de los juegos del grupo.

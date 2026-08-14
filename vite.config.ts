@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// GitHub Pages publica el sitio en un subdirectorio (/mesa/), mientras que el
+// GitHub Pages publica el sitio en un subdirectorio (/table-tracker/), mientras que el
 // servidor de desarrollo y Vercel lo sirven en la raíz. El workflow de Pages
-// exporta BASE_PATH=/mesa/; en cualquier otro sitio se queda en '/'.
+// exporta BASE_PATH=/table-tracker/; en cualquier otro sitio se queda en '/'.
 const base = process.env.BASE_PATH ?? '/'
 
 export default defineConfig({
