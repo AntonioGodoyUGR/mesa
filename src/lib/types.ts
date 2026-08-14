@@ -84,6 +84,28 @@ export interface SessionUser {
 }
 
 /**
+ * Cómo se juega a un juego en TODA la app, no solo en tu grupo.
+ *
+ * Son agregados y nada más: ni nombres, ni grupos, ni jugadores identificables.
+ * Las partidas ajenas no se pueden leer —la RLS las recorta a tu grupo—, así que
+ * esto lo cuenta una función del servidor (`game_global_stats`) que devuelve
+ * justo estos números y ningún dato de nadie.
+ */
+export interface GameGlobalStats {
+  gameSlug: string
+  matches: number
+  /** Grupos distintos que lo han jugado alguna vez. */
+  groups: number
+  players: number
+  /** Cuánta gente se sienta de media a esta mesa. */
+  averagePlayers: number | null
+  averageTotal: number | null
+  /** Récord: el total más alto, o el más bajo si gana quien menos suma. */
+  bestTotal: number | null
+  lastPlayedAt: string | null
+}
+
+/**
  * Qué relación tiene el usuario con un juego concreto:
  * `owned` lo tiene en casa, `wishlist` le gustaría tenerlo.
  * No hay tercer estado: un juego que no está en la biblioteca no tiene fila.

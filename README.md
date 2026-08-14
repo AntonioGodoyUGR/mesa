@@ -118,6 +118,21 @@ igual que Catán: partidas, historial, estadísticas y chuleta.
   quedan bloqueadas: son las claves del `jsonb` de esas partidas. La etiqueta, el emoji o los
   puntos sí se pueden cambiar.
 
+### La ficha de un juego
+
+Cada juego tiene su página en `/juegos/<slug>`: quién gana en vuestro grupo y cómo se juega en
+toda la app. Se llega desde la chuleta de reglas y desde el título de cualquier partida.
+
+- **Tus partidas** y **En vuestro grupo** salen de las partidas que ya tenéis cargadas:
+  `matchesOfGame` (`src/lib/stats.ts`) recorta la lista a ese juego y se la pasa a
+  `computePlayerStats` y `computeLeaderboard`, los mismos de tu perfil. Cero cálculo nuevo.
+- **En toda la app** cuenta las partidas de *todos* los grupos, que la RLS no deja leer. Lo
+  resuelve `game_global_stats`, una función `security definer` que devuelve **solo agregados**
+  —partidas, grupos, jugadores, medias, récord y última fecha—, nunca nombres ni identificadores.
+  Está concedida a `anon`, así que la ficha se abre sin cuenta.
+- Si la función todavía no está en la base de datos, la sección avisa y el resto de la página
+  funciona igual.
+
 ### Biblioteca personal
 
 En **tu cuenta → Tu biblioteca** (`/biblioteca`) se marca cada juego como **📦 en casa** o

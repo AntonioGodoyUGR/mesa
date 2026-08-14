@@ -694,6 +694,61 @@ begin
 end;
 $$;
 
+-- -----------------------------------------------------------------------------
+-- Estadísticas globales de un juego, para su ficha.
+--
+-- Las partidas están recortadas por RLS al grupo de cada uno, así que un `select`
+-- normal nunca vería más allá de las tuyas. Esta función es `security definer`
+-- a propósito: se salta la RLS para contar, pero devuelve ÚNICAMENTE agregados
+-- —cuántas partidas, cuántos grupos, medias— y ni un nombre, ni un id de grupo,
+-- ni uno de jugador. Es lo que permite enseñar «así se juega a esto en Mesa» sin
+-- filtrar nada de nadie.
+--
+-- La ejecuta también `anon`: la ficha de un juego se consulta sin sesión, igual
+-- que su chuleta de reglas.
+-- -----------------------------------------------------------------------------
+create or replace function public.game_global_stats(p_game_slug text)
+returns table (
+  matches bigint,
+  groups bigint,
+  players bigint,
+  average_players numeric,
+  average_total numeric,
+  best_total int,
+  last_played_at date
+)
+language sql security definer stable set search_path = public as $$
+  with played as (
+    select m.id, m.group_id, m.played_at
+    from public.matches m
+    where m.game_slug = p_game_slug
+  ),
+  entries as (
+    select mp.match_id, mp.player_id, mp.total
+    from public.match_players mp
+    join played on played.id = mp.match_id
+  ),
+  per_match as (
+    select count(*)::numeric as seats from entries group by match_id
+  )
+  select
+    (select count(*) from played),
+    (select count(distinct group_id) from played),
+    (select count(distinct player_id) from entries),
+    (select round(avg(seats), 1) from per_match),
+    (select round(avg(total), 1) from entries),
+    -- «Mejor» depende del juego: en los de menos-es-más el récord es el mínimo.
+    (select case
+       when (select winner_rule from public.games where slug = p_game_slug) = 'lowest'
+         then min(total)
+       else max(total)
+     end from entries),
+    (select max(played_at) from played);
+$$;
+
+-- Sin esto un visitante sin cuenta no podría abrir la ficha de un juego.
+grant execute on function public.game_global_stats(text) to anon, authenticated;
+
 -- =============================================================================
 -- Row Level Security — todo se recorta por pertenencia al grupo
 -- =============================================================================

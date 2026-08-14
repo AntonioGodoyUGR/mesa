@@ -45,6 +45,21 @@ export function matchesOf(
   return matches.filter((match) => participation(match, playerId))
 }
 
+/**
+ * Las partidas de un juego concreto, conservando el orden de entrada
+ * (de la más reciente a la más antigua).
+ *
+ * Pasando el resultado a `computePlayerStats` o a `computeLeaderboard` se
+ * obtienen esas mismas estadísticas acotadas a un solo juego, sin duplicar
+ * ni un cálculo.
+ */
+export function matchesOfGame(
+  matches: MatchWithPlayers[],
+  gameSlug: string,
+): MatchWithPlayers[] {
+  return matches.filter((match) => match.game_slug === gameSlug)
+}
+
 export function computePlayerStats(
   matches: MatchWithPlayers[],
   playerId: string,

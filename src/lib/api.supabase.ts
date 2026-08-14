@@ -217,6 +217,36 @@ export const supabaseApi: MesaApi = {
     return data.publicUrl
   },
 
+  async getGameStats(gameSlug) {
+    // Función `security definer`: se salta la RLS para contar las partidas de
+    // todos los grupos, pero solo devuelve agregados. Ver `supabase/schema.sql`.
+    const { data, error } = await supabase
+      .rpc('game_global_stats', { p_game_slug: gameSlug })
+      .single()
+    if (error) fail('No se han podido cargar las estadísticas del juego', error)
+
+    const row = data as {
+      matches: number | null
+      groups: number | null
+      players: number | null
+      average_players: number | null
+      average_total: number | null
+      best_total: number | null
+      last_played_at: string | null
+    }
+
+    return {
+      gameSlug,
+      matches: row.matches ?? 0,
+      groups: row.groups ?? 0,
+      players: row.players ?? 0,
+      averagePlayers: row.average_players,
+      averageTotal: row.average_total,
+      bestTotal: row.best_total,
+      lastPlayedAt: row.last_played_at,
+    }
+  },
+
   async listLibrary() {
     // Sin filtro por usuario: la RLS de `game_library` ya recorta a las filas propias.
     const { data, error } = await supabase

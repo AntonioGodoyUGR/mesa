@@ -8,7 +8,7 @@ import {
   matchesOf,
 } from '../lib/stats'
 import { MatchCard } from '../components/MatchCard'
-import { Avatar, EmptyState, Spinner } from '../components/ui'
+import { Avatar, EmptyState, Spinner, Stat } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
@@ -148,15 +148,6 @@ export function PlayerProfilePage() {
           ))
         )}
       </section>
-    </div>
-  )
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="card px-3 py-4 text-center">
-      <p className="tnum text-2xl font-black leading-none">{value}</p>
-      <p className="mt-1 text-[11px] text-[var(--color-muted)]">{label}</p>
     </div>
   )
 }

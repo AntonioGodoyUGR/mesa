@@ -3,6 +3,7 @@ import { supabaseApi } from './api.supabase'
 import { demoApi } from './api.demo'
 import type { GameDefinition } from '../games/types'
 import type {
+  GameGlobalStats,
   Group,
   GroupMember,
   LibraryEntry,
@@ -50,6 +51,12 @@ export interface MesaApi {
   /** Sube la portada ya redimensionada y devuelve su URL pública. */
   uploadGameImage(groupId: string, file: Blob): Promise<string>
 
+  /**
+   * Cómo se juega a un juego en toda la app, en agregado.
+   * No necesita sesión: la ficha de un juego se consulta como invitado.
+   */
+  getGameStats(gameSlug: string): Promise<GameGlobalStats>
+
   /** La biblioteca de la cuenta con la sesión iniciada: comprados y deseados. */
   listLibrary(): Promise<LibraryEntry[]>
   /** Marca un juego, lo mueve de sección o —con `null`— lo saca de la biblioteca. */
@@ -69,6 +76,9 @@ export const queryKeys = {
   players: (groupId: string) => ['players', groupId] as const,
   matches: (groupId: string) => ['matches', groupId] as const,
   games: (groupId: string) => ['games', groupId] as const,
+  // Las estadísticas globales son de la app entera: no dependen ni del grupo ni
+  // de la cuenta, solo del juego.
+  gameStats: (gameSlug: string) => ['game-stats', gameSlug] as const,
   // La biblioteca es de la cuenta, no del grupo: no lleva id en la clave.
   library: ['library'] as const,
 }

@@ -209,6 +209,11 @@ function resolveGame(slug: string): GameDefinition {
   return builtin
 }
 
+/** Un decimal, como el `round(…, 1)` que hace la función equivalente en Postgres. */
+function round1(value: number): number {
+  return Math.round(value * 10) / 10
+}
+
 /** Pequeño retardo para que los estados de carga se vean como en producción. */
 function delay<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), 120))
@@ -426,6 +431,43 @@ export const demoApi: MesaApi = {
       reader.readAsDataURL(file)
     })
     return dataUrl
+  },
+
+  async getGameStats(gameSlug) {
+    // La contrapartida de `game_global_stats`. Aquí no hay RLS que saltarse ni
+    // más grupos que el de la demostración, pero los números se calculan igual
+    // para que la ficha se vea completa sin backend.
+    const matches = db().matches.filter((match) => match.game_slug === gameSlug)
+    const ids = new Set(matches.map((match) => match.id))
+    const entries = db().matchPlayers.filter((entry) => ids.has(entry.match_id))
+
+    const lowest = db().customGames.find((game) => game.slug === gameSlug)?.winnerRule
+      ?? getGame(gameSlug)?.winnerRule
+    const totals = entries.map((entry) => entry.total)
+
+    return delay({
+      gameSlug,
+      matches: matches.length,
+      groups: new Set(matches.map((match) => match.group_id)).size,
+      players: new Set(entries.map((entry) => entry.player_id)).size,
+      averagePlayers: matches.length === 0 ? null : round1(entries.length / matches.length),
+      averageTotal:
+        totals.length === 0
+          ? null
+          : round1(totals.reduce((sum, value) => sum + value, 0) / totals.length),
+      bestTotal:
+        totals.length === 0
+          ? null
+          : lowest === 'lowest'
+            ? Math.min(...totals)
+            : Math.max(...totals),
+      lastPlayedAt:
+        matches.length === 0
+          ? null
+          : matches.reduce((latest, match) =>
+              match.played_at > latest.played_at ? match : latest,
+            ).played_at,
+    })
   },
 
   async listLibrary() {

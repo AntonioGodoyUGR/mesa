@@ -18,6 +18,7 @@ import { PlayerProfilePage } from './pages/PlayerProfilePage'
 import { RulesIndexPage } from './pages/RulesIndexPage'
 import { RuleSheetPage } from './pages/RuleSheetPage'
 import { CustomGamePage } from './pages/CustomGamePage'
+import { GamePage } from './pages/GamePage'
 import { LibraryPage } from './pages/LibraryPage'
 
 export default function App() {
@@ -34,6 +35,10 @@ export default function App() {
                   {/* Las reglas se consultan en la mesa, con o sin sesión iniciada. */}
                   <Route path="reglas" element={<RulesIndexPage />} />
                   <Route path="reglas/:slug" element={<RuleSheetPage />} />
+                  {/* La ficha de un juego también: enseña las estadísticas globales
+                      a quien todavía no tiene cuenta. `juegos/nuevo` gana igualmente,
+                      porque un tramo fijo pesa más que uno dinámico. */}
+                  <Route path="juegos/:slug" element={<GamePage />} />
                   <Route path="login" element={<LoginPage />} />
 
                   <Route element={<RequireAuth />}>

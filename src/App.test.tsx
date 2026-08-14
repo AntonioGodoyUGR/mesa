@@ -137,4 +137,23 @@ describe('App', () => {
     expect(await screen.findByText('Preparación')).toBeVisible()
     expect(screen.getByText('Puntuación')).toBeVisible()
   })
+
+  it('la ficha de un juego reúne tus estadísticas y las de toda la app', async () => {
+    renderApp()
+
+    fireEvent.click(await screen.findByRole('link', { name: /Reglas/ }))
+    fireEvent.click(await screen.findByText('Carcassonne'))
+    fireEvent.click(await screen.findByRole('link', { name: /Estadísticas de Carcassonne/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Tus partidas' })).toBeVisible()
+
+    // La demo trae una partida de Carcassonne, que perdió «Tú» por 74 a 91.
+    const global = (await screen.findByRole('heading', { name: 'En toda la app' }))
+      .parentElement!
+    expect(await within(global).findByText('Grupos')).toBeVisible()
+    expect(within(global).getByText('91')).toBeVisible()
+
+    // Y desde la ficha se vuelve a la chuleta.
+    expect(screen.getByRole('link', { name: /Chuleta de reglas/ })).toBeVisible()
+  })
 })

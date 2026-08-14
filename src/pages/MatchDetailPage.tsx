@@ -69,7 +69,13 @@ export function MatchDetailPage() {
         )}
         <div className="min-w-0 flex-1">
           <h1 className="game-ink display truncate text-xl">
-            {game?.name ?? match.game_slug}
+            {game ? (
+              // Desde una partida se llega a la ficha del juego, que es donde
+              // están el resto de partidas y las estadísticas.
+              <Link to={`/juegos/${game.slug}`}>{game.name}</Link>
+            ) : (
+              match.game_slug
+            )}
           </h1>
           <p className="text-sm text-[var(--color-muted)]">
             {formatDate(match.played_at)} · {entries.length} jugadores

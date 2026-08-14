@@ -74,6 +74,10 @@ export function RuleSheetPage() {
 
       <RuleSheetView game={game} />
 
+      <Link to={`/juegos/${game.slug}`} className="btn btn-ghost">
+        📊 Estadísticas de {game.name}
+      </Link>
+
       {game.groupId && (
         <Link to={`/juegos/${game.slug}/editar`} className="btn btn-ghost">
           Editar este juego
