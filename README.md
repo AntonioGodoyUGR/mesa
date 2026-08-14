@@ -171,6 +171,10 @@ un juego que no tienes.
   tus compañeros de grupo ven lo que tienes.
 - Un juego solo puede estar en un estado —lo comprado deja de estar deseado— y volver a pulsar
   el botón que ya estaba marcado lo saca de la biblioteca.
+- **Tu ficha de jugador** (`/jugadores/<tu id>`, el avatar de la cabecera) enseña los dos
+  estantes con sus juegos: `LibraryShelf` pinta los últimos seis de cada uno y deja el resto
+  para `/biblioteca`, que es donde se marca y se busca. Solo sale en tu ficha: la de otro
+  jugador —o la de un invitado sin cuenta— no tiene biblioteca que enseñar.
 
 ### Entrar solo cuando hace falta
 

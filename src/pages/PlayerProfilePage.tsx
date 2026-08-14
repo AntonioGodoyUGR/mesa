@@ -11,9 +11,11 @@ import {
 import { MatchCard } from '../components/MatchCard'
 import { Avatar } from '../components/Avatar'
 import { AvatarEditor } from '../components/AvatarEditor'
+import { LibraryShelf } from '../components/LibraryShelf'
 import { EmptyState, ErrorNote, Spinner, Stat } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
+import { useLibrary } from '../context/LibraryContext'
 import { api, queryKeys } from '../lib/api'
 import { hasAvatar, parseAvatar, serializeAvatar, type AvatarLook } from '../lib/avatar'
 
@@ -21,7 +23,8 @@ export function PlayerProfilePage() {
   const { id } = useParams()
   const queryClient = useQueryClient()
   const { group, players, me } = useGroup()
-  const { getGame } = useGames()
+  const { games, getGame } = useGames()
+  const { entries } = useLibrary()
 
   // Mientras se compone, el muñeco vive aquí; al guardar se convierte en la cadena
   // que va a `avatar_url` y el borrador desaparece.
@@ -61,6 +64,9 @@ export function PlayerProfilePage() {
   const stats = computePlayerStats(matches, player.id, getGame)
   const own = matchesOf(matches, player.id)
   const head = computeHeadToHead(matches, player.id, me?.id ?? null)
+  // La biblioteca es de la cuenta y solo la ve su dueño: en el perfil de otro
+  // jugador —o en el de un invitado sin cuenta— no hay nada que enseñar.
+  const isMe = !!me && me.id === player.id
 
   return (
     <div className="flex flex-col gap-5">
@@ -165,6 +171,8 @@ export function PlayerProfilePage() {
           )}
         </section>
       )}
+
+      {isMe && <LibraryShelf games={games} entries={entries} />}
 
       {stats.byGame.length > 0 && (
         <section className="flex flex-col gap-2">

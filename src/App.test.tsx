@@ -139,6 +139,26 @@ describe('App', () => {
     expect(screen.getByText('Catán')).toBeVisible()
   })
 
+  it('tu ficha enseña tu biblioteca, y la de otro jugador no', async () => {
+    renderApp()
+
+    fireEvent.click(await screen.findByRole('link', { name: 'Tu ficha y tu avatar' }))
+
+    // La demo trae Catán comprado y Wingspan deseado, cada uno en su estante.
+    const shelf = within(
+      (await screen.findByRole('heading', { name: 'Tu biblioteca' })).closest('section')!,
+    )
+    expect(shelf.getByText('Catán')).toBeVisible()
+    expect(shelf.getByText('Wingspan')).toBeVisible()
+
+    // Es privada: en el perfil de otro no aparece.
+    fireEvent.click(screen.getByRole('link', { name: /Jugadores/ }))
+    fireEvent.click(await screen.findByText('Ana'))
+
+    expect(await screen.findByRole('heading', { name: 'Sus partidas' })).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Tu biblioteca' })).toBeNull()
+  })
+
   it('las chuletas de reglas son accesibles desde la barra inferior', async () => {
     renderApp()
 

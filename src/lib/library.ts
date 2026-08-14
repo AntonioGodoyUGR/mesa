@@ -17,6 +17,8 @@ export interface LibraryStatusInfo {
   icon: string
   /** Aclaración bajo el título y en el `title` del botón. */
   hint: string
+  /** Qué se dice cuando esa sección está vacía, en la biblioteca y en el perfil. */
+  empty: string
 }
 
 export const LIBRARY_STATUSES: LibraryStatusInfo[] = [
@@ -26,6 +28,7 @@ export const LIBRARY_STATUSES: LibraryStatusInfo[] = [
     title: 'En casa',
     icon: '📦',
     hint: 'Comprado: la caja está en tu estantería',
+    empty: 'Todavía no has marcado ningún juego como comprado.',
   },
   {
     id: 'wishlist',
@@ -33,6 +36,7 @@ export const LIBRARY_STATUSES: LibraryStatusInfo[] = [
     title: 'Lista de deseos',
     icon: '⭐',
     hint: 'Deseado: te lo apuntas para el próximo cumpleaños',
+    empty: 'Todavía no has apuntado ningún juego en la lista de deseos.',
   },
 ]
 

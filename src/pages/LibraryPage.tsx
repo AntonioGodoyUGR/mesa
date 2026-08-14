@@ -15,7 +15,7 @@ import { ShowMore, usePaged } from '../components/ShowMore'
 import { ErrorNote, PageHeader, Spinner } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useLibrary } from '../context/LibraryContext'
-import { LIBRARY_STATUSES, libraryGames } from '../lib/library'
+import { LIBRARY_STATUSES, libraryGames, libraryStatusInfo } from '../lib/library'
 import type { GameDefinition } from '../games/types'
 import type { LibraryStatus } from '../lib/types'
 
@@ -199,16 +199,15 @@ function EmptyLibrary({
     )
   }
 
+  // En «Todos» el catálogo nunca está vacío, así que el estante que falta es el otro.
+  const info = libraryStatusInfo(tab === 'all' ? 'owned' : tab)
+
   return (
     <div className="card flex flex-col items-center gap-3 px-6 py-10 text-center">
       <span className="text-4xl" aria-hidden="true">
-        {tab === 'wishlist' ? '⭐' : '📦'}
+        {info.icon}
       </span>
-      <p className="text-sm text-[var(--color-muted)]">
-        {tab === 'wishlist'
-          ? 'Todavía no has apuntado ningún juego en la lista de deseos.'
-          : 'Todavía no has marcado ningún juego como comprado.'}
-      </p>
+      <p className="text-sm text-[var(--color-muted)]">{info.empty}</p>
       <button type="button" className="btn btn-primary" onClick={onSeeAll}>
         Ver todos los juegos
       </button>
