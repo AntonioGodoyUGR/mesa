@@ -32,12 +32,15 @@ export default function App() {
             <LibraryProvider>
               <Routes>
                 <Route element={<Layout />}>
-                  {/* Las reglas se consultan en la mesa, con o sin sesión iniciada. */}
+                  {/* Consultar es público: el catálogo, las reglas y la ficha de
+                      cada juego se leen sin cuenta. La sesión hace falta cuando
+                      empiezan a existir datos tuyos —tu perfil, tu grupo, tus
+                      juegos—, no antes. */}
+                  <Route index element={<HomePage />} />
                   <Route path="reglas" element={<RulesIndexPage />} />
                   <Route path="reglas/:slug" element={<RuleSheetPage />} />
-                  {/* La ficha de un juego también: enseña las estadísticas globales
-                      a quien todavía no tiene cuenta. `juegos/nuevo` gana igualmente,
-                      porque un tramo fijo pesa más que uno dinámico. */}
+                  {/* `juegos/nuevo` gana a `juegos/:slug` aunque se declare
+                      después: un tramo fijo pesa más que uno dinámico. */}
                   <Route path="juegos/:slug" element={<GamePage />} />
                   <Route path="login" element={<LoginPage />} />
 
@@ -47,7 +50,6 @@ export default function App() {
                     <Route path="biblioteca" element={<LibraryPage />} />
 
                     <Route element={<RequireGroup />}>
-                      <Route index element={<HomePage />} />
                       <Route path="grupo" element={<GroupPage />} />
                       <Route path="nueva/:slug" element={<NewMatchPage />} />
                       <Route path="partidas" element={<MatchesPage />} />

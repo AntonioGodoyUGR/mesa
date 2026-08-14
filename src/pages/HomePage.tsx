@@ -7,6 +7,7 @@ import { GameTile } from '../components/GameTile'
 import { MatchCard } from '../components/MatchCard'
 import { ShowMore, usePaged } from '../components/ShowMore'
 import { Spinner } from '../components/ui'
+import { useAuth } from '../context/AuthContext'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
@@ -15,9 +16,14 @@ import type { GameDefinition } from '../games/types'
 /**
  * Pantalla principal: la rejilla de juegos ES el botón de «nueva partida».
  * Debajo, las últimas partidas del grupo.
+ *
+ * También es la puerta de entrada de quien llega sin cuenta. Entonces la misma
+ * rejilla lleva a la ficha de cada juego en vez de al marcador —no hay grupo con
+ * quien jugar todavía— y las secciones que hablan del grupo no se pintan.
  */
 export function HomePage() {
-  const { group } = useGroup()
+  const { group, loading: groupLoading } = useGroup()
+  const { user, loading: authLoading } = useAuth()
   const { games, builtin, custom } = useGames()
   const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
 
@@ -57,13 +63,25 @@ export function HomePage() {
   const results = usePaged(found)
   const catalogue = usePaged(rest)
 
+  // Media portada depende de si hay grupo, empezando por a dónde lleva cada
+  // juego. Mientras no se sepa no se pinta: es la espera que antes hacían los
+  // guardianes de la ruta, no una nueva.
+  if (authLoading || groupLoading) return <Spinner label="Comprobando sesión…" />
+
+  // Con grupo, tocar un juego abre el marcador; sin él, su ficha, que es lo
+  // único que se puede hacer con un juego sin nadie con quien jugarlo.
+  const tileLink = (game: GameDefinition) =>
+    group ? `/nueva/${game.slug}` : `/juegos/${game.slug}`
+
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-3">
         <div>
-          <h1 className="display text-xl">Nueva partida</h1>
+          <h1 className="display text-xl">{group ? 'Nueva partida' : 'Juegos'}</h1>
           <p className="mt-0.5 text-sm text-[var(--color-muted)]">
-            Elige el juego para apuntar el resultado.
+            {group
+              ? 'Elige el juego para apuntar el resultado.'
+              : 'Reglas y estadísticas de cada juego, sin cuenta.'}
           </p>
         </div>
 
@@ -78,16 +96,17 @@ export function HomePage() {
         {searching ? (
           found.length > 0 ? (
             <>
-              <GameGrid games={results.shown} />
+              <GameGrid games={results.shown} to={tileLink} />
               <ShowMore hidden={results.hidden} onClick={results.showMore} />
             </>
           ) : (
             <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
               Ningún juego cumple lo que buscas.{' '}
-              <Link to="/juegos/nuevo" className="font-medium text-[var(--color-brand)]">
-                Créalo tú
-              </Link>
-              .
+              {group && (
+                <Link to="/juegos/nuevo" className="font-medium text-[var(--color-brand)]">
+                  Créalo tú
+                </Link>
+              )}
             </p>
           )
         ) : (
@@ -95,69 +114,98 @@ export function HomePage() {
             {favourites.length > 0 && (
               <>
                 <h2 className="display text-base">Los que más jugáis</h2>
-                <GameGrid games={favourites} />
+                <GameGrid games={favourites} to={tileLink} />
               </>
             )}
 
-            <h2 className="display text-base">Vuestros juegos</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {ours.map((game) => (
-                <GameTile key={game.slug} game={game} to={`/nueva/${game.slug}`} />
-              ))}
-              <Link
-                to="/juegos/nuevo"
-                className="card flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
-              >
-                <span className="text-3xl leading-none" aria-hidden="true">
-                  ＋
-                </span>
-                <span className="text-sm font-semibold">Crear juego</span>
-                <span className="text-[11px] text-[var(--color-muted)]">
-                  Con vuestras reglas
-                </span>
-              </Link>
-            </div>
+            {/* Crear un juego es de un grupo: sin él no habría dónde guardarlo. */}
+            {group && (
+              <>
+                <h2 className="display text-base">Vuestros juegos</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {ours.map((game) => (
+                    <GameTile key={game.slug} game={game} to={tileLink(game)} />
+                  ))}
+                  <Link
+                    to="/juegos/nuevo"
+                    className="card flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+                  >
+                    <span className="text-3xl leading-none" aria-hidden="true">
+                      ＋
+                    </span>
+                    <span className="text-sm font-semibold">Crear juego</span>
+                    <span className="text-[11px] text-[var(--color-muted)]">
+                      Con vuestras reglas
+                    </span>
+                  </Link>
+                </div>
+              </>
+            )}
 
             <h2 className="display text-base">
-              {favourites.length > 0 ? 'Del catálogo' : 'Todos los juegos'}
+              {group ? 'Del catálogo' : 'Todos los juegos'}
             </h2>
-            <GameGrid games={catalogue.shown} />
+            <GameGrid games={catalogue.shown} to={tileLink} />
             <ShowMore hidden={catalogue.hidden} onClick={catalogue.showMore} />
           </>
         )}
       </section>
 
-      <section>
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="display text-base">Últimas partidas</h2>
-          <Link to="/partidas" className="text-sm font-medium text-[var(--color-brand)]">
-            Ver todas
+      {group ? (
+        <section>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="display text-base">Últimas partidas</h2>
+            <Link
+              to="/partidas"
+              className="text-sm font-medium text-[var(--color-brand)]"
+            >
+              Ver todas
+            </Link>
+          </div>
+
+          <div className="mt-3 flex flex-col gap-2">
+            {matchesQuery.isLoading && <Spinner label="Cargando partidas…" />}
+
+            {!matchesQuery.isLoading && recent.length === 0 && (
+              <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
+                Todavía no hay ninguna partida apuntada. Toca un juego para empezar.
+              </p>
+            )}
+
+            {recent.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="card flex flex-col items-center gap-3 px-4 py-6 text-center">
+          <h2 className="display text-base">Apuntad vuestras partidas</h2>
+          <p className="text-sm text-[var(--color-muted)]">
+            Con un grupo, cada juego se convierte en un marcador: resultados, récords y
+            quién gana más.
+          </p>
+          {/* Sin sesión, el guardián de `grupo/nuevo` pasa antes por el login y
+              devuelve aquí; no hace falta bifurcar el destino. */}
+          <Link to="/grupo/nuevo" className="btn btn-primary">
+            {user ? 'Crear o unirse a un grupo' : 'Crear cuenta'}
           </Link>
-        </div>
-
-        <div className="mt-3 flex flex-col gap-2">
-          {matchesQuery.isLoading && <Spinner label="Cargando partidas…" />}
-
-          {!matchesQuery.isLoading && recent.length === 0 && (
-            <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
-              Todavía no hay ninguna partida apuntada. Toca un juego para empezar.
-            </p>
-          )}
-
-          {recent.map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))}
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }
 
-function GameGrid({ games }: { games: GameDefinition[] }) {
+function GameGrid({
+  games,
+  to,
+}: {
+  games: GameDefinition[]
+  to: (game: GameDefinition) => string
+}) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {games.map((game) => (
-        <GameTile key={game.slug} game={game} to={`/nueva/${game.slug}`} />
+        <GameTile key={game.slug} game={game} to={to(game)} />
       ))}
     </div>
   )

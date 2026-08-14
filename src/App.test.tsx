@@ -18,14 +18,24 @@ function renderApp() {
   )
 }
 
+/**
+ * La rejilla de juegos y las últimas partidas nombran los mismos juegos, así que
+ * hay que decir en cuál de las dos se busca.
+ */
+async function gameGrid() {
+  const heading = await screen.findByRole('heading', { name: /Nueva partida|Juegos/ })
+  return within(heading.closest('section')!)
+}
+
 describe('App', () => {
   it('la pantalla principal ofrece los juegos y las últimas partidas', async () => {
     renderApp()
 
     expect(await screen.findByRole('heading', { name: 'Nueva partida' })).toBeVisible()
-    expect(screen.getByText('Catán')).toBeVisible()
-    expect(screen.getByText('Carcassonne')).toBeVisible()
-    expect(screen.getByText('Camel Up')).toBeVisible()
+    const games = await gameGrid()
+    expect(games.getByText('Catán')).toBeVisible()
+    expect(games.getByText('Carcassonne')).toBeVisible()
+    expect(games.getByText('Camel Up')).toBeVisible()
 
     // Las partidas sembradas por la demo aparecen en «Últimas partidas».
     await waitFor(() => expect(screen.getAllByText(/Ana/).length).toBeGreaterThan(0))
@@ -42,9 +52,10 @@ describe('App', () => {
     fireEvent.click(within(players).getByRole('button', { name: '3' }))
 
     // Camel Up dura 20–30 min y admite de 3 a 8; Terraforming Mars es de otra tarde.
-    expect(await screen.findByText('Camel Up')).toBeVisible()
-    expect(screen.queryByText('Terraforming Mars')).toBeNull()
-    expect(screen.queryByText('Patchwork')).toBeNull() // corto, pero solo para dos
+    const games = await gameGrid()
+    expect(games.getByText('Camel Up')).toBeVisible()
+    expect(games.queryByText('Terraforming Mars')).toBeNull()
+    expect(games.queryByText('Patchwork')).toBeNull() // corto, pero solo para dos
 
     fireEvent.click(screen.getByRole('button', { name: 'Quitar filtros' }))
     expect(await screen.findByText('Terraforming Mars')).toBeVisible()
@@ -53,7 +64,7 @@ describe('App', () => {
   it('permite elegir jugadores y puntuar una partida de Catán', async () => {
     renderApp()
 
-    fireEvent.click(await screen.findByText('Catán'))
+    fireEvent.click((await gameGrid()).getByText('Catán'))
 
     // Paso 1: los jugadores del grupo.
     const button = await screen.findByRole('button', { name: 'Apuntar puntuaciones' })

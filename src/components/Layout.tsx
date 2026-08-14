@@ -6,11 +6,23 @@ import { isDemoMode } from '../lib/api'
 import { getStoredTheme, resolveTheme, setTheme } from '../lib/theme'
 import { Avatar } from './ui'
 
-const TABS = [
+interface Tab {
+  to: string
+  label: string
+  icon: string
+  end: boolean
+  /** Solo tiene sentido con un grupo detrás: partidas y jugadores son suyos. */
+  needsGroup?: boolean
+  /** Lo contrario: la invitación a empezar, que sobra en cuanto hay grupo. */
+  guestOnly?: boolean
+}
+
+const TABS: Tab[] = [
   { to: '/', label: 'Inicio', icon: '🎲', end: true },
-  { to: '/partidas', label: 'Partidas', icon: '📋', end: false },
-  { to: '/jugadores', label: 'Jugadores', icon: '👥', end: false },
+  { to: '/partidas', label: 'Partidas', icon: '📋', end: false, needsGroup: true },
+  { to: '/jugadores', label: 'Jugadores', icon: '👥', end: false, needsGroup: true },
   { to: '/reglas', label: 'Reglas', icon: '📖', end: false },
+  { to: '/grupo/nuevo', label: 'Empezar', icon: '✨', end: false, guestOnly: true },
 ]
 
 function ThemeToggle() {
@@ -48,6 +60,12 @@ export function Layout() {
   const { user } = useAuth()
   const { group } = useGroup()
   const location = useLocation()
+
+  // Una pestaña que lleva a una pantalla vetada es una promesa incumplida: la
+  // barra enseña solo lo que se puede abrir desde donde está el visitante.
+  const tabs = TABS.filter((tab) => (tab.needsGroup ? !!group : true)).filter((tab) =>
+    tab.guestOnly ? !group : true,
+  )
 
   // Al cambiar de pantalla se vuelve arriba: sin esto, en móvil se entra a una
   // ficha por la mitad del scroll anterior.
@@ -96,7 +114,7 @@ export function Layout() {
 
       <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t-2 border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="mx-auto flex w-full max-w-3xl">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <NavLink
               key={tab.to}
               to={tab.to}

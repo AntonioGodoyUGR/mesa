@@ -148,6 +148,20 @@ un juego que no tienes.
 - Un juego solo puede estar en un estado —lo comprado deja de estar deseado— y volver a pulsar
   el botón que ya estaba marcado lo saca de la biblioteca.
 
+### Entrar solo cuando hace falta
+
+Consultar no pide cuenta. Sin sesión se ven la portada con el catálogo entero, las chuletas
+de reglas y la ficha de cada juego con sus estadísticas globales; la misma rejilla que para
+un miembro abre el marcador lleva entonces a la ficha del juego, que es lo único que se
+puede hacer sin nadie con quien jugar.
+
+La sesión se pide donde empiezan a existir datos tuyos: **tu grupo** (`/grupo`,
+`/grupo/nuevo`), **tu biblioteca**, **crear o editar un juego** y todo lo que cuelga de un
+grupo —apuntar una partida, el historial y los jugadores—. Lo resuelven los mismos dos
+guardianes de siempre, `RequireAuth` y `RequireGroup` (`src/App.tsx`); lo que cambió es qué
+rutas quedan fuera de ellos. La barra de abajo esconde las pestañas que no se podrían abrir
+y ofrece **✨ Empezar** en su lugar.
+
 ### Jugadores sin cuenta
 
 Los `players` de un grupo son independientes de las cuentas: un invitado tiene su ficha, su
