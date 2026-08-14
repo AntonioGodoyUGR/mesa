@@ -5,6 +5,7 @@ import { useGroup } from '../context/GroupContext'
 import { isDemoMode } from '../lib/api'
 import { getStoredTheme, resolveTheme, setTheme } from '../lib/theme'
 import { Avatar } from './Avatar'
+import { Logo } from './Logo'
 
 interface Tab {
   to: string
@@ -79,12 +80,8 @@ export function Layout() {
 
       <header className="safe-top sticky top-0 z-20 border-b-2 border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-          <Link
-            to="/"
-            className="display flex items-center gap-2 text-lg text-[var(--color-brand)]"
-          >
-            <span aria-hidden="true">🎯</span>
-            <span>Mesa</span>
+          <Link to="/" className="shrink-0 text-[var(--color-brand)]">
+            <Logo className="text-[0.95rem] sm:text-lg" />
           </Link>
 
           {group && (

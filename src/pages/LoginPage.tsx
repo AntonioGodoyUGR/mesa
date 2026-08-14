@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { isDemoMode } from '../lib/api'
+import { Logo } from '../components/Logo'
 import { ErrorNote, Spinner } from '../components/ui'
 
 export function LoginPage() {
@@ -41,10 +42,9 @@ export function LoginPage() {
   return (
     <div className="mx-auto flex max-w-sm flex-col gap-5 pt-6">
       <div className="text-center">
-        <span className="text-4xl" aria-hidden="true">
-          🎯
-        </span>
-        <h1 className="display mt-2 text-2xl">Mesa</h1>
+        <h1 className="text-[var(--color-brand)]">
+          <Logo stacked className="text-4xl" />
+        </h1>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
           Los resultados de vuestras partidas, en un sitio.
         </p>

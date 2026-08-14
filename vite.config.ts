@@ -17,8 +17,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Mesa — Marcador de juegos de mesa',
-        short_name: 'Mesa',
+        name: 'Table Tracker — Marcador de juegos de mesa',
+        short_name: 'Table Tracker',
         description:
           'Registra los resultados de tus partidas, consulta el histórico con cada jugador y ten las reglas siempre a mano.',
         theme_color: '#1461d1',
