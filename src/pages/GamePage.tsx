@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { GameCover } from '../components/GameCover'
+import { GameTools } from '../components/GameTools'
 import { LibraryToggle } from '../components/LibraryToggle'
 import { MatchCard } from '../components/MatchCard'
 import { EmptyState, ErrorNote, Spinner, Stat } from '../components/ui'
@@ -128,6 +129,10 @@ export function GamePage() {
           />
         </section>
       )}
+
+      {/* Los accesorios del juego son de lo poco que se puede usar aquí sin haber
+          jugado nada, así que van antes que cualquier estadística. */}
+      <GameTools game={game} />
 
       <section className="flex flex-col gap-2">
         <h2 className="display text-base">Tus partidas</h2>

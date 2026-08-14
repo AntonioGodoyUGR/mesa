@@ -65,6 +65,9 @@ export const camelUp: GameDefinition = {
     },
   ],
 
+  // La pirámide suelta un dado de tres caras cada vez.
+  tools: [{ kind: 'dice', count: 1, faces: 3, label: 'Dado de la pirámide' }],
+
   rules: {
     players: '3–8 jugadores',
     duration: '20–30 min',

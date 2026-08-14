@@ -71,6 +71,34 @@ export interface RuleSheet {
 }
 
 /**
+ * Accesorios de mesa: lo que hace falta para jugar y no es la hoja de puntuación.
+ *
+ * La app no lleva la partida, así que esto no simula nada: sustituye al dado que se
+ * ha perdido y al reloj de arena que nadie encuentra. Un juego declara los suyos y
+ * `GameTools` los pinta; ningún componente sabe a qué juego pertenecen.
+ */
+export interface DiceTool {
+  kind: 'dice'
+  /** Cuántos se tiran a la vez (Monopoly y Catán, dos; el parchís, uno). */
+  count: number
+  /** Caras de cada dado. */
+  faces: number
+  /** Cómo se llaman en el juego, si tienen nombre propio. */
+  label?: string
+}
+
+export interface TimerTool {
+  kind: 'timer'
+  /** Cuenta atrás, en segundos. */
+  seconds: number
+  label?: string
+}
+
+export type GameTool = DiceTool | TimerTool
+
+export type GameToolKind = GameTool['kind']
+
+/**
  * Cuánto cuesta ponerse a jugar, para el buscador.
  * - `easy`: se explica en cinco minutos (Uno, Dixit, parchís).
  * - `medium`: hay que pensar, pero se pilla jugando (Catán, Azul, 7 Wonders).
@@ -129,6 +157,8 @@ export interface GameDefinition {
   /** Puntuación objetivo, si el juego la tiene (Catán = 10). */
   targetScore?: number
   fields: ScoreField[]
+  /** Dados, temporizadores… lo que el juego necesita en la mesa. */
+  tools?: GameTool[]
   /** Chuleta de reglas. Opcional: un juego creado por un usuario puede no tenerla. */
   rules?: RuleSheet
   /** Portada del juego. Si falta se pinta el `icon` sobre el color del tema. */

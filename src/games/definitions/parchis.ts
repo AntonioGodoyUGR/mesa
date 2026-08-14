@@ -52,6 +52,8 @@ export const parchis: GameDefinition = {
     },
   ],
 
+  tools: [{ kind: 'dice', count: 1, faces: 6 }],
+
   rules: {
     players: '2–4 jugadores',
     duration: '30–60 min',

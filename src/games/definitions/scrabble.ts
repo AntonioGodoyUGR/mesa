@@ -50,6 +50,8 @@ export const scrabble: GameDefinition = {
     },
   ],
 
+  tools: [{ kind: 'timer', seconds: 120, label: 'Reloj de turno' }],
+
   rules: {
     players: '2–4 jugadores',
     duration: '45–90 min',

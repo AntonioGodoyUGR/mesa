@@ -133,6 +133,30 @@ toda la app. Se llega desde la chuleta de reglas y desde el título de cualquier
 - Si la función todavía no está en la base de datos, la sección avisa y el resto de la página
   funciona igual.
 
+### Dados y temporizadores
+
+Mesa no lleva la partida, pero sí sustituye al dado que se ha perdido y al reloj de arena
+que nadie encuentra. Un juego declara sus accesorios en `tools`, dentro de su propia
+`GameDefinition`:
+
+```ts
+tools: [{ kind: 'dice', count: 2, faces: 6, label: 'Dados de producción' }]
+tools: [{ kind: 'timer', seconds: 60, label: 'Reloj de turno' }]
+```
+
+- `GameTools` (`src/components/GameTools.tsx`) los pinta bajo el título **En la mesa**, en
+  la ficha del juego y al apuntar las puntuaciones. Como todo lo demás, **no sabe de ningún
+  juego**: pinta lo que haya declarado, y si no hay nada no ocupa sitio.
+- La lógica está aparte, en `src/games/tools.ts`: la tirada recibe la fuente de azar por
+  parámetro (`rollDice(tool, random)`) para poder fijarla en las pruebas, y ahí viven
+  también el formato del reloj y los límites de lo que se puede declarar.
+- La cuenta atrás guarda **cuándo termina**, no cuánto queda: restar un segundo por tick se
+  desfasa en cuanto la pestaña pasa a segundo plano. Al llegar a cero vibra el móvil, si el
+  navegador deja.
+- El **creador de juegos** tiene el mismo apartado: hasta cuatro accesorios, con su vista
+  previa funcionando dentro del propio formulario. Van en el `jsonb` de la definición, así
+  que no hizo falta ni una columna nueva.
+
 ### Biblioteca personal
 
 En **tu cuenta → Tu biblioteca** (`/biblioteca`) se marca cada juego como **📦 en casa** o

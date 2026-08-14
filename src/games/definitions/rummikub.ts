@@ -52,6 +52,9 @@ export const rummikub: GameDefinition = {
     },
   ],
 
+  // El límite de tiempo por turno que trae el juego en la caja.
+  tools: [{ kind: 'timer', seconds: 60, label: 'Reloj de turno' }],
+
   rules: {
     players: '2–4 jugadores',
     duration: '45–60 min',

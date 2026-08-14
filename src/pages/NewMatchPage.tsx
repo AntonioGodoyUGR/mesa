@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { applyUniqueField, emptyScores, validateScores } from '../games/registry'
 import type { ScoreValues } from '../games/types'
 import { GameCover } from '../components/GameCover'
+import { GameTools } from '../components/GameTools'
 import { PlayerPicker } from '../components/PlayerPicker'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { ErrorNote, Spinner } from '../components/ui'
@@ -187,6 +188,10 @@ export function NewMatchPage() {
 
       {step === 2 && (
         <>
+          {/* Los dados y el reloj, antes que la hoja: se usan mientras se juega,
+              y las puntuaciones se apuntan al final. */}
+          <GameTools game={game} />
+
           <ScoreSheet
             game={game}
             rows={rows}

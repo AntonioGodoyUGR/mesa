@@ -7,6 +7,7 @@
  * ni de React ni de la red: generar el slug, validar lo que ha compuesto el usuario y
  * traducir entre el formulario y la definición.
  */
+import { normalizeTools, validateTools } from './tools'
 import type { GameDefinition, RuleSheet, ScoreField, ScoreFieldType } from './types'
 
 /**
@@ -186,6 +187,8 @@ export function validateDefinition(game: GameDefinition): string[] {
     }
   })
 
+  problems.push(...validateTools(game.tools))
+
   const totals = game.fields.filter((field) => field.isTotal)
   if (game.totalMode === 'explicit' && totals.length !== 1) {
     problems.push(
@@ -296,9 +299,11 @@ export function normalizeDefinition(game: GameDefinition): GameDefinition {
       min: field.type === 'toggle' ? undefined : field.min,
       max: field.type === 'toggle' ? undefined : field.max,
     })),
+    tools: normalizeTools(game.tools),
     rules: game.rules ? cleanRules(game.rules) : undefined,
   }
 
+  if (!normalized.tools) delete normalized.tools
   if (!normalized.rules) delete normalized.rules
   if (!normalized.imageUrl) delete normalized.imageUrl
   if (!normalized.playTime) delete normalized.playTime

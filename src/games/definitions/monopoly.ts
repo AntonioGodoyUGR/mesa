@@ -65,6 +65,8 @@ export const monopoly: GameDefinition = {
     },
   ],
 
+  tools: [{ kind: 'dice', count: 2, faces: 6 }],
+
   rules: {
     players: '2–8 jugadores',
     duration: '90–180 min',

@@ -19,7 +19,25 @@ import {
 } from '../games/custom'
 import { applyUniqueField, emptyScores } from '../games/registry'
 import { DIFFICULTY_OPTIONS } from '../games/filters'
-import type { GameDefinition, PlayTime, RuleSheet, ScoreValues } from '../games/types'
+import {
+  MAX_DICE,
+  MAX_DICE_FACES,
+  MAX_TIMER_SECONDS,
+  MAX_TOOLS,
+  MIN_TIMER_SECONDS,
+  TOOL_KIND_ICONS,
+  TOOL_KIND_LABELS,
+  blankTool,
+  formatSeconds,
+} from '../games/tools'
+import type {
+  GameDefinition,
+  GameTool,
+  PlayTime,
+  RuleSheet,
+  ScoreValues,
+} from '../games/types'
+import { GameTools } from '../components/GameTools'
 import { ScoreFieldEditor } from '../components/ScoreFieldEditor'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { RuleSheetView } from '../components/RuleSheetView'
@@ -173,6 +191,17 @@ export function CustomGamePage() {
     const fields = [...game!.fields]
     fields[index] = next
     update({ fields })
+  }
+
+  /** Los accesorios se guardan como lista; sin ninguno, el juego se guarda sin `tools`. */
+  function updateTools(tools: GameTool[]) {
+    update({ tools: tools.length > 0 ? tools : undefined })
+  }
+
+  function updateTool(index: number, next: GameTool) {
+    const tools = [...(game!.tools ?? [])]
+    tools[index] = next
+    updateTools(tools)
   }
 
   function moveField(index: number, direction: -1 | 1) {
@@ -512,6 +541,42 @@ export function CustomGamePage() {
         )}
       </Block>
 
+      <Block title="En la mesa (opcional)" icon="🎲">
+        <p className="text-xs text-[var(--color-muted)]">
+          Dados y temporizadores para usar mientras jugáis. Salen en la ficha del juego y
+          al apuntar la partida, encima de la hoja de puntuación.
+        </p>
+
+        <div className="flex flex-col gap-2">
+          {(game.tools ?? []).map((tool, index) => (
+            <ToolEditor
+              key={index}
+              tool={tool}
+              onChange={(next) => updateTool(index, next)}
+              onRemove={() =>
+                updateTools((game.tools ?? []).filter((_, position) => position !== index))
+              }
+            />
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(['dice', 'timer'] as const).map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              className="btn btn-ghost px-3 py-1.5 text-sm"
+              disabled={(game.tools ?? []).length >= MAX_TOOLS}
+              onClick={() => updateTools([...(game.tools ?? []), blankTool(kind)])}
+            >
+              ＋ {TOOL_KIND_LABELS[kind]}
+            </button>
+          ))}
+        </div>
+
+        {(game.tools ?? []).length > 0 && <GameTools game={game} />}
+      </Block>
+
       <Block title="Reglas (opcional)" icon="📖">
         <p className="text-xs text-[var(--color-muted)]">
           Todo esto se puede dejar en blanco. Escribe un elemento por línea; en el turno y
@@ -682,6 +747,100 @@ function Block({
       </button>
       {open && <div className="flex flex-col gap-3">{children}</div>}
     </section>
+  )
+}
+
+/**
+ * Un accesorio del juego. Los dos tipos comparten el nombre opcional y se diferencian
+ * en los números: cuántos dados y de cuántas caras, o cuánto dura la cuenta atrás.
+ */
+function ToolEditor({
+  tool,
+  onChange,
+  onRemove,
+}: {
+  tool: GameTool
+  onChange: (next: GameTool) => void
+  onRemove: () => void
+}) {
+  return (
+    <article className="card flex flex-col gap-2 p-3">
+      <div className="flex items-center gap-2">
+        <span className="display text-sm">
+          <span aria-hidden="true">{TOOL_KIND_ICONS[tool.kind]}</span>{' '}
+          {TOOL_KIND_LABELS[tool.kind]}
+        </span>
+        <button
+          type="button"
+          className="btn btn-ghost ml-auto px-2 py-1 text-sm text-[var(--color-danger)]"
+          onClick={onRemove}
+        >
+          ✕<span className="sr-only">Quitar {TOOL_KIND_LABELS[tool.kind]}</span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {tool.kind === 'dice' ? (
+          <>
+            <label className="flex flex-col gap-1">
+              <span className="label">Cuántos</span>
+              <input
+                className="input tnum"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={MAX_DICE}
+                value={tool.count}
+                onChange={(event) =>
+                  onChange({ ...tool, count: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="label">Caras</span>
+              <input
+                className="input tnum"
+                type="number"
+                inputMode="numeric"
+                min={2}
+                max={MAX_DICE_FACES}
+                value={tool.faces}
+                onChange={(event) =>
+                  onChange({ ...tool, faces: Number(event.target.value) })
+                }
+              />
+            </label>
+          </>
+        ) : (
+          <label className="flex flex-col gap-1">
+            <span className="label">Segundos · {formatSeconds(tool.seconds)}</span>
+            <input
+              className="input tnum"
+              type="number"
+              inputMode="numeric"
+              min={MIN_TIMER_SECONDS}
+              max={MAX_TIMER_SECONDS}
+              step={5}
+              value={tool.seconds}
+              onChange={(event) =>
+                onChange({ ...tool, seconds: Number(event.target.value) })
+              }
+            />
+          </label>
+        )}
+
+        <label className="flex flex-col gap-1">
+          <span className="label">Cómo se llama (opcional)</span>
+          <input
+            className="input"
+            placeholder={tool.kind === 'dice' ? 'Dados de producción' : 'Reloj de turno'}
+            value={tool.label ?? ''}
+            maxLength={30}
+            onChange={(event) => onChange({ ...tool, label: event.target.value })}
+          />
+        </label>
+      </div>
+    </article>
   )
 }
 

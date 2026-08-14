@@ -53,6 +53,8 @@ export const trivialPursuit: GameDefinition = {
     },
   ],
 
+  tools: [{ kind: 'dice', count: 1, faces: 6 }],
+
   rules: {
     players: '2–6 jugadores o equipos',
     duration: '60–90 min',

@@ -98,6 +98,9 @@ export const catan: GameDefinition = {
     },
   ],
 
+  // Los dos dados de producción de cada turno.
+  tools: [{ kind: 'dice', count: 2, faces: 6, label: 'Dados de producción' }],
+
   rules: {
     players: '3–4 jugadores (hasta 6 con la ampliación)',
     duration: '60–90 min',
