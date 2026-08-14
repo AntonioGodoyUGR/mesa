@@ -49,7 +49,7 @@ export function PlayerProfilePage() {
       <header className="flex items-center gap-4">
         <Avatar name={player.display_name} size={56} registered={!!player.user_id} />
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold tracking-tight">
+          <h1 className="display truncate text-xl">
             {player.display_name}
           </h1>
           <p className="text-sm text-[var(--color-muted)]">
@@ -69,7 +69,7 @@ export function PlayerProfilePage() {
 
       {head.together > 0 && (
         <section className="card p-4">
-          <h2 className="font-semibold">Partidas contigo</h2>
+          <h2 className="display text-base">Partidas contigo</h2>
           <p className="mt-1 text-sm text-[var(--color-muted)]">
             Habéis coincidido en {head.together} partidas.
           </p>
@@ -104,7 +104,7 @@ export function PlayerProfilePage() {
 
       {stats.byGame.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold">Por juego</h2>
+          <h2 className="display text-base">Por juego</h2>
           <ul className="card divide-y divide-[var(--color-border)]">
             {stats.byGame.map((record) => {
               const game = getGame(record.gameSlug)
@@ -137,7 +137,7 @@ export function PlayerProfilePage() {
       )}
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">Sus partidas</h2>
+        <h2 className="display text-base">Sus partidas</h2>
         {own.length === 0 ? (
           <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
             Todavía no ha jugado ninguna.

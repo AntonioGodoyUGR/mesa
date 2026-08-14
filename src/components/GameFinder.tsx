@@ -60,7 +60,7 @@ export function GameFinder({
           <span aria-hidden="true">⚙️</span>
           Filtros
           {active > 0 && (
-            <span className="tnum rounded-full bg-[var(--color-brand)] px-1.5 text-xs font-bold text-white">
+            <span className="tnum rounded-full bg-[var(--color-brand)] px-1.5 text-xs font-bold text-[var(--color-brand-ink)]">
               {active}
             </span>
           )}
@@ -156,11 +156,7 @@ function Chip<T>({
       aria-pressed={active}
       title={option.hint}
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-        active
-          ? 'border-transparent bg-[var(--color-brand)] text-white'
-          : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)]'
-      }`}
+      className={`chip ${active ? 'chip-on' : ''}`}
     >
       {option.icon && <span aria-hidden="true">{option.icon}</span>}
       {option.label}

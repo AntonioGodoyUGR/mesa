@@ -5,11 +5,7 @@ export const everdell: GameDefinition = {
   name: 'Everdell',
   icon: '🌰',
   tagline: 'Bichos, ciudad de quince cartas y cuatro estaciones',
-  theme: {
-    primary: '#4a7c59',
-    accent: '#b5651d',
-    surface: '#eff5ef',
-  },
+  theme: { primary: '#4a7c59' },
   minPlayers: 1,
   maxPlayers: 4,
   playTime: { min: 40, max: 80 },

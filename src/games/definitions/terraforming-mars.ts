@@ -5,11 +5,7 @@ export const terraformingMars: GameDefinition = {
   name: 'Terraforming Mars',
   icon: '🪐',
   tagline: 'Corporaciones subiendo la temperatura del planeta rojo',
-  theme: {
-    primary: '#b3452e',
-    accent: '#2f6f8f',
-    surface: '#faeeea',
-  },
+  theme: { primary: '#b3452e' },
   minPlayers: 1,
   maxPlayers: 5,
   playTime: { min: 90, max: 150 },

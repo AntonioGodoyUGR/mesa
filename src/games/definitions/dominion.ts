@@ -5,11 +5,7 @@ export const dominion: GameDefinition = {
   name: 'Dominion',
   icon: '👑',
   tagline: 'Construye tu mazo y llénalo de provincias',
-  theme: {
-    primary: '#6b4f2a',
-    accent: '#3d7a4d',
-    surface: '#f6f1e8',
-  },
+  theme: { primary: '#6b4f2a' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 30, max: 45 },

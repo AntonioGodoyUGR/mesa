@@ -5,11 +5,7 @@ export const catan: GameDefinition = {
   name: 'Catán',
   icon: '🌾',
   tagline: 'Coloniza la isla y llega a 10 puntos de victoria',
-  theme: {
-    primary: '#c9622f',
-    accent: '#e8b84a',
-    surface: '#fdf3e7',
-  },
+  theme: { primary: '#b5582a' },
   minPlayers: 3,
   maxPlayers: 6,
   playTime: { min: 60, max: 90 },

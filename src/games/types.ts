@@ -85,12 +85,15 @@ export interface PlayTime {
 }
 
 export interface GameTheme {
-  /** Color principal del juego, usado en el icono y los acentos. */
+  /**
+   * El único color del juego. Se usa como texto sobre el fondo, como relleno de la
+   * caja cuando no hay portada y como filete a la izquierda en las listas.
+   *
+   * Va siempre a través de las utilidades `game-wash` y `game-ink` de `index.css`,
+   * que lo mezclan con el fondo del modo activo: aquí se guarda un solo tono y es
+   * la hoja de estilos la que decide cómo se ve en claro y en oscuro.
+   */
   primary: string
-  /** Color secundario para degradados y estados activos. */
-  accent: string
-  /** Fondo suave de las tarjetas del juego. */
-  surface: string
 }
 
 export interface GameDefinition {

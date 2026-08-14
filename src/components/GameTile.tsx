@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useCover } from './GameCover'
 import { isCustomGame, type GameDefinition } from '../games/types'
@@ -6,6 +7,11 @@ import { isCustomGame, type GameDefinition } from '../games/types'
  * Tarjeta de un juego en la pantalla principal.
  * Todo lo que pinta (portada, icono, color, nombre, número de jugadores) sale de la
  * definición: no conoce ningún juego en concreto.
+ *
+ * La caja es cuadrada porque las portadas se guardan cuadradas (512 px recortados al
+ * centro, ver `scripts/fetch-covers.ts`): cualquier otra proporción se comería un
+ * trozo de la carátula. El nombre va debajo y no encima, para que se lea igual sobre
+ * una portada clara que sobre una oscura.
  */
 export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
   const custom = isCustomGame(game)
@@ -14,61 +20,36 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
   return (
     <Link
       to={to}
-      className="card group relative flex flex-col justify-between overflow-hidden p-4 transition-transform active:scale-[0.98]"
-      style={{ borderColor: `${game.theme.primary}40` }}
+      className="card group flex flex-col overflow-hidden transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:hard-lift active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+      style={{ '--game': game.theme.primary } as CSSProperties}
     >
-      {cover.src ? (
-        <>
+      <span className="relative block aspect-square border-b-2 border-[var(--color-border)]">
+        {cover.src ? (
           <img
             src={cover.src}
             alt=""
             loading="lazy"
             onError={cover.onError}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            className="h-full w-full object-cover"
           />
-          {/* Degradado de abajo arriba: el nombre tiene que leerse sobre cualquier foto. */}
-          <span
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10"
-            aria-hidden="true"
-          />
-        </>
-      ) : (
-        <span
-          className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-15 transition-transform group-hover:scale-110"
-          style={{ backgroundColor: game.theme.primary }}
-          aria-hidden="true"
-        />
-      )}
+        ) : (
+          <span className="game-wash flex h-full w-full items-center justify-center">
+            <span className="text-4xl leading-none" aria-hidden="true">
+              {game.icon}
+            </span>
+          </span>
+        )}
 
-      <span className="relative flex items-start justify-between gap-2">
-        <span className="text-4xl leading-none" aria-hidden="true">
-          {cover.src ? '' : game.icon}
-        </span>
         {custom && (
-          <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-            style={{
-              backgroundColor: cover.src ? '#00000066' : game.theme.surface,
-              color: cover.src ? '#fff' : game.theme.primary,
-            }}
-          >
+          <span className="overline hard-sm absolute right-1.5 top-1.5 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-accent)] px-2 py-0.5 text-[9px] text-[var(--color-accent-ink)]">
             Vuestro
           </span>
         )}
       </span>
 
-      <span className="relative mt-3">
-        <span
-          className="block font-bold"
-          style={{ color: cover.src ? '#fff' : game.theme.primary }}
-        >
-          {game.name}
-        </span>
-        <span
-          className={`mt-0.5 block text-xs ${
-            cover.src ? 'text-white/75' : 'text-[var(--color-muted)]'
-          }`}
-        >
+      <span className="block px-2.5 pb-2.5 pt-2">
+        <span className="display block text-[0.8125rem] leading-tight">{game.name}</span>
+        <span className="overline tnum mt-0.5 block text-[0.625rem] text-[var(--color-muted)]">
           {game.minPlayers}–{game.maxPlayers} jugadores · {game.scoreLabel}
         </span>
       </span>

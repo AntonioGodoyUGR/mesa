@@ -40,7 +40,7 @@ export function GroupSetupPage() {
       />
 
       <section className="card flex flex-col gap-3 p-4">
-        <h2 className="font-semibold">Crear un grupo</h2>
+        <h2 className="display text-base">Crear un grupo</h2>
         <input
           className="input"
           placeholder="Los del jueves"
@@ -60,7 +60,7 @@ export function GroupSetupPage() {
       </section>
 
       <section className="card flex flex-col gap-3 p-4">
-        <h2 className="font-semibold">Unirte con un código</h2>
+        <h2 className="display text-base">Unirte con un código</h2>
         <input
           className="input tracking-[0.3em] uppercase"
           placeholder="XXXXXX"

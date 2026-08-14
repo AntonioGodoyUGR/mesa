@@ -5,11 +5,7 @@ export const parchis: GameDefinition = {
   name: 'Parchís',
   icon: '🎲',
   tagline: 'Veinte de contar y comer',
-  theme: {
-    primary: '#c62828',
-    accent: '#2e7d32',
-    surface: '#fdeded',
-  },
+  theme: { primary: '#c62828' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 30, max: 60 },

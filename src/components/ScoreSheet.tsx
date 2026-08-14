@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { computeTotal } from '../games/registry'
 import type { GameDefinition, ScoreValues } from '../games/types'
 import { ScoreFieldInput } from './ScoreFieldInput'
@@ -71,7 +71,7 @@ export function ScoreSheet({
       ))}
 
       {tied && (
-        <p className="rounded-xl border border-[var(--color-accent)]/50 bg-[var(--color-accent)]/10 px-3 py-2 text-sm">
+        <p className="note note-warn">
           Hay empate a {best} {game.scoreLabelShort}. Marca a mano quién ganó.
         </p>
       )}
@@ -124,13 +124,14 @@ function PlayerCard({
   const reachedTarget = game.targetScore !== undefined && total >= game.targetScore
 
   return (
+    // Quien va ganando se levanta de la pila: sombra más larga y cabecera teñida
+    // del color del juego.
     <section
-      className="card overflow-hidden"
-      style={leading ? { borderColor: `${game.theme.primary}80` } : undefined}
+      className={`card overflow-hidden ${leading ? 'hard-lift' : ''}`}
+      style={{ '--game': game.theme.primary } as CSSProperties}
     >
       <header
-        className="flex items-center gap-3 px-4 py-3"
-        style={{ backgroundColor: leading ? `${game.theme.primary}12` : undefined }}
+        className={`flex items-center gap-3 px-4 py-3 ${leading ? 'game-tint' : ''}`}
       >
         <Avatar name={row.name} size={34} registered={row.registered} />
 
@@ -145,10 +146,10 @@ function PlayerCard({
           <button
             type="button"
             onClick={onPickWinner}
-            className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors ${
+            className={`chip shrink-0 text-xs ${
               isWinner
-                ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/25'
-                : 'border-[var(--color-border)] text-[var(--color-muted)]'
+                ? 'hard-sm bg-[var(--color-accent)] text-[var(--color-accent-ink)]'
+                : ''
             }`}
           >
             🏆 Ganó
@@ -157,8 +158,7 @@ function PlayerCard({
 
         <span className="text-right">
           <span
-            className="tnum block text-2xl font-black leading-none"
-            style={{ color: leading ? game.theme.primary : undefined }}
+            className={`tnum block text-2xl font-black leading-none ${leading ? 'game-ink' : ''}`}
           >
             {total}
           </span>

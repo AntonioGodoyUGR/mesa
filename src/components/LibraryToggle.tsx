@@ -36,11 +36,7 @@ export function LibraryToggle({
             aria-label={`${info.label}: ${gameName}`}
             title={info.hint}
             onClick={() => onChange(nextLibraryStatus(status, info.id))}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
-              active
-                ? 'border-transparent bg-[var(--color-brand)] text-white'
-                : 'border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-muted)]'
-            }`}
+            className={`chip disabled:opacity-50 ${active ? 'chip-on' : ''}`}
           >
             <span aria-hidden="true">{info.icon}</span>
             {!compact && info.label}

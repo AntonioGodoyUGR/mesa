@@ -5,11 +5,7 @@ export const sevenWondersDuel: GameDefinition = {
   name: '7 Wonders Duel',
   icon: '⚔️',
   tagline: 'La misma civilización, pero cara a cara',
-  theme: {
-    primary: '#8c3b3b',
-    accent: '#c9a227',
-    surface: '#f8eeee',
-  },
+  theme: { primary: '#8c3b3b' },
   minPlayers: 2,
   maxPlayers: 2,
   playTime: { min: 30, max: 30 },

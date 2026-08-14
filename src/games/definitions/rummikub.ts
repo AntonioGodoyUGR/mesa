@@ -5,11 +5,7 @@ export const rummikub: GameDefinition = {
   name: 'Rummikub',
   icon: '🎴',
   tagline: 'Grupos, escaleras y fichas que cambian de sitio',
-  theme: {
-    primary: '#1d6fa5',
-    accent: '#e07a3f',
-    surface: '#eaf3f9',
-  },
+  theme: { primary: '#1d6fa5' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 45, max: 60 },

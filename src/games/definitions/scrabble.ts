@@ -5,11 +5,7 @@ export const scrabble: GameDefinition = {
   name: 'Scrabble',
   icon: '🔤',
   tagline: 'Palabras cruzadas por puntos',
-  theme: {
-    primary: '#8a6a3d',
-    accent: '#c0392b',
-    surface: '#f7f1e6',
-  },
+  theme: { primary: '#8a6a3d' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 45, max: 90 },

@@ -5,11 +5,7 @@ export const cascadia: GameDefinition = {
   name: 'Cascadia',
   icon: '🐻',
   tagline: 'Hexágonos de hábitat y fauna colocada con criterio',
-  theme: {
-    primary: '#2f7d6b',
-    accent: '#d98324',
-    surface: '#eaf5f2',
-  },
+  theme: { primary: '#2f7d6b' },
   minPlayers: 1,
   maxPlayers: 4,
   playTime: { min: 30, max: 45 },

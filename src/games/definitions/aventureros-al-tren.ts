@@ -5,11 +5,7 @@ export const aventurerosAlTren: GameDefinition = {
   name: 'Aventureros al Tren',
   icon: '🚂',
   tagline: 'Rutas de tren y billetes que hay que cumplir',
-  theme: {
-    primary: '#b23a48',
-    accent: '#2f6f8f',
-    surface: '#faeef0',
-  },
+  theme: { primary: '#b23a48' },
   minPlayers: 2,
   maxPlayers: 5,
   playTime: { min: 30, max: 60 },

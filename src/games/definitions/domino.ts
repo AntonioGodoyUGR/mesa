@@ -5,11 +5,7 @@ export const domino: GameDefinition = {
   name: 'Dominó',
   icon: '🁫',
   tagline: 'Cierra la mano y cuenta los puntos ajenos',
-  theme: {
-    primary: '#2f2f38',
-    accent: '#c9a227',
-    surface: '#f0f0f2',
-  },
+  theme: { primary: '#2f2f38' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 30, max: 60 },

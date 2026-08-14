@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { computeBreakdown } from '../games/registry'
@@ -50,11 +51,14 @@ export function MatchDetailPage() {
   }
 
   const game = getGame(match.game_slug)
-  const color = game?.theme.primary ?? 'var(--color-brand)'
   const entries = [...match.match_players].sort((a, b) => a.rank - b.rank)
 
   return (
-    <div className="flex flex-col gap-4">
+    // `--game` se declara una vez y lo heredan las fichas de cada jugador.
+    <div
+      className="flex flex-col gap-4"
+      style={{ '--game': game?.theme.primary ?? 'var(--color-brand)' } as CSSProperties}
+    >
       <header className="flex items-center gap-3">
         {game ? (
           <GameCover game={game} size={52} />
@@ -64,7 +68,7 @@ export function MatchDetailPage() {
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-xl font-bold tracking-tight" style={{ color }}>
+          <h1 className="game-ink display truncate text-xl">
             {game?.name ?? match.game_slug}
           </h1>
           <p className="text-sm text-[var(--color-muted)]">
@@ -89,7 +93,7 @@ export function MatchDetailPage() {
 
       <div className="flex flex-col gap-3">
         {entries.map((entry) => (
-          <PlayerBreakdown key={entry.id} entry={entry} game={game} color={color} />
+          <PlayerBreakdown key={entry.id} entry={entry} game={game} />
         ))}
       </div>
 
@@ -112,11 +116,9 @@ export function MatchDetailPage() {
 function PlayerBreakdown({
   entry,
   game,
-  color,
 }: {
   entry: MatchPlayer & { player: Player }
   game: GameDefinition | undefined
-  color: string
 }) {
   // Campos a cero que no aportan nada: se ocultan para que el desglose se lea de un vistazo.
   const breakdown = game
@@ -124,10 +126,9 @@ function PlayerBreakdown({
     : []
 
   return (
-    <section className="card overflow-hidden">
+    <section className={`card overflow-hidden ${entry.is_winner ? 'hard-lift' : ''}`}>
       <header
-        className="flex items-center gap-3 px-4 py-3"
-        style={{ backgroundColor: entry.is_winner ? `${color}12` : undefined }}
+        className={`flex items-center gap-3 px-4 py-3 ${entry.is_winner ? 'game-tint' : ''}`}
       >
         <span className="tnum w-5 text-center text-sm font-bold text-[var(--color-muted)]">
           {entry.rank}
@@ -145,7 +146,7 @@ function PlayerBreakdown({
           {entry.player.display_name}
         </Link>
         <span className="text-right">
-          <span className="tnum block text-2xl font-black leading-none" style={{ color }}>
+          <span className="game-ink tnum block text-2xl font-black leading-none">
             {entry.total}
           </span>
           <span className="block text-[11px] text-[var(--color-muted)]">

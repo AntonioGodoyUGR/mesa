@@ -30,7 +30,7 @@ export function EmptyState({
       <span className="text-4xl" aria-hidden="true">
         {icon}
       </span>
-      <h2 className="text-base font-semibold">{title}</h2>
+      <h2 className="display text-base">{title}</h2>
       {description && (
         <p className="max-w-sm text-sm text-[var(--color-muted)]">{description}</p>
       )}
@@ -43,10 +43,7 @@ export function ErrorNote({ error }: { error: unknown }) {
   if (!error) return null
   const message = error instanceof Error ? error.message : String(error)
   return (
-    <p
-      role="alert"
-      className="rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]"
-    >
+    <p role="alert" className="note note-danger">
       {message}
     </p>
   )
@@ -64,7 +61,7 @@ export function PageHeader({
   return (
     <header className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="truncate text-xl font-bold tracking-tight">{title}</h1>
+        <h1 className="display truncate text-xl">{title}</h1>
         {subtitle && (
           <p className="mt-0.5 text-sm text-[var(--color-muted)]">{subtitle}</p>
         )}
@@ -97,7 +94,7 @@ export function Avatar({
 
   return (
     <span
-      className="relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white"
+      className="relative inline-flex shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-border)] font-bold text-white"
       style={{
         width: size,
         height: size,
@@ -109,7 +106,7 @@ export function Avatar({
       {initials || '?'}
       {!registered && (
         <span
-          className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[var(--color-surface)] bg-[var(--color-surface-2)] text-[8px] text-[var(--color-muted)]"
+          className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[8px] text-[var(--color-muted)]"
           title="Invitado sin cuenta"
         >
           ·

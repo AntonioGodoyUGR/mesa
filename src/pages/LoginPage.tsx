@@ -44,19 +44,19 @@ export function LoginPage() {
         <span className="text-4xl" aria-hidden="true">
           🎯
         </span>
-        <h1 className="mt-2 text-2xl font-black tracking-tight">Mesa</h1>
+        <h1 className="display mt-2 text-2xl">Mesa</h1>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
           Los resultados de vuestras partidas, en un sitio.
         </p>
       </div>
 
       {isDemoMode && (
-        <p className="rounded-xl border border-[var(--color-accent)]/50 bg-[var(--color-accent)]/10 px-3 py-2 text-sm">
+        <p className="note note-warn">
           Modo demostración: no hace falta cuenta, entra directamente.
         </p>
       )}
 
-      <div className="flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-1 text-sm font-medium">
+      <div className="hard-sm flex rounded-lg border-2 border-[var(--color-border)] bg-[var(--color-surface-2)] p-1">
         {(
           [
             ['signin', 'Entrar'],
@@ -69,7 +69,7 @@ export function LoginPage() {
             onClick={() => setMode(value)}
             className={`flex-1 rounded-lg py-2 transition-colors ${
               mode === value
-                ? 'bg-[var(--color-surface)] shadow-sm'
+                ? 'overline bg-[var(--color-surface)] text-[var(--color-text)]'
                 : 'text-[var(--color-muted)]'
             }`}
           >

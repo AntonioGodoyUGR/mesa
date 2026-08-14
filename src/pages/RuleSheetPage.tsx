@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GameCover } from '../components/GameCover'
 import { LibraryToggle } from '../components/LibraryToggle'
@@ -33,16 +34,14 @@ export function RuleSheetPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div
+      className="flex flex-col gap-4"
+      style={{ '--game': game.theme.primary } as CSSProperties}
+    >
       <header className="flex items-center gap-3">
         <GameCover game={game} size={52} />
         <div className="min-w-0 flex-1">
-          <h1
-            className="truncate text-xl font-bold tracking-tight"
-            style={{ color: game.theme.primary }}
-          >
-            {game.name}
-          </h1>
+          <h1 className="game-ink display truncate text-xl">{game.name}</h1>
           <p className="truncate text-sm text-[var(--color-muted)]">{game.tagline}</p>
         </div>
         {group && (

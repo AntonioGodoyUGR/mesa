@@ -61,7 +61,7 @@ export function HomePage() {
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">Nueva partida</h1>
+          <h1 className="display text-xl">Nueva partida</h1>
           <p className="mt-0.5 text-sm text-[var(--color-muted)]">
             Elige el juego para apuntar el resultado.
           </p>
@@ -94,19 +94,19 @@ export function HomePage() {
           <>
             {favourites.length > 0 && (
               <>
-                <h2 className="font-bold tracking-tight">Los que más jugáis</h2>
+                <h2 className="display text-base">Los que más jugáis</h2>
                 <GameGrid games={favourites} />
               </>
             )}
 
-            <h2 className="font-bold tracking-tight">Vuestros juegos</h2>
+            <h2 className="display text-base">Vuestros juegos</h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {ours.map((game) => (
                 <GameTile key={game.slug} game={game} to={`/nueva/${game.slug}`} />
               ))}
               <Link
                 to="/juegos/nuevo"
-                className="card flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center transition-transform active:scale-[0.98]"
+                className="card flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 <span className="text-3xl leading-none" aria-hidden="true">
                   ＋
@@ -118,7 +118,7 @@ export function HomePage() {
               </Link>
             </div>
 
-            <h2 className="font-bold tracking-tight">
+            <h2 className="display text-base">
               {favourites.length > 0 ? 'Del catálogo' : 'Todos los juegos'}
             </h2>
             <GameGrid games={catalogue.shown} />
@@ -129,7 +129,7 @@ export function HomePage() {
 
       <section>
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-bold tracking-tight">Últimas partidas</h2>
+          <h2 className="display text-base">Últimas partidas</h2>
           <Link to="/partidas" className="text-sm font-medium text-[var(--color-brand)]">
             Ver todas
           </Link>

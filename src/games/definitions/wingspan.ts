@@ -5,11 +5,7 @@ export const wingspan: GameDefinition = {
   name: 'Wingspan',
   icon: '🦅',
   tagline: 'Un aviario que se puntúa por partes',
-  theme: {
-    primary: '#3f7d5a',
-    accent: '#d9a441',
-    surface: '#eef5f0',
-  },
+  theme: { primary: '#3f7d5a' },
   minPlayers: 1,
   maxPlayers: 5,
   playTime: { min: 40, max: 70 },

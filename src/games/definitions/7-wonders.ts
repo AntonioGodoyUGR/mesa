@@ -5,11 +5,7 @@ export const sevenWonders: GameDefinition = {
   name: '7 Wonders',
   icon: '🏛️',
   tagline: 'Tres eras de cartas y siete montones de puntos',
-  theme: {
-    primary: '#a8792c',
-    accent: '#2f6f6f',
-    surface: '#f8f2e6',
-  },
+  theme: { primary: '#8f6725' },
   minPlayers: 3,
   maxPlayers: 7,
   playTime: { min: 30, max: 45 },

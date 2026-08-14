@@ -89,11 +89,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-        active
-          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/12'
-          : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)]'
-      }`}
+      className={`chip shrink-0 ${active ? 'chip-on' : ''}`}
     >
       {children}
     </button>

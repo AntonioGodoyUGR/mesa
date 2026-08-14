@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import type { GameDefinition } from '../games/types'
 
 /**
@@ -29,12 +29,10 @@ export function GameCover({ game, size = 40 }: { game: GameDefinition; size?: nu
 
   return (
     <span
-      className="flex shrink-0 items-center justify-center overflow-hidden rounded-lg"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: cover.src ? 'transparent' : game.theme.surface,
-      }}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-[var(--color-border)] ${
+        cover.src ? '' : 'game-wash'
+      }`}
+      style={{ width: size, height: size, '--game': game.theme.primary } as CSSProperties}
       aria-hidden="true"
     >
       {cover.src ? (

@@ -5,11 +5,7 @@ export const dixit: GameDefinition = {
   name: 'Dixit',
   icon: '🐰',
   tagline: 'Una frase, seis ilustraciones y mucha mala idea',
-  theme: {
-    primary: '#6a4c93',
-    accent: '#f2a65a',
-    surface: '#f3eefa',
-  },
+  theme: { primary: '#6a4c93' },
   minPlayers: 3,
   maxPlayers: 6,
   playTime: { min: 30, max: 30 },

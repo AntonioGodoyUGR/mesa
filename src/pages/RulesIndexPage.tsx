@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import {
   NO_FILTERS,
@@ -79,14 +79,14 @@ function GameList({ title, games }: { title: string | null; games: GameDefinitio
 
   return (
     <section className="flex flex-col gap-2">
-      {title && <h2 className="font-semibold">{title}</h2>}
+      {title && <h2 className="display text-base">{title}</h2>}
       <ul className="flex flex-col gap-2">
         {page.shown.map((game) => (
           <li key={game.slug}>
             <Link
               to={`/reglas/${game.slug}`}
-              className="card flex items-center gap-3 p-3"
-              style={{ borderLeft: `3px solid ${game.theme.primary}` }}
+              className="card game-edge flex items-center gap-3 p-3"
+              style={{ '--game': game.theme.primary } as CSSProperties}
             >
               <GameCover game={game} size={40} />
               <span className="min-w-0 flex-1">

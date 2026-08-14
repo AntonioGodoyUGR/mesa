@@ -5,11 +5,7 @@ export const trivialPursuit: GameDefinition = {
   name: 'Trivial Pursuit',
   icon: '🧀',
   tagline: 'Seis quesitos y la pregunta final',
-  theme: {
-    primary: '#7a3fb3',
-    accent: '#e8a33d',
-    surface: '#f4eefb',
-  },
+  theme: { primary: '#7a3fb3' },
   minPlayers: 2,
   maxPlayers: 6,
   playTime: { min: 60, max: 90 },

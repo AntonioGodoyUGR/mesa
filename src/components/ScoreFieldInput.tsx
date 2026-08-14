@@ -42,14 +42,12 @@ export function ScoreFieldInput({
           aria-label={field.label}
           disabled={disabled}
           onClick={() => onChange(!value)}
-          className={`relative h-7 w-12 shrink-0 rounded-full border transition-colors disabled:opacity-40 ${
-            value
-              ? 'border-[var(--color-brand)] bg-[var(--color-brand)]'
-              : 'border-[var(--color-border)] bg-[var(--color-surface-2)]'
+          className={`relative h-7 w-12 shrink-0 rounded-full border-2 border-[var(--color-border)] transition-colors disabled:opacity-40 ${
+            value ? 'bg-[var(--color-brand)]' : 'bg-[var(--color-surface-2)]'
           }`}
         >
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+            className={`absolute top-0.5 h-5 w-5 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface)] transition-transform ${
               value ? 'translate-x-[1.4rem]' : 'translate-x-0.5'
             }`}
           />
@@ -57,7 +55,7 @@ export function ScoreFieldInput({
       )}
 
       {field.type === 'counter' && (
-        <span className="flex shrink-0 items-center gap-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-0.5">
+        <span className="flex shrink-0 items-center gap-1 rounded-lg border-2 border-[var(--color-border)] bg-[var(--color-surface-2)] p-0.5">
           <button
             type="button"
             disabled={disabled || numeric <= (field.min ?? 0)}

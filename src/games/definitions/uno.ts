@@ -5,11 +5,7 @@ export const uno: GameDefinition = {
   name: 'UNO',
   icon: '🃏',
   tagline: 'Quédate sin cartas y grita a tiempo',
-  theme: {
-    primary: '#d62828',
-    accent: '#f2b705',
-    surface: '#fdeeee',
-  },
+  theme: { primary: '#d62828' },
   minPlayers: 2,
   maxPlayers: 10,
   playTime: { min: 30, max: 45 },

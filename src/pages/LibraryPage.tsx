@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import {
   NO_FILTERS,
@@ -64,7 +64,7 @@ export function LibraryPage() {
             type="button"
             onClick={() => setTab(info.id)}
             aria-label={`${info.title}: ${info.id === 'owned' ? counts.owned : counts.wishlist} juegos`}
-            className="card px-3 py-4 text-center transition-transform active:scale-[0.98]"
+            className="card px-3 py-4 text-center transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
             <span className="block text-xl leading-none" aria-hidden="true">
               {info.icon}
@@ -86,11 +86,7 @@ export function LibraryPage() {
             type="button"
             aria-pressed={tab === option.id}
             onClick={() => setTab(option.id)}
-            className={`tnum flex-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              tab === option.id
-                ? 'border-transparent bg-[var(--color-brand)] text-white'
-                : 'border-[var(--color-border)] text-[var(--color-muted)]'
-            }`}
+            className={`chip tnum flex-1 justify-center ${tab === option.id ? 'chip-on' : ''}`}
           >
             {/* Un solo nodo de texto: partirlo deja el nombre accesible sin el espacio. */}
             {option.count === null ? option.label : `${option.label} (${option.count})`}
@@ -161,8 +157,8 @@ function GameRow({
 }) {
   return (
     <div
-      className="card flex items-center gap-3 p-3"
-      style={{ borderLeft: `3px solid ${game.theme.primary}` }}
+      className="card game-edge flex items-center gap-3 p-3"
+      style={{ '--game': game.theme.primary } as CSSProperties}
     >
       {/* El nombre lleva a su chuleta; los botones quedan fuera del enlace a propósito. */}
       <Link to={`/reglas/${game.slug}`} className="flex min-w-0 flex-1 items-center gap-3">

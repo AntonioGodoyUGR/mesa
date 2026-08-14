@@ -159,24 +159,28 @@ const SHEETS: Record<SheetId, Sheet> = {
  * Los juegos escritos a mano llevan los colores de su caja; aquí hay demasiados para
  * mirarlos uno a uno, así que se reparten estas paletas de forma estable (mismo slug,
  * mismo color siempre) para que la rejilla no sea una pared gris.
+ *
+ * Los 16 tonos están verificados a la vez contra los tres usos del color: como texto
+ * sobre el papel claro, con texto blanco encima, y aclarado sobre el fondo oscuro.
+ * Todos pasan de 4.5:1 en los tres, así que ninguno se cae en modo oscuro.
  */
 const PALETTES: GameTheme[] = [
-  { primary: '#1f5f8b', accent: '#e0a458', surface: '#eaf2f8' },
-  { primary: '#8b2f3f', accent: '#e8b04b', surface: '#fbeef0' },
-  { primary: '#2f6b4f', accent: '#d8a657', surface: '#ecf5ef' },
-  { primary: '#5b3fa0', accent: '#f0a6ca', surface: '#f2eefb' },
-  { primary: '#b4531f', accent: '#f2c14e', surface: '#fdf0e6' },
-  { primary: '#1b4d4a', accent: '#7fbfa8', surface: '#e8f3f1' },
-  { primary: '#7a3b8f', accent: '#f3c969', surface: '#f6edf9' },
-  { primary: '#a03b2f', accent: '#e9c46a', surface: '#fbedea' },
-  { primary: '#2b4a7d', accent: '#8ecae6', surface: '#eaf0f9' },
-  { primary: '#4f6d2f', accent: '#c9d95c', surface: '#f0f5e6' },
-  { primary: '#8a4b2a', accent: '#dda15e', surface: '#faf0e6' },
-  { primary: '#3f3d56', accent: '#b9a7e0', surface: '#eeedf5' },
-  { primary: '#0f5b6b', accent: '#68c5c1', surface: '#e6f3f5' },
-  { primary: '#93325a', accent: '#f5a9c0', surface: '#fbecf2' },
-  { primary: '#5a5a1f', accent: '#d4c95c', surface: '#f4f3e3' },
-  { primary: '#33547a', accent: '#e2955f', surface: '#ecf1f7' },
+  { primary: '#0f5499' },
+  { primary: '#a52233' },
+  { primary: '#1a7f4d' },
+  { primary: '#7028c3' },
+  { primary: '#90390e' },
+  { primary: '#1a757f' },
+  { primary: '#981f84' },
+  { primary: '#a12921' },
+  { primary: '#2847c3' },
+  { primary: '#427f1a' },
+  { primary: '#7f571a' },
+  { primary: '#5630d5' },
+  { primary: '#1a7f72' },
+  { primary: '#9d205e' },
+  { primary: '#657307' },
+  { primary: '#1a7f1a' },
 ]
 
 /** Hash estable del slug: el mismo juego se pinta siempre del mismo color. */

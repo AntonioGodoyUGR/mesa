@@ -1,41 +1,71 @@
 @import 'tailwindcss';
 
 /* ------------------------------------------------------------------
-   Sistema visual de Mesa.
-   Los colores de marca son neutros a propósito: cada juego aporta el
-   suyo a través de `GameDefinition.theme`, aplicado en línea.
+   Sistema visual de Mesa — estética «arcade», paleta cian.
+
+   Tres reglas lo explican casi todo:
+     · el contorno es de 2 px y del color del texto, no un gris suave;
+     · debajo de cada superficie hay una sombra sólida y desplazada,
+       nunca un desenfoque;
+     · los titulares van en negra y en mayúsculas.
+
+   Cada juego sigue aportando su color por `GameDefinition.theme`, pero
+   ya no se pinta tal cual: pasa por las utilidades `game-wash` y
+   `game-ink` de más abajo, que lo ajustan al modo claro u oscuro.
    ------------------------------------------------------------------ */
 @theme {
-  --color-bg: #f7f6f3;
-  --color-surface: #ffffff;
-  --color-surface-2: #f1efea;
-  --color-border: #e3ded5;
-  --color-text: #1c1a17;
-  --color-muted: #6f6a61;
-  --color-brand: #b8562f;
-  --color-brand-soft: #fbeee7;
-  --color-accent: #e0a458;
-  --color-success: #2f7d55;
-  --color-danger: #b4392f;
+  --color-bg: #d5f2ff;
+  --color-surface: #f4fdff;
+  --color-surface-2: #a5e2ff;
+  --color-border: #071219;
+  --color-text: #071219;
+  --color-muted: #5e707a;
+  --color-brand: #1461d1;
+  --color-brand-ink: #ffffff;
+  --color-brand-soft: #d0e4f8;
+  --color-accent: #d95f00;
+  --color-accent-ink: #071219;
+  --color-success: #1f7a45;
+  --color-danger: #c02a1c;
 
-  --font-sans: 'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system,
-    sans-serif;
+  /* El color de la sombra sólida. En claro es la tinta; en oscuro, la
+     marca: sobre fondo oscuro una sombra negra no se ve. */
+  --color-hard: #071219;
 
-  --radius-card: 1rem;
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Arial Black', 'Segoe UI Variable Display', Impact, system-ui, sans-serif;
+
+  --radius-card: 0.5rem;
+
+  /* Cuánto del color del juego entra en sus fondos y en su texto. En
+     oscuro hace falta más color, y el texto hay que aclararlo. */
+  --game-wash-mix: 22%;
+  --game-tint-mix: 10%;
+  --game-ink-mix: 100%;
+  --game-ink-base: #071219;
 }
 
 .dark {
-  --color-bg: #121316;
-  --color-surface: #1b1d21;
-  --color-surface-2: #24262c;
-  --color-border: #32353c;
-  --color-text: #f0ede8;
-  --color-muted: #9c968c;
-  --color-brand: #e07a4c;
-  --color-brand-soft: #2d211c;
-  --color-accent: #e0a458;
-  --color-success: #4ea87a;
-  --color-danger: #e0685c;
+  --color-bg: #0b1720;
+  --color-surface: #12222e;
+  --color-surface-2: #1a2f3e;
+  --color-border: #e2f5ff;
+  --color-text: #e2f5ff;
+  --color-muted: #8898a1;
+  --color-brand: #4d9bff;
+  --color-brand-ink: #071219;
+  --color-brand-soft: #1b354f;
+  --color-accent: #ffab3d;
+  --color-accent-ink: #071219;
+  --color-success: #5ad195;
+  --color-danger: #ff7264;
+
+  --color-hard: #4d9bff;
+
+  --game-wash-mix: 42%;
+  --game-tint-mix: 22%;
+  --game-ink-mix: 55%;
+  --game-ink-base: #ffffff;
 }
 
 html,
@@ -76,11 +106,69 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Titulares: negra, mayúsculas y muy juntas. */
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+/* Etiquetas y datos pequeños: mayúsculas espaciadas. */
+@utility overline {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* La sombra sólida, en sus tres intensidades. */
+@utility hard {
+  box-shadow: 4px 4px 0 var(--color-hard);
+}
+
+@utility hard-sm {
+  box-shadow: 2px 2px 0 var(--color-hard);
+}
+
+@utility hard-lift {
+  box-shadow: 7px 7px 0 var(--color-hard);
+}
+
+/* ------------------------------------------------------------------
+   El color del juego. Se pasa por la variable `--game` en línea y estas
+   utilidades lo mezclan con el fondo del modo activo, para que el mismo
+   azul funcione sobre papel cian y sobre fondo casi negro.
+   ------------------------------------------------------------------ */
+@utility game-wash {
+  background-color: color-mix(in oklab, var(--game) var(--game-wash-mix), var(--color-surface));
+}
+
+@utility game-tint {
+  background-color: color-mix(in oklab, var(--game) var(--game-tint-mix), var(--color-surface));
+}
+
+@utility game-ink {
+  color: color-mix(in srgb, var(--game) var(--game-ink-mix), var(--game-ink-base));
+}
+
+/* Filete lateral de las filas de lista: el mismo ajuste que `game-ink`, porque un
+   azul profundo pegado a una tarjeta oscura no se distingue de ella. */
+@utility game-edge {
+  border-left: 6px solid color-mix(in srgb, var(--game) var(--game-ink-mix), var(--game-ink-base));
+}
+
 @layer components {
   .card {
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 2px solid var(--color-border);
     border-radius: var(--radius-card);
+    box-shadow: 4px 4px 0 var(--color-hard);
+  }
+
+  /* Cajas pegadas al borde de la pantalla o apiladas: sin sombra, que
+     si no la lista parece un montón de cartas caídas. */
+  .card-flat {
+    box-shadow: none;
   }
 
   .btn {
@@ -88,23 +176,34 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     padding: 0.625rem 1rem;
-    font-weight: 600;
-    font-size: 0.9375rem;
-    border: 1px solid transparent;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    border: 2px solid var(--color-border);
+    box-shadow: 3px 3px 0 var(--color-hard);
     cursor: pointer;
-    transition: filter 0.15s ease, background-color 0.15s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
   }
 
   .btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Al pulsar, el botón se hunde hasta tocar su propia sombra. */
+  .btn:not(:disabled):active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 var(--color-hard);
   }
 
   .btn-primary {
     background: var(--color-brand);
-    color: #fff;
+    color: var(--color-brand-ink);
   }
 
   .btn-primary:not(:disabled):hover {
@@ -113,7 +212,6 @@ body {
 
   .btn-ghost {
     background: var(--color-surface);
-    border-color: var(--color-border);
     color: var(--color-text);
   }
 
@@ -124,8 +222,9 @@ body {
   .input {
     width: 100%;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 0.75rem;
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    box-shadow: 3px 3px 0 var(--color-hard);
     padding: 0.625rem 0.875rem;
     font-size: 1rem;
     color: var(--color-text);
@@ -133,16 +232,60 @@ body {
   }
 
   .input:focus {
-    outline: 2px solid var(--color-brand);
-    outline-offset: -1px;
+    outline: 3px solid var(--color-brand);
+    outline-offset: -3px;
   }
 
   .label {
     display: block;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--color-muted);
     margin-bottom: 0.375rem;
+  }
+
+  /* Avisos en línea: el mismo bloque recortado, en dos tonos. */
+  .note {
+    border: 2px solid var(--color-border);
+    border-radius: 0.5rem;
+    box-shadow: 2px 2px 0 var(--color-hard);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .note-warn {
+    background: color-mix(in oklab, var(--color-accent) 28%, var(--color-surface));
+  }
+
+  .note-danger {
+    background: color-mix(in oklab, var(--color-danger) 15%, var(--color-surface));
+    color: var(--color-danger);
+  }
+
+  /* Píldora de filtro. Activa: rellena de marca y saca sombra. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-muted);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+
+  .chip-on {
+    background: var(--color-brand);
+    color: var(--color-brand-ink);
+    box-shadow: 2px 2px 0 var(--color-hard);
   }
 }
 

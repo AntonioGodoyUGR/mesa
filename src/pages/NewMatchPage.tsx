@@ -132,7 +132,7 @@ export function NewMatchPage() {
       <header className="flex items-center gap-3">
         <GameCover game={game} size={52} />
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold tracking-tight">{game.name}</h1>
+          <h1 className="display truncate text-xl">{game.name}</h1>
           <p className="text-sm text-[var(--color-muted)]">
             {step === 1 ? 'Paso 1 · ¿Quién jugó?' : `Paso 2 · ${game.scoreLabel}`}
           </p>
@@ -168,7 +168,7 @@ export function NewMatchPage() {
           </p>
 
           {selected.length > 0 && !hasRegistered && (
-            <p className="rounded-xl border border-[var(--color-accent)]/50 bg-[var(--color-accent)]/10 px-3 py-2 text-sm">
+            <p className="note note-warn">
               Al menos uno de los jugadores tiene que tener cuenta. Los demás pueden ser
               invitados.
             </p>
@@ -224,7 +224,7 @@ export function NewMatchPage() {
           {issues.map((issue) => (
             <p
               key={`${issue.playerIndex}-${issue.fieldKey}-${issue.message}`}
-              className="rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]"
+              className="note note-danger"
             >
               {issue.message}
             </p>

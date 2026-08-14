@@ -5,11 +5,7 @@ export const splendor: GameDefinition = {
   name: 'Splendor',
   icon: '💎',
   tagline: 'Gemas, cartas de descuento y carrera a 15',
-  theme: {
-    primary: '#4a5aa8',
-    accent: '#d4af37',
-    surface: '#eef0fa',
-  },
+  theme: { primary: '#4a5aa8' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 30, max: 30 },

@@ -14,8 +14,9 @@ import { fileURLToPath } from 'node:url'
 
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'public')
 
-const BG = [0xb8, 0x56, 0x2f]
-const FG = [0xf7, 0xf6, 0xf3]
+// Los mismos dos colores que el favicon: azul de marca y el cian del fondo claro.
+const BG = [0x14, 0x61, 0xd1]
+const FG = [0xd5, 0xf2, 0xff]
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
   let c = n

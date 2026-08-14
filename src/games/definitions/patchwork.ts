@@ -5,11 +5,7 @@ export const patchwork: GameDefinition = {
   name: 'Patchwork',
   icon: '🧵',
   tagline: 'Un tetris de retales a dos, con botones y tiempo',
-  theme: {
-    primary: '#a4508b',
-    accent: '#5f8d4e',
-    surface: '#f7eef5',
-  },
+  theme: { primary: '#a4508b' },
   minPlayers: 2,
   maxPlayers: 2,
   playTime: { min: 20, max: 30 },

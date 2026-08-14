@@ -60,22 +60,28 @@ export function fieldKeyFor(label: string, taken: string[]): string {
   return `${base}_${index}`
 }
 
-/** Paleta de colores del creador: la elige el usuario, no la escribe. */
+/**
+ * Paleta de colores del creador: la elige el usuario, no la escribe.
+ *
+ * Mismos criterios que las del catálogo: cada tono aguanta como texto sobre el fondo
+ * claro, como fondo con texto blanco y aclarado sobre el oscuro. Por eso son más
+ * profundos de lo que parecería a simple vista.
+ */
 export const CUSTOM_PALETTE = [
-  '#c9622f',
-  '#b3452f',
-  '#8d5cc4',
-  '#2f6fb3',
-  '#1f8a70',
-  '#5c8a1f',
-  '#c99a2f',
-  '#b3357a',
-  '#4a5568',
+  '#0f5499',
+  '#a52233',
+  '#1a7f4d',
+  '#7028c3',
+  '#90390e',
+  '#1a757f',
+  '#981f84',
+  '#7f571a',
+  '#3f4a56',
 ] as const
 
-/** Del color principal salen los otros dos: el usuario elige uno y ya está. */
+/** El tema de un juego del grupo es solo su color: el resto lo pone la hoja de estilos. */
 export function themeFrom(primary: string) {
-  return { primary, accent: `${primary}cc`, surface: `${primary}14` }
+  return { primary }
 }
 
 /** Definición de partida del formulario: lo más simple que puede ser un juego. */

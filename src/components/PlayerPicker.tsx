@@ -55,11 +55,7 @@ export function PlayerPicker({
               onClick={() => onToggle(player.id)}
               disabled={!isSelected && full}
               aria-pressed={isSelected}
-              className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-sm font-medium transition-colors disabled:opacity-40 ${
-                isSelected
-                  ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/12 text-[var(--color-text)]'
-                  : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)]'
-              }`}
+              className={`chip py-1 pl-1 pr-3 disabled:opacity-40 ${isSelected ? 'chip-on' : ''}`}
             >
               <Avatar
                 name={player.display_name}
@@ -68,7 +64,7 @@ export function PlayerPicker({
               />
               <span className="max-w-[9rem] truncate">{player.display_name}</span>
               {isSelected && (
-                <span className="tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-[11px] font-bold text-white">
+                <span className="tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-[11px] font-bold text-[var(--color-brand-ink)]">
                   {index + 1}
                 </span>
               )}

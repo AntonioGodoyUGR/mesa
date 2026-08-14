@@ -5,11 +5,7 @@ export const kingOfTokyo: GameDefinition = {
   name: 'King of Tokyo',
   icon: '👹',
   tagline: 'Monstruos, dados y una ciudad que aguanta lo que puede',
-  theme: {
-    primary: '#e04b2a',
-    accent: '#2f3e63',
-    surface: '#fdeee9',
-  },
+  theme: { primary: '#ca4426' },
   minPlayers: 2,
   maxPlayers: 6,
   playTime: { min: 30, max: 30 },

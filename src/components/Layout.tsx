@@ -19,7 +19,7 @@ function ThemeToggle() {
   return (
     <button
       type="button"
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-base"
+      className="hard-sm flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface)] text-base"
       onClick={() => {
         const next = !dark
         setDark(next)
@@ -35,9 +35,9 @@ function ThemeToggle() {
 function DemoBanner() {
   if (!isDemoMode) return null
   return (
-    <div className="bg-[var(--color-accent)]/20 px-4 py-1.5 text-center text-xs text-[var(--color-text)]">
+    <div className="overline border-b-2 border-[var(--color-border)] bg-[var(--color-accent)] px-4 py-1.5 text-center text-[0.6875rem] text-[var(--color-accent-ink)]">
       Modo demostración · los datos se guardan solo en este navegador.{' '}
-      <Link to="/grupo" className="font-semibold underline">
+      <Link to="/grupo" className="underline">
         Cómo conectar Supabase
       </Link>
     </div>
@@ -59,20 +59,18 @@ export function Layout() {
     <div className="flex min-h-dvh flex-col">
       <DemoBanner />
 
-      <header className="safe-top sticky top-0 z-20 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur">
+      <header className="safe-top sticky top-0 z-20 border-b-2 border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2 font-bold tracking-tight">
-            <span className="text-lg" aria-hidden="true">
-              🎯
-            </span>
+          <Link
+            to="/"
+            className="display flex items-center gap-2 text-lg text-[var(--color-brand)]"
+          >
+            <span aria-hidden="true">🎯</span>
             <span>Mesa</span>
           </Link>
 
           {group && (
-            <Link
-              to="/grupo"
-              className="min-w-0 truncate rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium text-[var(--color-muted)]"
-            >
+            <Link to="/grupo" className="chip min-w-0 truncate">
               {group.name}
             </Link>
           )}
@@ -96,7 +94,7 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur">
+      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t-2 border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="mx-auto flex w-full max-w-3xl">
           {TABS.map((tab) => (
             <NavLink
@@ -104,7 +102,7 @@ export function Layout() {
               to={tab.to}
               end={tab.end}
               className={({ isActive }) =>
-                `flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors ${
+                `overline flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors ${
                   isActive
                     ? 'text-[var(--color-brand)]'
                     : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'

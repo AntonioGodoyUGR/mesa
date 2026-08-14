@@ -21,8 +21,8 @@ export default defineConfig({
         short_name: 'Mesa',
         description:
           'Registra los resultados de tus partidas, consulta el histórico con cada jugador y ten las reglas siempre a mano.',
-        theme_color: '#b8562f',
-        background_color: '#f7f6f3',
+        theme_color: '#1461d1',
+        background_color: '#d5f2ff',
         display: 'standalone',
         orientation: 'portrait',
         start_url: base,

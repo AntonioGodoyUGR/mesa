@@ -5,11 +5,7 @@ export const camelUp: GameDefinition = {
   name: 'Camel Up',
   icon: '🐪',
   tagline: 'Apuesta por camellos que se montan unos encima de otros',
-  theme: {
-    primary: '#d59a26',
-    accent: '#3f8f7a',
-    surface: '#fdf6e3',
-  },
+  theme: { primary: '#956c1b' },
   minPlayers: 3,
   maxPlayers: 8,
   playTime: { min: 20, max: 30 },

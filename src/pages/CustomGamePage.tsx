@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -259,12 +259,12 @@ export function CustomGamePage() {
               <img
                 src={game.imageUrl}
                 alt=""
-                className="h-20 w-20 shrink-0 rounded-xl object-cover"
+                className="hard-sm h-20 w-20 shrink-0 rounded-lg border-2 border-[var(--color-border)] object-cover"
               />
             ) : (
               <span
-                className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl text-3xl"
-                style={{ backgroundColor: game.theme.surface }}
+                className="game-wash hard-sm flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border-2 border-[var(--color-border)] text-3xl"
+                style={{ '--game': game.theme.primary } as CSSProperties}
                 aria-hidden="true"
               >
                 {game.icon}
@@ -314,10 +314,8 @@ export function CustomGamePage() {
                 type="button"
                 aria-label={`Color ${color}`}
                 onClick={() => update({ theme: themeFrom(color) })}
-                className={`h-9 w-9 rounded-full border-2 transition-transform ${
-                  game.theme.primary === color
-                    ? 'scale-110 border-[var(--color-text)]'
-                    : 'border-transparent'
+                className={`h-9 w-9 rounded-full border-2 border-[var(--color-border)] transition-transform ${
+                  game.theme.primary === color ? 'hard-sm scale-110' : 'opacity-70'
                 }`}
                 style={{ backgroundColor: color }}
               />
@@ -614,7 +612,7 @@ export function CustomGamePage() {
       {problems.map((problem) => (
         <p
           key={problem}
-          className="rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3 py-2 text-sm text-[var(--color-danger)]"
+          className="note note-danger"
         >
           {problem}
         </p>
@@ -668,7 +666,7 @@ function Block({
     <section className="flex flex-col gap-3">
       <button
         type="button"
-        className="flex items-center gap-2 text-left font-bold tracking-tight"
+        className="display flex items-center gap-2 text-left text-base"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >

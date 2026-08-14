@@ -5,11 +5,7 @@ export const azul: GameDefinition = {
   name: 'Azul',
   icon: '🔷',
   tagline: 'Azulejos, filas completas y suelo lleno de penalizaciones',
-  theme: {
-    primary: '#1f5f8b',
-    accent: '#e0a458',
-    surface: '#eaf2f8',
-  },
+  theme: { primary: '#1f5f8b' },
   minPlayers: 2,
   maxPlayers: 4,
   playTime: { min: 30, max: 45 },

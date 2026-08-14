@@ -5,11 +5,7 @@ export const monopoly: GameDefinition = {
   name: 'Monopoly',
   icon: '🎩',
   tagline: 'Compra media ciudad y arruina a los demás',
-  theme: {
-    primary: '#1f7a4d',
-    accent: '#d64545',
-    surface: '#eef7f0',
-  },
+  theme: { primary: '#1f7a4d' },
   minPlayers: 2,
   maxPlayers: 8,
   playTime: { min: 90, max: 180 },

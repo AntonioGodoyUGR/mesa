@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { GameCover } from './GameCover'
 import { useGames } from '../context/GamesContext'
@@ -14,14 +15,13 @@ export function MatchCard({
 }) {
   const { getGame } = useGames()
   const game = getGame(match.game_slug)
-  const color = game?.theme.primary ?? 'var(--color-brand)'
   const entries = [...match.match_players].sort((a, b) => a.rank - b.rank)
 
   return (
     <Link
       to={`/partidas/${match.id}`}
-      className="card flex items-center gap-3 p-3 transition-transform active:scale-[0.99]"
-      style={{ borderLeft: `3px solid ${color}` }}
+      className="card game-edge flex items-center gap-3 p-3 transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+      style={{ '--game': game?.theme.primary ?? 'var(--color-brand)' } as CSSProperties}
     >
       {game ? (
         <GameCover game={game} size={40} />

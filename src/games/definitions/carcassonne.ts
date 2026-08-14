@@ -5,11 +5,7 @@ export const carcassonne: GameDefinition = {
   name: 'Carcassonne',
   icon: '🏰',
   tagline: 'Coloca losetas, reclama ciudades y caminos',
-  theme: {
-    primary: '#4a6fa5',
-    accent: '#7fa650',
-    surface: '#eef2f9',
-  },
+  theme: { primary: '#4a6fa5' },
   minPlayers: 2,
   maxPlayers: 5,
   playTime: { min: 30, max: 45 },

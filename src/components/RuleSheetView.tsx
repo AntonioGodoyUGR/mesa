@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { difficultyIcon, difficultyLabel, formatPlayTime } from '../games/filters'
 import type { GameDefinition } from '../games/types'
 
@@ -13,7 +14,6 @@ import type { GameDefinition } from '../games/types'
  */
 export function RuleSheetView({ game }: { game: GameDefinition }) {
   const rules = game.rules ?? {}
-  const color = game.theme.primary
 
   const hasContent =
     !!rules.setup?.length ||
@@ -23,22 +23,22 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
     !!rules.reminders?.length
 
   return (
-    <article className="flex flex-col gap-4">
+    // El color del juego se declara una vez aquí: `--game` se hereda, así que las
+    // utilidades `game-tint` e `game-ink` de dentro lo encuentran sin pasarlo a mano.
+    <article
+      className="flex flex-col gap-4"
+      style={{ '--game': game.theme.primary } as CSSProperties}
+    >
       <div className="flex flex-wrap gap-2 text-xs">
-        {rules.players && <Chip icon="👥" text={rules.players} color={color} />}
+        {rules.players && <Chip icon="👥" text={rules.players} />}
         {/* La duración escrita a mano en la chuleta manda sobre la del buscador. */}
         {(rules.duration || game.playTime) && (
-          <Chip
-            icon="⏱️"
-            text={rules.duration ?? formatPlayTime(game.playTime)!}
-            color={color}
-          />
+          <Chip icon="⏱️" text={rules.duration ?? formatPlayTime(game.playTime)!} />
         )}
         {game.difficulty && (
           <Chip
             icon={difficultyIcon(game.difficulty)!}
             text={difficultyLabel(game.difficulty)!}
-            color={color}
           />
         )}
         <Chip
@@ -48,7 +48,6 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
               ? `Meta: ${game.targetScore} ${game.scoreLabelShort}`
               : `Gana ${game.winnerRule === 'lowest' ? 'menos' : 'más'} ${game.scoreLabelShort}`
           }
-          color={color}
         />
       </div>
 
@@ -59,14 +58,11 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       )}
 
       {!!rules.setup?.length && (
-        <Section title="Preparación" icon="🧩" color={color}>
+        <Section title="Preparación" icon="🧩">
           <ol className="flex flex-col gap-1.5">
             {rules.setup.map((step, index) => (
               <li key={step} className="flex gap-2.5 text-sm">
-                <span
-                  className="tnum mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
-                  style={{ backgroundColor: color }}
-                >
+                <span className="game-wash tnum mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-border)] text-[11px] font-bold">
                   {index + 1}
                 </span>
                 <span>{step}</span>
@@ -77,7 +73,7 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       )}
 
       {!!rules.turn?.length && (
-        <Section title="El turno" icon="🔄" color={color}>
+        <Section title="El turno" icon="🔄">
           <ul className="flex flex-col gap-2">
             {rules.turn.map((phase) => (
               <li key={phase.name} className="text-sm">
@@ -90,7 +86,7 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       )}
 
       {!!rules.scoring?.length && (
-        <Section title="Puntuación" icon="🏆" color={color}>
+        <Section title="Puntuación" icon="🏆">
           <table className="w-full text-sm">
             <tbody className="divide-y divide-[var(--color-border)]">
               {rules.scoring.map((row) => (
@@ -107,13 +103,13 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       )}
 
       {rules.endCondition && (
-        <Section title="Fin de la partida" icon="🏁" color={color}>
+        <Section title="Fin de la partida" icon="🏁">
           <p className="text-sm">{rules.endCondition}</p>
         </Section>
       )}
 
       {!!rules.reminders?.length && (
-        <Section title="No se te olvide" icon="💡" color={color}>
+        <Section title="No se te olvide" icon="💡">
           <ul className="flex flex-col gap-1.5">
             {rules.reminders.map((reminder) => (
               <li key={reminder} className="flex gap-2 text-sm">
@@ -142,12 +138,9 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
   )
 }
 
-function Chip({ icon, text, color }: { icon: string; text: string; color: string }) {
+function Chip({ icon, text }: { icon: string; text: string }) {
   return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium"
-      style={{ borderColor: `${color}55`, backgroundColor: `${color}12` }}
-    >
+    <span className="game-tint inline-flex items-center gap-1.5 rounded-full border-2 border-[var(--color-border)] px-2.5 py-1 font-semibold">
       <span aria-hidden="true">{icon}</span>
       {text}
     </span>
@@ -157,20 +150,15 @@ function Chip({ icon, text, color }: { icon: string; text: string; color: string
 function Section({
   title,
   icon,
-  color,
   children,
 }: {
   title: string
   icon: string
-  color: string
   children: React.ReactNode
 }) {
   return (
     <section className="card p-4">
-      <h2
-        className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide"
-        style={{ color }}
-      >
+      <h2 className="game-ink display mb-3 flex items-center gap-2 text-sm">
         <span aria-hidden="true">{icon}</span>
         {title}
       </h2>

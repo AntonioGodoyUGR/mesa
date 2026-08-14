@@ -62,7 +62,7 @@ export function GroupPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">Tu biblioteca</h2>
+        <h2 className="display text-base">Tu biblioteca</h2>
         <Link to="/biblioteca" className="card flex items-center gap-4 p-4">
           <span className="text-2xl leading-none" aria-hidden="true">
             📚
@@ -83,18 +83,14 @@ export function GroupPage() {
 
       {groups.length > 1 && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold">Cambiar de grupo</h2>
+          <h2 className="display text-base">Cambiar de grupo</h2>
           <div className="flex flex-wrap gap-2">
             {groups.map((candidate) => (
               <button
                 key={candidate.id}
                 type="button"
                 onClick={() => setGroupId(candidate.id)}
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
-                  candidate.id === group.id
-                    ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/12'
-                    : 'border-[var(--color-border)] text-[var(--color-muted)]'
-                }`}
+                className={`chip ${candidate.id === group.id ? 'chip-on' : ''}`}
               >
                 {candidate.name}
               </button>
@@ -104,7 +100,7 @@ export function GroupPage() {
       )}
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">
+        <h2 className="display text-base">
           Miembros con cuenta{' '}
           <span className="text-sm font-normal text-[var(--color-muted)]">
             ({membersQuery.data?.length ?? 0})
@@ -131,7 +127,7 @@ export function GroupPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">
+        <h2 className="display text-base">
           Jugadores{' '}
           <span className="text-sm font-normal text-[var(--color-muted)]">
             ({players.length})
@@ -181,7 +177,7 @@ export function GroupPage() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">
+        <h2 className="display text-base">
           Juegos del grupo{' '}
           <span className="text-sm font-normal text-[var(--color-muted)]">
             ({custom.length})
@@ -222,7 +218,7 @@ export function GroupPage() {
 
       {isDemoMode && (
         <section className="card flex flex-col gap-2 p-4 text-sm">
-          <h2 className="font-semibold">Modo demostración</h2>
+          <h2 className="display text-base">Modo demostración</h2>
           <p className="text-[var(--color-muted)]">
             No hay ninguna base de datos conectada: los datos viven en este navegador. Para
             usarlo de verdad, crea un proyecto en Supabase, ejecuta{' '}

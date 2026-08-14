@@ -61,7 +61,7 @@ scripts/            Generadores (seed de juegos, iconos PNG)
 ### La idea: todo parametrizado
 
 Un juego se describe **una sola vez**, en su fichero de `src/games/definitions/`: su icono,
-sus colores, cuántos jugadores admite, **cómo se llaman los puntos en ese juego** (Puntos de
+su color, cuántos jugadores admite, **cómo se llaman los puntos en ese juego** (Puntos de
 victoria, Puntos, Monedas), qué campos se apuntan, cómo se calcula el total, quién gana y su
 chuleta de reglas.
 
@@ -101,7 +101,7 @@ un icono que la caja de otro juego (la API de BoardGameGeek dejó de ser públic
 ### Juegos propios
 
 La misma idea, pero desde la app: **＋ Crear juego** en la portada (o en la pantalla del
-grupo) abre un formulario con el juego entero —emoji, portada, colores, jugadores, campos de
+grupo) abre un formulario con el juego entero —emoji, portada, color, jugadores, campos de
 puntuación y reglas opcionales— y una **vista previa en vivo** que es el marcador de verdad,
 no una maqueta. Se guarda como un `GameDefinition` más, así que a partir de ahí se comporta
 igual que Catán: partidas, historial, estadísticas y chuleta.
@@ -145,6 +145,20 @@ cuenta y conserva todo el histórico.
 
 La caché de TanStack Query se persiste en `localStorage`, así que las reglas y las partidas ya
 vistas se consultan sin cobertura. Guardar una partida sí requiere conexión.
+
+### El estilo
+
+Todo el aspecto vive en `src/index.css` y se resume en tres reglas: contorno de 2 px del color
+del texto, **sombra sólida desplazada** en vez de desenfoque, y titulares en negra y mayúsculas
+(`display`). El resto son piezas reutilizables —`.card`, `.btn`, `.input`, `.chip`, `.note`—;
+en los componentes casi no hay color escrito a mano.
+
+El color de cada juego es **uno solo** (`GameTheme.primary`) y nunca se pinta tal cual: se pasa
+en línea como `--game` y lo consumen las utilidades `game-wash`, `game-tint`, `game-ink` y
+`game-edge`, que lo mezclan con el fondo del modo activo. Por eso el mismo tono funciona sobre
+el papel cian y sobre el fondo casi negro, sin necesidad de una paleta por tema. Los 16 colores
+del catálogo (`src/games/catalog.ts`) están comprobados a 4.5:1 en los tres usos: como texto
+sobre claro, con texto blanco encima y aclarados sobre oscuro.
 
 ## Comandos
 
