@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useCover } from './GameCover'
 import { isCustomGame, type GameDefinition } from '../games/types'
 
 /**
@@ -8,6 +9,7 @@ import { isCustomGame, type GameDefinition } from '../games/types'
  */
 export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
   const custom = isCustomGame(game)
+  const cover = useCover(game)
 
   return (
     <Link
@@ -15,12 +17,13 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
       className="card group relative flex flex-col justify-between overflow-hidden p-4 transition-transform active:scale-[0.98]"
       style={{ borderColor: `${game.theme.primary}40` }}
     >
-      {game.imageUrl ? (
+      {cover.src ? (
         <>
           <img
-            src={game.imageUrl}
+            src={cover.src}
             alt=""
             loading="lazy"
+            onError={cover.onError}
             className="pointer-events-none absolute inset-0 h-full w-full object-cover"
           />
           {/* Degradado de abajo arriba: el nombre tiene que leerse sobre cualquier foto. */}
@@ -39,14 +42,14 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
 
       <span className="relative flex items-start justify-between gap-2">
         <span className="text-4xl leading-none" aria-hidden="true">
-          {game.imageUrl ? '' : game.icon}
+          {cover.src ? '' : game.icon}
         </span>
         {custom && (
           <span
             className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
             style={{
-              backgroundColor: game.imageUrl ? '#00000066' : game.theme.surface,
-              color: game.imageUrl ? '#fff' : game.theme.primary,
+              backgroundColor: cover.src ? '#00000066' : game.theme.surface,
+              color: cover.src ? '#fff' : game.theme.primary,
             }}
           >
             Vuestro
@@ -57,13 +60,13 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
       <span className="relative mt-3">
         <span
           className="block font-bold"
-          style={{ color: game.imageUrl ? '#fff' : game.theme.primary }}
+          style={{ color: cover.src ? '#fff' : game.theme.primary }}
         >
           {game.name}
         </span>
         <span
           className={`mt-0.5 block text-xs ${
-            game.imageUrl ? 'text-white/75' : 'text-[var(--color-muted)]'
+            cover.src ? 'text-white/75' : 'text-[var(--color-muted)]'
           }`}
         >
           {game.minPlayers}–{game.maxPlayers} jugadores · {game.scoreLabel}

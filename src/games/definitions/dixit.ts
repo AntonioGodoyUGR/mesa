@@ -12,6 +12,8 @@ export const dixit: GameDefinition = {
   },
   minPlayers: 3,
   maxPlayers: 6,
+  playTime: { min: 30, max: 30 },
+  difficulty: 'easy',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'explicit',

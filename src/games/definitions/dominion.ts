@@ -12,6 +12,8 @@ export const dominion: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 4,
+  playTime: { min: 30, max: 45 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'explicit',

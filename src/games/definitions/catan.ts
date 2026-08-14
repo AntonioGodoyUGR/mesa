@@ -12,6 +12,8 @@ export const catan: GameDefinition = {
   },
   minPlayers: 3,
   maxPlayers: 6,
+  playTime: { min: 60, max: 90 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'computed',

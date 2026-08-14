@@ -12,6 +12,8 @@ export const parchis: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 4,
+  playTime: { min: 30, max: 60 },
+  difficulty: 'easy',
   scoreLabel: 'Fichas en casa',
   scoreLabelShort: 'Casa',
   totalMode: 'computed',

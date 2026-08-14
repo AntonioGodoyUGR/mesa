@@ -129,6 +129,25 @@ alter table public.games add constraint games_custom_slug_prefix
 create index if not exists games_group_idx on public.games (group_id);
 
 -- -----------------------------------------------------------------------------
+-- Biblioteca personal: qué juegos ha comprado cada uno y cuáles desea.
+--
+-- Cuelga de la CUENTA y no del grupo a propósito: la caja está en tu estantería
+-- juegues con quien juegues. Un juego solo puede estar en un estado (la clave
+-- primaria es user+juego), porque lo comprado deja de estar deseado.
+-- -----------------------------------------------------------------------------
+create table if not exists public.game_library (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  game_slug text not null references public.games (slug) on delete cascade,
+  status text not null check (status in ('owned', 'wishlist')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, game_slug)
+);
+
+create index if not exists game_library_user_idx
+  on public.game_library (user_id, status);
+
+-- -----------------------------------------------------------------------------
 -- Partidas
 -- -----------------------------------------------------------------------------
 create table if not exists public.matches (
@@ -191,6 +210,10 @@ create trigger groups_set_updated_at before update on public.groups
 
 drop trigger if exists matches_set_updated_at on public.matches;
 create trigger matches_set_updated_at before update on public.matches
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists game_library_set_updated_at on public.game_library;
+create trigger game_library_set_updated_at before update on public.game_library
   for each row execute function public.set_updated_at();
 
 -- -----------------------------------------------------------------------------
@@ -682,6 +705,7 @@ alter table public.matches enable row level security;
 alter table public.match_players enable row level security;
 alter table public.games enable row level security;
 alter table public.game_score_fields enable row level security;
+alter table public.game_library enable row level security;
 
 -- Perfiles: cada uno gestiona el suyo; se leen los de tus compañeros de grupo.
 drop policy if exists profiles_select on public.profiles;
@@ -798,6 +822,24 @@ create policy game_score_fields_select on public.game_score_fields for select
         and (g.group_id is null or public.is_group_member(g.group_id))
     )
   );
+
+-- Biblioteca: privada de cada cuenta, en los cuatro sentidos. Ni siquiera los
+-- compañeros de grupo ven lo que tienes o lo que deseas.
+drop policy if exists game_library_select on public.game_library;
+create policy game_library_select on public.game_library for select to authenticated
+  using (user_id = auth.uid());
+
+drop policy if exists game_library_insert on public.game_library;
+create policy game_library_insert on public.game_library for insert to authenticated
+  with check (user_id = auth.uid());
+
+drop policy if exists game_library_update on public.game_library;
+create policy game_library_update on public.game_library for update to authenticated
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+drop policy if exists game_library_delete on public.game_library;
+create policy game_library_delete on public.game_library for delete to authenticated
+  using (user_id = auth.uid());
 
 -- =============================================================================
 -- Realtime: las partidas del grupo se actualizan solas en todos los móviles

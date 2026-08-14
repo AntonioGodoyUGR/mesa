@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   applyUniqueField,
   computeTotal,
+  CURATED_GAMES,
   emptyScores,
   GAME_LIST,
   rankPlayers,
   requireGame,
   validateScores,
 } from './registry'
+import { CATALOG_GAMES } from './catalog'
+import { COVERS, coverUrl } from './covers'
 import type { ScoreValues } from './types'
 
 const catan = requireGame('catan')
@@ -46,10 +49,12 @@ describe('coherencia de las definiciones', () => {
     }
   })
 
-  // `rules` es opcional en el tipo porque los juegos que crea un usuario pueden no
-  // traerla; los integrados sí están obligados a llevar la chuleta entera.
-  it('la chuleta de reglas está completa en todos los juegos integrados', () => {
-    for (const game of GAME_LIST) {
+  // `rules` es opcional en el tipo: no la traen ni los juegos que crea un usuario ni los
+  // del catálogo amplio (`catalog.data.ts`), que se declaran en una línea y enseñan «Sin
+  // chuleta de reglas» en vez de inventarse un resumen. Los escritos a mano en
+  // `definitions/` sí están obligados a llevar la chuleta entera: es lo que los distingue.
+  it('la chuleta de reglas está completa en todos los juegos escritos a mano', () => {
+    for (const game of CURATED_GAMES) {
       const rules = game.rules
       expect(rules, `${game.slug} sin chuleta`).toBeDefined()
       expect(rules?.players, game.slug).toBeTruthy()
@@ -62,10 +67,108 @@ describe('coherencia de las definiciones', () => {
     }
   })
 
+  // `playTime` y `difficulty` también son opcionales en el tipo (un juego de grupo
+  // puede no declararlos), pero sin ellos un juego del catálogo desaparecería del
+  // buscador en cuanto alguien filtrase por duración o dificultad.
+  it('todos los juegos integrados declaran duración y dificultad', () => {
+    for (const game of GAME_LIST) {
+      expect(game.playTime, `${game.slug} sin duración`).toBeDefined()
+      expect(game.playTime!.min, game.slug).toBeGreaterThan(0)
+      expect(game.playTime!.max, game.slug).toBeGreaterThanOrEqual(game.playTime!.min)
+      expect(['easy', 'medium', 'hard'], game.slug).toContain(game.difficulty)
+    }
+  })
+
+  // La portada es opcional: los juegos que no tienen caja que enseñar se quedan con su
+  // icono. Las que hay son las descargadas por `npm run covers`, servidas desde el propio
+  // dominio bajo la base del despliegue; no debe quedar ninguna URL remota escrita a mano,
+  // que es lo que había antes y suponía hacer hotlink al servidor de otro.
+  it('las portadas declaradas salen de public/covers/', () => {
+    for (const game of GAME_LIST) {
+      if (game.imageUrl === undefined) continue
+      expect(game.imageUrl, game.slug).toBe(coverUrl(game.slug))
+    }
+  })
+
+  // `covers.generated.ts` lo escribe un script y se commitea junto a los .webp. Las dos
+  // formas de que se desincronice son que sobreviva la entrada de un juego que ya no
+  // existe, y que se commitee el fichero generado sin las imágenes: ninguna de las dos
+  // rompe la compilación, solo dejan un hueco en la interfaz.
+  it('cada portada generada apunta a un juego real y a un fichero que existe', () => {
+    const slugs = new Set(GAME_LIST.map((game) => game.slug))
+    // Se listan con `import.meta.glob` en vez de leer el disco con `node:fs` porque este
+    // fichero compila con el tsconfig de la app, que no trae los tipos de Node. Sin
+    // `eager` no se importa ninguna imagen: solo interesan las claves.
+    const enDisco = new Set(
+      Object.keys(import.meta.glob('../../public/covers/*.webp')).map((path) =>
+        path.replace('../../public/', ''),
+      ),
+    )
+
+    for (const [slug, cover] of Object.entries(COVERS)) {
+      expect(slugs.has(slug), `${slug} no está en GAME_LIST`).toBe(true)
+      expect(cover.file.startsWith('/'), `${slug}: la ruta debe ser relativa`).toBe(false)
+      expect(enDisco.has(cover.file), `falta public/${cover.file}`).toBe(true)
+    }
+  })
+
   it('ningún juego integrado usa el prefijo reservado a los juegos de grupo', () => {
     for (const game of GAME_LIST) {
       expect(game.slug.startsWith('c-'), `${game.slug} pisa el prefijo c-`).toBe(false)
     }
+  })
+})
+
+describe('catálogo amplio', () => {
+  const curatedSlugs = new Set(CURATED_GAMES.map((game) => game.slug))
+
+  it('está entero dentro de la lista de juegos integrados', () => {
+    const slugs = new Set(GAME_LIST.map((game) => game.slug))
+    for (const game of CATALOG_GAMES) {
+      expect(slugs.has(game.slug), `${game.slug} no llegó a GAME_LIST`).toBe(true)
+    }
+    expect(GAME_LIST.length).toBe(CURATED_GAMES.length + CATALOG_GAMES.length)
+  })
+
+  // Si un juego del catálogo repitiera el slug de uno escrito a mano, el registro se
+  // quedaría con el escrito a mano y la fila del catálogo desaparecería sin avisar.
+  // Cuando eso pase, lo correcto es borrar la fila de `catalog.data.ts`.
+  it('ninguna fila pisa el slug de un juego escrito a mano', () => {
+    const pisados = CATALOG_GAMES.filter((game) => curatedSlugs.has(game.slug))
+    expect(pisados.map((game) => game.slug)).toEqual([])
+  })
+
+  it('cada juego trae nombre, icono y lema', () => {
+    for (const game of CATALOG_GAMES) {
+      expect(game.name.trim(), game.slug).not.toBe('')
+      expect(game.icon.trim(), game.slug).not.toBe('')
+      expect(game.tagline.trim(), game.slug).not.toBe('')
+      expect(game.slug, `${game.name}: slug con mayúsculas o símbolos`).toMatch(
+        /^[a-z0-9]+(-[a-z0-9]+)*$/,
+      )
+    }
+  })
+
+  it('los rangos de jugadores son posibles', () => {
+    for (const game of CATALOG_GAMES) {
+      expect(game.minPlayers, game.slug).toBeGreaterThan(0)
+      expect(game.maxPlayers, game.slug).toBeGreaterThanOrEqual(game.minPlayers)
+    }
+  })
+
+  it('todos declaran una hoja de puntuación utilizable', () => {
+    for (const game of CATALOG_GAMES) {
+      expect(game.fields.length, `${game.slug} sin campos`).toBeGreaterThan(0)
+      expect(game.scoreLabel.trim(), game.slug).not.toBe('')
+    }
+  })
+
+  // Cada juego copia los campos de su hoja: si los compartieran, tocar el mínimo de uno
+  // se lo cambiaría a los otros trescientos que usan la misma hoja.
+  it('dos juegos con la misma hoja no comparten el objeto de los campos', () => {
+    const conPuntos = CATALOG_GAMES.filter((game) => game.fields[0]?.key === 'points')
+    expect(conPuntos.length).toBeGreaterThan(1)
+    expect(conPuntos[0].fields[0]).not.toBe(conPuntos[1].fields[0])
   })
 })
 

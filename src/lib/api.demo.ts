@@ -5,6 +5,7 @@ import type { MesaApi } from './api'
 import type {
   Group,
   GroupMember,
+  LibraryEntry,
   Match,
   MatchPlayer,
   MatchWithPlayers,
@@ -31,6 +32,8 @@ interface DemoState {
   matchPlayers: MatchPlayer[]
   /** Los juegos que se inventa el usuario, con la imagen como data URL. */
   customGames: GameDefinition[]
+  /** Biblioteca personal: lo comprado y lo deseado. */
+  library: LibraryEntry[]
 }
 
 function uid(prefix: string): string {
@@ -144,7 +147,13 @@ function buildSeed(): DemoState {
     { playerIndex: 3, scores: { settlements: 3, cities: 1, largest_army: true, knights: 5 } },
   ])
 
-  return { user, group, players, matches, matchPlayers, customGames: [] }
+  // Dos juegos ya marcados para que la biblioteca no salga vacía en la demostración.
+  const library: LibraryEntry[] = [
+    { user_id: user.id, game_slug: 'catan', status: 'owned', created_at: `${daysAgo(30)}T20:00:00.000Z` },
+    { user_id: user.id, game_slug: 'wingspan', status: 'wishlist', created_at: `${daysAgo(5)}T20:00:00.000Z` },
+  ]
+
+  return { user, group, players, matches, matchPlayers, customGames: [], library }
 }
 
 function load(): DemoState {
@@ -152,8 +161,13 @@ function load(): DemoState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const stored = JSON.parse(raw) as DemoState
-      // Los datos guardados por una versión anterior no traían juegos propios.
-      return { ...stored, customGames: stored.customGames ?? [] }
+      // Los datos guardados por una versión anterior no traían juegos propios
+      // ni biblioteca.
+      return {
+        ...stored,
+        customGames: stored.customGames ?? [],
+        library: stored.library ?? [],
+      }
     }
   } catch {
     // Datos corruptos de una versión anterior: se regeneran.
@@ -397,6 +411,8 @@ export const demoApi: MesaApi = {
     state = {
       ...db(),
       customGames: db().customGames.filter((game) => game.slug !== slug),
+      // En Supabase lo hace la clave ajena de `game_library` con `on delete cascade`.
+      library: db().library.filter((entry) => entry.game_slug !== slug),
     }
     commit()
   },
@@ -410,5 +426,32 @@ export const demoApi: MesaApi = {
       reader.readAsDataURL(file)
     })
     return dataUrl
+  },
+
+  async listLibrary() {
+    const entries = [...db().library].sort((a, b) =>
+      b.created_at.localeCompare(a.created_at),
+    )
+    return delay(entries)
+  },
+
+  async setLibraryStatus(gameSlug, status) {
+    const rest = db().library.filter((entry) => entry.game_slug !== gameSlug)
+    state = {
+      ...db(),
+      library:
+        status === null
+          ? rest
+          : [
+              ...rest,
+              {
+                user_id: db().user.id,
+                game_slug: gameSlug,
+                status,
+                created_at: new Date().toISOString(),
+              },
+            ],
+    }
+    commit()
   },
 }

@@ -1,6 +1,7 @@
 /**
- * Genera `supabase/seed_games.sql` a partir de las definiciones de
- * `src/games/definitions/`.
+ * Genera `supabase/seed_games.sql` a partir del catálogo de la app: los juegos
+ * escritos a mano en `src/games/definitions/` y las filas del catálogo amplio
+ * (`src/games/catalog.data.ts`), que es exactamente lo que hay en `GAME_LIST`.
  *
  * Es lo que mantiene una sola fuente de verdad: las reglas de puntuación se
  * escriben una vez en TypeScript y de ahí bajan a la base de datos, que las
@@ -14,6 +15,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { GAME_LIST } from '../src/games/registry'
+import { COVERS } from '../src/games/covers'
 import type { GameDefinition, ScoreField } from '../src/games/types'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -44,6 +46,7 @@ function gameRow(game: GameDefinition, index: number): string {
     text(game.name),
     text(game.icon),
     text(game.tagline),
+    text(game.imageUrl),
     json(game.theme),
     num(game.minPlayers),
     num(game.maxPlayers),
@@ -77,21 +80,36 @@ function fieldRow(game: GameDefinition, field: ScoreField, index: number): strin
   ].join(', ')})`
 }
 
-const gameRows = GAME_LIST.map(gameRow).join(',\n')
-const fieldRows = GAME_LIST.flatMap((game) =>
+/**
+ * Las portadas integradas viven en `public/covers/` y su ruta depende de dónde esté
+ * publicada la app: en la raíz (Vercel) o bajo `/mesa/` (GitHub Pages). Guardarla en la
+ * base de datos ataría las filas a un despliegue concreto, así que se quita: la app ya
+ * resuelve la portada por su cuenta desde `covers.generated.ts`, que viaja en el bundle.
+ * En `games.image_url` solo acaban URLs absolutas, que son las de los juegos del grupo.
+ */
+function forDatabase(game: GameDefinition): GameDefinition {
+  if (!COVERS[game.slug]) return game
+  const { imageUrl: _local, ...rest } = game
+  return rest
+}
+
+const GAMES = GAME_LIST.map(forDatabase)
+
+const gameRows = GAMES.map(gameRow).join(',\n')
+const fieldRows = GAMES.flatMap((game) =>
   game.fields.map((field, index) => fieldRow(game, field, index)),
 ).join(',\n')
 
-const slugList = GAME_LIST.map((game) => text(game.slug)).join(', ')
+const slugList = GAMES.map((game) => text(game.slug)).join(', ')
 
 const sql = `-- =============================================================================
 -- GENERADO AUTOMÁTICAMENTE POR \`npm run seed:games\` — NO EDITAR A MANO.
--- Fuente: src/games/definitions/
--- Juegos: ${GAME_LIST.map((g) => g.name).join(', ')}
+-- Fuente: src/games/definitions/ y src/games/catalog.data.ts
+-- Juegos: ${GAMES.length}
 -- =============================================================================
 
 insert into public.games (
-  slug, name, icon, tagline, theme, min_players, max_players,
+  slug, name, icon, tagline, image_url, theme, min_players, max_players,
   score_label, score_label_short, total_mode, winner_rule, target_score,
   sort_order, definition
 ) values
@@ -100,6 +118,7 @@ on conflict (slug) do update set
   name = excluded.name,
   icon = excluded.icon,
   tagline = excluded.tagline,
+  image_url = excluded.image_url,
   theme = excluded.theme,
   min_players = excluded.min_players,
   max_players = excluded.max_players,
@@ -139,7 +158,7 @@ delete from public.game_score_fields f
 where f.game_slug in (${slugList})
   and not exists (
     select 1 from (values
-${GAME_LIST.flatMap((game) =>
+${GAMES.flatMap((game) =>
   game.fields.map((field) => `      (${text(game.slug)}, ${text(field.key)})`),
 ).join(',\n')}
     ) as keep(slug, field_key)
@@ -150,10 +169,11 @@ ${GAME_LIST.flatMap((game) =>
 mkdirSync(dirname(outputPath), { recursive: true })
 writeFileSync(outputPath, sql, 'utf8')
 
-const fieldCount = GAME_LIST.reduce((total, game) => total + game.fields.length, 0)
+const fieldCount = GAMES.reduce((total, game) => total + game.fields.length, 0)
 console.log(
-  `✓ supabase/seed_games.sql — ${GAME_LIST.length} juegos, ${fieldCount} campos de puntuación`,
+  `✓ supabase/seed_games.sql — ${GAMES.length} juegos, ${fieldCount} campos de puntuación`,
 )
-for (const game of GAME_LIST) {
-  console.log(`  ${game.icon} ${game.name} (${game.fields.length} campos)`)
-}
+// Listarlos todos serían cientos de líneas: se enseña cuántos hay de cada tipo.
+const conChuleta = GAMES.filter((game) => game.rules).length
+const conPortada = Object.keys(COVERS).length
+console.log(`  ${conChuleta} con chuleta de reglas, ${conPortada} con portada`)

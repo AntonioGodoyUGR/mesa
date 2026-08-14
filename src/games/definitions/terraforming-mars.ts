@@ -12,6 +12,8 @@ export const terraformingMars: GameDefinition = {
   },
   minPlayers: 1,
   maxPlayers: 5,
+  playTime: { min: 90, max: 150 },
+  difficulty: 'hard',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'computed',

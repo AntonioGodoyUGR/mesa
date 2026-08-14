@@ -12,6 +12,8 @@ export const patchwork: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 2,
+  playTime: { min: 20, max: 30 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'computed',

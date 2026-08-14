@@ -12,6 +12,8 @@ export const scrabble: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 4,
+  playTime: { min: 45, max: 90 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'explicit',

@@ -17,6 +17,10 @@ dist-ssr
 .env.*
 !.env.example
 
+# Volcados de BoardGameGeek para `npm run ids`: decenas de MB y se descargan a mano.
+# Lo que sí se versiona es el fichero generado, scripts/external-ids.generated.ts.
+scripts/data/
+
 # Capacitor
 android/
 ios/

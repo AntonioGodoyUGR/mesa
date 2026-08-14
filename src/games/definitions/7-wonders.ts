@@ -12,6 +12,8 @@ export const sevenWonders: GameDefinition = {
   },
   minPlayers: 3,
   maxPlayers: 7,
+  playTime: { min: 30, max: 45 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'computed',

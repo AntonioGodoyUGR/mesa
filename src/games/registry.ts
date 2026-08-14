@@ -1,66 +1,45 @@
 import type { GameDefinition, ScoreField, ScoreValues } from './types'
-// Clásicos
-import { monopoly } from './definitions/monopoly'
-import { trivialPursuit } from './definitions/trivial-pursuit'
-import { scrabble } from './definitions/scrabble'
-import { uno } from './definitions/uno'
-import { rummikub } from './definitions/rummikub'
-import { domino } from './definitions/domino'
-import { parchis } from './definitions/parchis'
-// Modernos
-import { catan } from './definitions/catan'
-import { carcassonne } from './definitions/carcassonne'
-import { camelUp } from './definitions/camel-up'
-import { aventurerosAlTren } from './definitions/aventureros-al-tren'
-import { azul } from './definitions/azul'
-import { splendor } from './definitions/splendor'
-import { kingOfTokyo } from './definitions/king-of-tokyo'
-import { dixit } from './definitions/dixit'
-import { patchwork } from './definitions/patchwork'
-import { sevenWonders } from './definitions/7-wonders'
-import { sevenWondersDuel } from './definitions/7-wonders-duel'
-import { wingspan } from './definitions/wingspan'
-import { cascadia } from './definitions/cascadia'
-import { everdell } from './definitions/everdell'
-import { dominion } from './definitions/dominion'
-import { terraformingMars } from './definitions/terraforming-mars'
+import { CURATED_GAMES } from './curated'
+import { CATALOG_GAMES } from './catalog'
+import { coverUrl } from './covers'
+
+export { CURATED_GAMES } from './curated'
+
+const CURATED_SLUGS = new Set(CURATED_GAMES.map((game) => game.slug))
 
 /**
- * Catálogo de juegos que vienen con la app.
- * Para añadir uno: crea su fichero en `definitions/`, impórtalo aquí y añádelo a la lista.
- * Después ejecuta `npm run seed:games` para reflejarlo en la base de datos.
+ * Catálogo de juegos que vienen con la app, en dos capas:
+ *
+ * - `CURATED_GAMES`: los escritos a mano en `definitions/`, con su hoja de puntuación
+ *   propia y su chuleta de reglas. Van primero: son los que se juegan a diario.
+ * - `CATALOG_GAMES`: los cientos de títulos declarados en una línea en `catalog.data.ts`,
+ *   con hoja genérica y sin chuleta.
+ *
+ * Si un juego está en las dos, manda la definición escrita a mano: escribir su fichero
+ * en `definitions/` es la forma de ascender un juego del catálogo.
  *
  * Los juegos que crean los usuarios NO están aquí: viven en la base de datos y se resuelven
  * en tiempo de ejecución (ver `context/GamesContext`). Su slug empieza por `c-`, prefijo que
  * ningún juego integrado puede usar.
  */
 export const BUILTIN_GAMES: GameDefinition[] = [
-  // Clásicos
-  monopoly,
-  trivialPursuit,
-  scrabble,
-  uno,
-  rummikub,
-  domino,
-  parchis,
-  // Modernos
-  catan,
-  carcassonne,
-  camelUp,
-  aventurerosAlTren,
-  azul,
-  splendor,
-  kingOfTokyo,
-  dixit,
-  patchwork,
-  sevenWonders,
-  sevenWondersDuel,
-  wingspan,
-  cascadia,
-  everdell,
-  dominion,
-  terraformingMars,
-]
+  ...CURATED_GAMES,
+  ...CATALOG_GAMES.filter((game) => !CURATED_SLUGS.has(game.slug)),
+].map(withCover)
+
+/**
+ * Le pone al juego la portada descargada, si la tiene.
+ *
+ * Se hace aquí, en un solo sitio, y no en cada definición ni al expandir el catálogo:
+ * las portadas las genera `npm run covers` a partir de la propia lista de juegos, así
+ * que si `definitions/` o `catalog.ts` importaran el fichero generado se cerraría el
+ * círculo. Un juego escrito a mano puede seguir trayendo su `imageUrl` puesta a dedo:
+ * se respeta cuando no hay portada descargada.
+ */
+function withCover(game: GameDefinition): GameDefinition {
+  const url = coverUrl(game.slug)
+  return url ? { ...game, imageUrl: url } : game
+}
 
 /** Alias histórico de `BUILTIN_GAMES`. */
 export const GAME_LIST = BUILTIN_GAMES

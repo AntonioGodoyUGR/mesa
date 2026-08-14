@@ -12,6 +12,8 @@ export const monopoly: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 8,
+  playTime: { min: 90, max: 180 },
+  difficulty: 'easy',
   scoreLabel: 'Patrimonio',
   scoreLabelShort: '€',
   totalMode: 'explicit',

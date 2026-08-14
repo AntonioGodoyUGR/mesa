@@ -5,6 +5,7 @@ import type { MesaApi } from './api'
 import type {
   Group,
   GroupMember,
+  LibraryEntry,
   MatchWithPlayers,
   Player,
   SessionUser,
@@ -214,5 +215,39 @@ export const supabaseApi: MesaApi = {
 
     const { data } = supabase.storage.from('game-images').getPublicUrl(path)
     return data.publicUrl
+  },
+
+  async listLibrary() {
+    // Sin filtro por usuario: la RLS de `game_library` ya recorta a las filas propias.
+    const { data, error } = await supabase
+      .from('game_library')
+      .select('user_id, game_slug, status, created_at')
+      .order('created_at', { ascending: false })
+    if (error) fail('No se ha podido cargar tu biblioteca', error)
+    return (data ?? []) as LibraryEntry[]
+  },
+
+  async setLibraryStatus(gameSlug, status) {
+    if (status === null) {
+      const { error } = await supabase
+        .from('game_library')
+        .delete()
+        .eq('game_slug', gameSlug)
+      if (error) fail('No se ha podido quitar el juego de tu biblioteca', error)
+      return
+    }
+
+    // `user_id` va explícito porque forma parte de la clave primaria del upsert;
+    // la policy comprueba después que sea el de la sesión.
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) throw new Error('Hay que iniciar sesión para usar la biblioteca')
+
+    const { error } = await supabase
+      .from('game_library')
+      .upsert(
+        { user_id: data.user.id, game_slug: gameSlug, status },
+        { onConflict: 'user_id,game_slug' },
+      )
+    if (error) fail('No se ha podido guardar el juego en tu biblioteca', error)
   },
 }

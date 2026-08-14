@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { GroupProvider } from './context/GroupContext'
 import { GamesProvider } from './context/GamesContext'
+import { LibraryProvider } from './context/LibraryContext'
 import { Layout } from './components/Layout'
 import { RequireAuth } from './components/RequireAuth'
 import { RequireGroup } from './components/RequireGroup'
@@ -17,6 +18,7 @@ import { PlayerProfilePage } from './pages/PlayerProfilePage'
 import { RulesIndexPage } from './pages/RulesIndexPage'
 import { RuleSheetPage } from './pages/RuleSheetPage'
 import { CustomGamePage } from './pages/CustomGamePage'
+import { LibraryPage } from './pages/LibraryPage'
 
 export default function App() {
   // GitHub Pages sirve la app bajo /mesa/; el dev server y Vercel, bajo /.
@@ -26,32 +28,36 @@ export default function App() {
       <AuthProvider>
         <GroupProvider>
           <GamesProvider>
-            <Routes>
-              <Route element={<Layout />}>
-                {/* Las reglas se consultan en la mesa, con o sin sesión iniciada. */}
-                <Route path="reglas" element={<RulesIndexPage />} />
-                <Route path="reglas/:slug" element={<RuleSheetPage />} />
-                <Route path="login" element={<LoginPage />} />
+            <LibraryProvider>
+              <Routes>
+                <Route element={<Layout />}>
+                  {/* Las reglas se consultan en la mesa, con o sin sesión iniciada. */}
+                  <Route path="reglas" element={<RulesIndexPage />} />
+                  <Route path="reglas/:slug" element={<RuleSheetPage />} />
+                  <Route path="login" element={<LoginPage />} />
 
-                <Route element={<RequireAuth />}>
-                  <Route path="grupo/nuevo" element={<GroupSetupPage />} />
+                  <Route element={<RequireAuth />}>
+                    <Route path="grupo/nuevo" element={<GroupSetupPage />} />
+                    {/* La biblioteca es de la cuenta: no hace falta tener grupo. */}
+                    <Route path="biblioteca" element={<LibraryPage />} />
 
-                  <Route element={<RequireGroup />}>
-                    <Route index element={<HomePage />} />
-                    <Route path="grupo" element={<GroupPage />} />
-                    <Route path="nueva/:slug" element={<NewMatchPage />} />
-                    <Route path="partidas" element={<MatchesPage />} />
-                    <Route path="partidas/:id" element={<MatchDetailPage />} />
-                    <Route path="jugadores" element={<PlayersPage />} />
-                    <Route path="jugadores/:id" element={<PlayerProfilePage />} />
-                    <Route path="juegos/nuevo" element={<CustomGamePage />} />
-                    <Route path="juegos/:slug/editar" element={<CustomGamePage />} />
+                    <Route element={<RequireGroup />}>
+                      <Route index element={<HomePage />} />
+                      <Route path="grupo" element={<GroupPage />} />
+                      <Route path="nueva/:slug" element={<NewMatchPage />} />
+                      <Route path="partidas" element={<MatchesPage />} />
+                      <Route path="partidas/:id" element={<MatchDetailPage />} />
+                      <Route path="jugadores" element={<PlayersPage />} />
+                      <Route path="jugadores/:id" element={<PlayerProfilePage />} />
+                      <Route path="juegos/nuevo" element={<CustomGamePage />} />
+                      <Route path="juegos/:slug/editar" element={<CustomGamePage />} />
+                    </Route>
                   </Route>
-                </Route>
 
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-            </Routes>
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Route>
+              </Routes>
+            </LibraryProvider>
           </GamesProvider>
         </GroupProvider>
       </AuthProvider>

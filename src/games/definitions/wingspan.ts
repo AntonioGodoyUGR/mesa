@@ -12,6 +12,8 @@ export const wingspan: GameDefinition = {
   },
   minPlayers: 1,
   maxPlayers: 5,
+  playTime: { min: 40, max: 70 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'computed',

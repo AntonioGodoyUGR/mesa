@@ -144,6 +144,20 @@ export function validateDefinition(game: GameDefinition): string[] {
     problems.push('El mínimo de jugadores no puede ser mayor que el máximo.')
   }
 
+  // La duración es opcional (sin ella el juego no sale al filtrar por duración),
+  // pero si se declara tiene que ser un intervalo con sentido.
+  if (game.playTime) {
+    if (game.playTime.min < 1) {
+      problems.push('La partida tiene que durar al menos un minuto.')
+    }
+    if (game.playTime.max < game.playTime.min) {
+      problems.push('La duración mínima no puede ser mayor que la máxima.')
+    }
+    if (game.playTime.max > 1440) {
+      problems.push('La duración no puede pasar de un día (1440 min).')
+    }
+  }
+
   if (game.fields.length === 0) {
     problems.push('Añade al menos un campo de puntuación.')
   }
@@ -281,6 +295,8 @@ export function normalizeDefinition(game: GameDefinition): GameDefinition {
 
   if (!normalized.rules) delete normalized.rules
   if (!normalized.imageUrl) delete normalized.imageUrl
+  if (!normalized.playTime) delete normalized.playTime
+  if (!normalized.difficulty) delete normalized.difficulty
 
   return normalized
 }

@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { searchGames } from '../games/registry'
+import { NO_FILTERS, filterGames, hasActiveFilters, type GameFilters } from '../games/filters'
+import { GameFinder } from '../components/GameFinder'
 import { GameTile } from '../components/GameTile'
 import { MatchCard } from '../components/MatchCard'
+import { ShowMore, usePaged } from '../components/ShowMore'
 import { Spinner } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
@@ -17,7 +19,7 @@ import type { GameDefinition } from '../games/types'
 export function HomePage() {
   const { group } = useGroup()
   const { games, builtin, custom } = useGames()
-  const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
 
   const matchesQuery = useQuery({
     queryKey: queryKeys.matches(group?.id ?? ''),
@@ -47,8 +49,13 @@ export function HomePage() {
   const ours = custom.filter((game) => !favouriteSlugs.has(game.slug))
   const rest = builtin.filter((game) => !favouriteSlugs.has(game.slug))
 
-  const found = useMemo(() => searchGames(games, query), [games, query])
-  const searching = query.trim().length > 0
+  const found = useMemo(() => filterGames(games, filters), [games, filters])
+  const searching = hasActiveFilters(filters)
+
+  // El catálogo son cientos de juegos: se enseñan por tandas, tanto los resultados de
+  // una búsqueda como la rejilla de abajo.
+  const results = usePaged(found)
+  const catalogue = usePaged(rest)
 
   return (
     <div className="flex flex-col gap-6">
@@ -60,20 +67,23 @@ export function HomePage() {
           </p>
         </div>
 
-        <input
-          className="input"
-          type="search"
+        <GameFinder
+          filters={filters}
+          onChange={setFilters}
           placeholder="Buscar entre los juegos…"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          results={found.length}
+          total={games.length}
         />
 
         {searching ? (
           found.length > 0 ? (
-            <GameGrid games={found} />
+            <>
+              <GameGrid games={results.shown} />
+              <ShowMore hidden={results.hidden} onClick={results.showMore} />
+            </>
           ) : (
             <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
-              Ningún juego se llama así.{' '}
+              Ningún juego cumple lo que buscas.{' '}
               <Link to="/juegos/nuevo" className="font-medium text-[var(--color-brand)]">
                 Créalo tú
               </Link>
@@ -111,7 +121,8 @@ export function HomePage() {
             <h2 className="font-bold tracking-tight">
               {favourites.length > 0 ? 'Del catálogo' : 'Todos los juegos'}
             </h2>
-            <GameGrid games={rest} />
+            <GameGrid games={catalogue.shown} />
+            <ShowMore hidden={catalogue.hidden} onClick={catalogue.showMore} />
           </>
         )}
       </section>

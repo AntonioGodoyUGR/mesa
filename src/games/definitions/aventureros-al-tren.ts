@@ -12,6 +12,8 @@ export const aventurerosAlTren: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 5,
+  playTime: { min: 30, max: 60 },
+  difficulty: 'easy',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'computed',

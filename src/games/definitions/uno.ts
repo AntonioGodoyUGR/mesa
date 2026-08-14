@@ -12,6 +12,8 @@ export const uno: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 10,
+  playTime: { min: 30, max: 45 },
+  difficulty: 'easy',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'explicit',

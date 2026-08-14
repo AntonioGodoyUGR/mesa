@@ -12,6 +12,8 @@ export const carcassonne: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 5,
+  playTime: { min: 30, max: 45 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'explicit',

@@ -12,6 +12,8 @@ export const rummikub: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 4,
+  playTime: { min: 45, max: 60 },
+  difficulty: 'easy',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'explicit',

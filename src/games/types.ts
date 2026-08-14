@@ -70,6 +70,20 @@ export interface RuleSheet {
   officialLink?: { label: string; url: string }
 }
 
+/**
+ * Cuánto cuesta ponerse a jugar, para el buscador.
+ * - `easy`: se explica en cinco minutos (Uno, Dixit, parchís).
+ * - `medium`: hay que pensar, pero se pilla jugando (Catán, Azul, 7 Wonders).
+ * - `hard`: toca leerse el reglamento antes (Terraforming Mars, Everdell).
+ */
+export type GameDifficulty = 'easy' | 'medium' | 'hard'
+
+/** Duración típica de una partida, en minutos. Si el juego dura siempre lo mismo, `min === max`. */
+export interface PlayTime {
+  min: number
+  max: number
+}
+
 export interface GameTheme {
   /** Color principal del juego, usado en el icono y los acentos. */
   primary: string
@@ -90,6 +104,14 @@ export interface GameDefinition {
   theme: GameTheme
   minPlayers: number
   maxPlayers: number
+  /**
+   * Duración típica en minutos, para buscar por «lo que nos queda de tarde».
+   * Opcional como `rules`: un juego creado por un usuario puede no declararla, y
+   * entonces no aparece al filtrar por duración. Los del catálogo la llevan siempre.
+   */
+  playTime?: PlayTime
+  /** Lo mismo que `playTime`, pero para filtrar por lo espeso que es el juego. */
+  difficulty?: GameDifficulty
   /** Cómo se llaman los puntos EN ESTE JUEGO: «Puntos de victoria», «Monedas»… */
   scoreLabel: string
   /** Forma corta para columnas de tabla: «PV», «Pts», «€». */

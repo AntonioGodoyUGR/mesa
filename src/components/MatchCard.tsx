@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { GameCover } from './GameCover'
 import { useGames } from '../context/GamesContext'
 import { formatDate } from '../lib/stats'
 import type { MatchWithPlayers } from '../lib/types'
@@ -22,9 +23,13 @@ export function MatchCard({
       className="card flex items-center gap-3 p-3 transition-transform active:scale-[0.99]"
       style={{ borderLeft: `3px solid ${color}` }}
     >
-      <span className="text-2xl leading-none" aria-hidden="true">
-        {game?.icon ?? '🎲'}
-      </span>
+      {game ? (
+        <GameCover game={game} size={40} />
+      ) : (
+        <span className="text-2xl leading-none" aria-hidden="true">
+          🎲
+        </span>
+      )}
 
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline gap-2">

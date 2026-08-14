@@ -12,6 +12,8 @@ export const trivialPursuit: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 6,
+  playTime: { min: 60, max: 90 },
+  difficulty: 'easy',
   scoreLabel: 'Quesitos',
   scoreLabelShort: 'Q',
   totalMode: 'computed',

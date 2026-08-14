@@ -1,3 +1,4 @@
+import { difficultyIcon, difficultyLabel, formatPlayTime } from '../games/filters'
 import type { GameDefinition } from '../games/types'
 
 /**
@@ -25,7 +26,21 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
     <article className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2 text-xs">
         {rules.players && <Chip icon="👥" text={rules.players} color={color} />}
-        {rules.duration && <Chip icon="⏱️" text={rules.duration} color={color} />}
+        {/* La duración escrita a mano en la chuleta manda sobre la del buscador. */}
+        {(rules.duration || game.playTime) && (
+          <Chip
+            icon="⏱️"
+            text={rules.duration ?? formatPlayTime(game.playTime)!}
+            color={color}
+          />
+        )}
+        {game.difficulty && (
+          <Chip
+            icon={difficultyIcon(game.difficulty)!}
+            text={difficultyLabel(game.difficulty)!}
+            color={color}
+          />
+        )}
         <Chip
           icon={game.winnerRule === 'lowest' ? '⬇️' : '⬆️'}
           text={

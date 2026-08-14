@@ -18,7 +18,8 @@ import {
   validateDefinition,
 } from '../games/custom'
 import { applyUniqueField, emptyScores } from '../games/registry'
-import type { GameDefinition, RuleSheet, ScoreValues } from '../games/types'
+import { DIFFICULTY_OPTIONS } from '../games/filters'
+import type { GameDefinition, PlayTime, RuleSheet, ScoreValues } from '../games/types'
 import { ScoreFieldEditor } from '../components/ScoreFieldEditor'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { RuleSheetView } from '../components/RuleSheetView'
@@ -154,6 +155,18 @@ export function CustomGamePage() {
 
   function update(patch: Partial<GameDefinition>) {
     setDraft({ ...(base as GameDefinition), ...patch })
+  }
+
+  /**
+   * Duración en minutos. Dejar los dos números a cero es válido: el juego se guarda
+   * sin duración y entonces no aparece al filtrar por ella.
+   */
+  function updatePlayTime(patch: Partial<PlayTime>) {
+    const current = game!.playTime
+    const next: PlayTime = { min: current?.min ?? 0, max: current?.max ?? 0, ...patch }
+    // Subir el mínimo arrastra al máximo: nadie quiere ver «de 60 a 30 minutos».
+    if (patch.min !== undefined && next.max < next.min) next.max = next.min
+    update({ playTime: next.min > 0 || next.max > 0 ? next : undefined })
   }
 
   function updateField(index: number, next: GameDefinition['fields'][number]) {
@@ -336,6 +349,52 @@ export function CustomGamePage() {
               value={game.maxPlayers}
               onChange={(event) => update({ maxPlayers: Number(event.target.value) })}
             />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="label">Dura (mín. minutos)</span>
+            <input
+              className="input tnum"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={1440}
+              placeholder="Sin decir"
+              value={game.playTime?.min || ''}
+              onChange={(event) => updatePlayTime({ min: Number(event.target.value) || 0 })}
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="label">Dura (máx. minutos)</span>
+            <input
+              className="input tnum"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={1440}
+              placeholder="Sin decir"
+              value={game.playTime?.max || ''}
+              onChange={(event) => updatePlayTime({ max: Number(event.target.value) || 0 })}
+            />
+          </label>
+          <label className="col-span-2 flex flex-col gap-1">
+            <span className="label">Dificultad</span>
+            <select
+              className="input"
+              value={game.difficulty ?? ''}
+              onChange={(event) =>
+                update({
+                  difficulty:
+                    (event.target.value as GameDefinition['difficulty']) || undefined,
+                })
+              }
+            >
+              <option value="">Sin especificar</option>
+              {DIFFICULTY_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.icon} {option.label} · {option.hint}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="flex flex-col gap-1">
             <span className="label">Cómo se llaman los puntos</span>

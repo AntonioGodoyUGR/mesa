@@ -1,14 +1,20 @@
 import { Link, useParams } from 'react-router-dom'
+import { GameCover } from '../components/GameCover'
+import { LibraryToggle } from '../components/LibraryToggle'
 import { RuleSheetView } from '../components/RuleSheetView'
 import { EmptyState, Spinner } from '../components/ui'
+import { useAuth } from '../context/AuthContext'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
+import { useLibrary } from '../context/LibraryContext'
 
 export function RuleSheetPage() {
   const { slug } = useParams()
   const { getGame, loading } = useGames()
   const game = getGame(slug)
   const { group } = useGroup()
+  const { user } = useAuth()
+  const { statusOf, setStatus, saving } = useLibrary()
 
   if (loading) return <Spinner />
 
@@ -29,9 +35,7 @@ export function RuleSheetPage() {
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center gap-3">
-        <span className="text-3xl leading-none" aria-hidden="true">
-          {game.icon}
-        </span>
+        <GameCover game={game} size={52} />
         <div className="min-w-0 flex-1">
           <h1
             className="truncate text-xl font-bold tracking-tight"
@@ -50,6 +54,24 @@ export function RuleSheetPage() {
           </Link>
         )}
       </header>
+
+      {/* Sin sesión no hay biblioteca donde guardarlo: la chuleta es ruta pública. */}
+      {user && (
+        <section className="card flex flex-wrap items-center gap-3 p-3">
+          <span className="min-w-0 flex-1 text-sm text-[var(--color-muted)]">
+            ¿Lo tienes en casa?{' '}
+            <Link to="/biblioteca" className="font-medium text-[var(--color-brand)]">
+              Tu biblioteca
+            </Link>
+          </span>
+          <LibraryToggle
+            gameName={game.name}
+            status={statusOf(game.slug)}
+            onChange={(next) => setStatus(game.slug, next)}
+            disabled={saving}
+          />
+        </section>
+      )}
 
       <RuleSheetView game={game} />
 

@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { computeBreakdown } from '../games/registry'
 import { formatDate } from '../lib/stats'
+import { GameCover } from '../components/GameCover'
 import { Avatar, EmptyState, ErrorNote, Spinner } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
@@ -55,9 +56,13 @@ export function MatchDetailPage() {
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center gap-3">
-        <span className="text-3xl leading-none" aria-hidden="true">
-          {game?.icon ?? '🎲'}
-        </span>
+        {game ? (
+          <GameCover game={game} size={52} />
+        ) : (
+          <span className="text-3xl leading-none" aria-hidden="true">
+            🎲
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-bold tracking-tight" style={{ color }}>
             {game?.name ?? match.game_slug}

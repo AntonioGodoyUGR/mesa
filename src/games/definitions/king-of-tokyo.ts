@@ -12,6 +12,8 @@ export const kingOfTokyo: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 6,
+  playTime: { min: 30, max: 30 },
+  difficulty: 'easy',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'explicit',

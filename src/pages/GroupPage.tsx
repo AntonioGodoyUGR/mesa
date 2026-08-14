@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../context/AuthContext'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
+import { useLibrary } from '../context/LibraryContext'
 import { api, isDemoMode, queryKeys } from '../lib/api'
 import { Avatar, ErrorNote, PageHeader } from '../components/ui'
 
@@ -13,6 +14,7 @@ export function GroupPage() {
   const { user, signOut } = useAuth()
   const { group, groups, setGroupId, players } = useGroup()
   const { custom } = useGames()
+  const { counts } = useLibrary()
   const [copied, setCopied] = useState(false)
   const [guestName, setGuestName] = useState('')
 
@@ -57,6 +59,26 @@ export function GroupPage() {
         <button type="button" className="btn btn-ghost shrink-0" onClick={() => void copyCode()}>
           {copied ? '¡Copiado!' : 'Copiar'}
         </button>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="font-semibold">Tu biblioteca</h2>
+        <Link to="/biblioteca" className="card flex items-center gap-4 p-4">
+          <span className="text-2xl leading-none" aria-hidden="true">
+            📚
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="tnum block text-sm font-medium">
+              {counts.owned} en casa · {counts.wishlist} en la lista de deseos
+            </span>
+            <span className="block text-xs text-[var(--color-muted)]">
+              Marca qué juegos has comprado y cuáles quieres. Solo los ves tú.
+            </span>
+          </span>
+          <span className="text-[var(--color-muted)]" aria-hidden="true">
+            ›
+          </span>
+        </Link>
       </section>
 
       {groups.length > 1 && (

@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { applyUniqueField, emptyScores, validateScores } from '../games/registry'
 import type { ScoreValues } from '../games/types'
+import { GameCover } from '../components/GameCover'
 import { PlayerPicker } from '../components/PlayerPicker'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { ErrorNote, Spinner } from '../components/ui'
@@ -129,9 +130,7 @@ export function NewMatchPage() {
   return (
     <div className="flex flex-col gap-5">
       <header className="flex items-center gap-3">
-        <span className="text-3xl leading-none" aria-hidden="true">
-          {game.icon}
-        </span>
+        <GameCover game={game} size={52} />
         <div className="min-w-0">
           <h1 className="truncate text-xl font-bold tracking-tight">{game.name}</h1>
           <p className="text-sm text-[var(--color-muted)]">

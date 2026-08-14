@@ -117,6 +117,15 @@ describe('validateDefinition', () => {
     )
   })
 
+  it('la duración es opcional, pero si se declara tiene que tener sentido', () => {
+    const game = { ...blankCustomGame(), name: 'Mi juego' }
+    expect(validateDefinition(game)).toEqual([])
+    expect(validateDefinition({ ...game, playTime: { min: 20, max: 40 } })).toEqual([])
+
+    const alReves = validateDefinition({ ...game, playTime: { min: 60, max: 30 } })
+    expect(alReves.some((p) => p.includes('duración mínima'))).toBe(true)
+  })
+
   it('detecta un campo con el mínimo por encima del máximo', () => {
     const game = blankCustomGame()
     game.name = 'Mi juego'
@@ -179,6 +188,12 @@ describe('normalizeDefinition', () => {
     expect(normalized.name).toBe('Mi juego')
     expect(normalized.tagline).toBe('Una frase')
     expect('rules' in normalized).toBe(false)
+  })
+
+  it('no guarda la duración ni la dificultad si no se han dicho', () => {
+    const normalized = normalizeDefinition({ ...blankCustomGame(), name: 'Mi juego' })
+    expect('playTime' in normalized).toBe(false)
+    expect('difficulty' in normalized).toBe(false)
   })
 
   it('un campo de sí o no no arrastra límites numéricos', () => {

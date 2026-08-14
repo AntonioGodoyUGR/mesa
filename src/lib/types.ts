@@ -82,3 +82,24 @@ export interface SessionUser {
   email: string | null
   displayName: string
 }
+
+/**
+ * Qué relación tiene el usuario con un juego concreto:
+ * `owned` lo tiene en casa, `wishlist` le gustaría tenerlo.
+ * No hay tercer estado: un juego que no está en la biblioteca no tiene fila.
+ */
+export type LibraryStatus = 'owned' | 'wishlist'
+
+/**
+ * Una entrada de la biblioteca personal.
+ *
+ * Es de la CUENTA, no del grupo: la caja está en tu estantería juegues con quien
+ * juegues. Los juegos que crea un grupo también se pueden marcar, y entonces la
+ * entrada solo tiene sentido mientras sigas en ese grupo.
+ */
+export interface LibraryEntry {
+  user_id: string
+  game_slug: string
+  status: LibraryStatus
+  created_at: string
+}

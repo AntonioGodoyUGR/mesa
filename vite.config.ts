@@ -40,7 +40,22 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Las portadas de public/covers/ NO entran aquí a propósito: son cientos de
+        // webp y precargarlas obligaría a bajarse una veintena de megas al instalar el
+        // service worker. Se cachean sobre la marcha, según se van viendo.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/covers\/[^/]+\.webp$/,
+            // Una portada no cambia nunca: si está en caché, no hay nada que preguntar.
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'portadas',
+              expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 180 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
         // Las respuestas de Supabase NO se cachean en el service worker:
         // la lectura offline la cubre la caché persistida de TanStack Query,
         // que sabe invalidar por consulta.

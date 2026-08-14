@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { searchGames } from '../games/registry'
+import {
+  NO_FILTERS,
+  difficultyLabel,
+  filterGames,
+  formatPlayTime,
+  hasActiveFilters,
+  type GameFilters,
+} from '../games/filters'
+import { GameCover } from '../components/GameCover'
+import { GameFinder } from '../components/GameFinder'
+import { ShowMore, usePaged } from '../components/ShowMore'
 import { PageHeader } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import type { GameDefinition } from '../games/types'
@@ -11,10 +21,10 @@ import type { GameDefinition } from '../games/types'
  */
 export function RulesIndexPage() {
   const { builtin, custom } = useGames()
-  const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
 
-  const official = useMemo(() => searchGames(builtin, query), [builtin, query])
-  const ours = useMemo(() => searchGames(custom, query), [custom, query])
+  const official = useMemo(() => filterGames(builtin, filters), [builtin, filters])
+  const ours = useMemo(() => filterGames(custom, filters), [custom, filters])
   const nothing = official.length === 0 && ours.length === 0
 
   return (
@@ -24,17 +34,18 @@ export function RulesIndexPage() {
         subtitle="Chuletas de una ojeada, disponibles sin conexión."
       />
 
-      <input
-        className="input"
-        type="search"
-        placeholder="Buscar juego…"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
+      <GameFinder
+        filters={filters}
+        onChange={setFilters}
+        results={official.length + ours.length}
+        total={builtin.length + custom.length}
       />
 
       {nothing && (
         <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
-          Ningún juego se llama así.
+          {hasActiveFilters(filters)
+            ? 'Ningún juego cumple lo que buscas.'
+            : 'Todavía no hay ninguna chuleta.'}
         </p>
       )}
 
@@ -51,25 +62,40 @@ export function RulesIndexPage() {
   )
 }
 
+/** «2–4 jugadores · 30–45 min · Medio», saltándose lo que el juego no declare. */
+function gameMeta(game: GameDefinition): string {
+  return [
+    `${game.minPlayers}–${game.maxPlayers} jugadores`,
+    formatPlayTime(game.playTime),
+    difficultyLabel(game.difficulty),
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
 function GameList({ title, games }: { title: string | null; games: GameDefinition[] }) {
+  // El índice de chuletas lista el catálogo entero: por tandas, como en la portada.
+  const page = usePaged(games)
+
   return (
     <section className="flex flex-col gap-2">
       {title && <h2 className="font-semibold">{title}</h2>}
       <ul className="flex flex-col gap-2">
-        {games.map((game) => (
+        {page.shown.map((game) => (
           <li key={game.slug}>
             <Link
               to={`/reglas/${game.slug}`}
               className="card flex items-center gap-3 p-3"
               style={{ borderLeft: `3px solid ${game.theme.primary}` }}
             >
-              <span className="text-2xl leading-none" aria-hidden="true">
-                {game.icon}
-              </span>
+              <GameCover game={game} size={40} />
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold">{game.name}</span>
                 <span className="block truncate text-xs text-[var(--color-muted)]">
                   {game.rules ? game.tagline : 'Sin chuleta de reglas'}
+                </span>
+                <span className="tnum block truncate text-xs text-[var(--color-muted)]">
+                  {gameMeta(game)}
                 </span>
               </span>
               <span className="text-[var(--color-muted)]" aria-hidden="true">
@@ -79,6 +105,8 @@ function GameList({ title, games }: { title: string | null; games: GameDefinitio
           </li>
         ))}
       </ul>
+
+      <ShowMore hidden={page.hidden} onClick={page.showMore} />
     </section>
   )
 }

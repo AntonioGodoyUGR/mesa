@@ -5,6 +5,8 @@ import type { GameDefinition } from '../games/types'
 import type {
   Group,
   GroupMember,
+  LibraryEntry,
+  LibraryStatus,
   MatchWithPlayers,
   Player,
   SaveCustomGameInput,
@@ -47,6 +49,11 @@ export interface MesaApi {
   deleteCustomGame(slug: string): Promise<void>
   /** Sube la portada ya redimensionada y devuelve su URL pública. */
   uploadGameImage(groupId: string, file: Blob): Promise<string>
+
+  /** La biblioteca de la cuenta con la sesión iniciada: comprados y deseados. */
+  listLibrary(): Promise<LibraryEntry[]>
+  /** Marca un juego, lo mueve de sección o —con `null`— lo saca de la biblioteca. */
+  setLibraryStatus(gameSlug: string, status: LibraryStatus | null): Promise<void>
 }
 
 export const api: MesaApi = isSupabaseConfigured ? supabaseApi : demoApi
@@ -62,4 +69,6 @@ export const queryKeys = {
   players: (groupId: string) => ['players', groupId] as const,
   matches: (groupId: string) => ['matches', groupId] as const,
   games: (groupId: string) => ['games', groupId] as const,
+  // La biblioteca es de la cuenta, no del grupo: no lleva id en la clave.
+  library: ['library'] as const,
 }

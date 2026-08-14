@@ -12,6 +12,8 @@ export const camelUp: GameDefinition = {
   },
   minPlayers: 3,
   maxPlayers: 8,
+  playTime: { min: 20, max: 30 },
+  difficulty: 'easy',
   scoreLabel: 'Monedas',
   scoreLabelShort: '🪙',
   totalMode: 'explicit',

@@ -12,6 +12,8 @@ export const splendor: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 4,
+  playTime: { min: 30, max: 30 },
+  difficulty: 'easy',
   scoreLabel: 'Prestigio',
   scoreLabelShort: 'PP',
   totalMode: 'explicit',

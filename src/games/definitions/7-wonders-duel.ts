@@ -12,6 +12,8 @@ export const sevenWondersDuel: GameDefinition = {
   },
   minPlayers: 2,
   maxPlayers: 2,
+  playTime: { min: 30, max: 30 },
+  difficulty: 'medium',
   scoreLabel: 'Puntos de victoria',
   scoreLabelShort: 'PV',
   totalMode: 'computed',

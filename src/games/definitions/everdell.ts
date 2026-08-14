@@ -12,6 +12,8 @@ export const everdell: GameDefinition = {
   },
   minPlayers: 1,
   maxPlayers: 4,
+  playTime: { min: 40, max: 80 },
+  difficulty: 'hard',
   scoreLabel: 'Puntos',
   scoreLabelShort: 'Pts',
   totalMode: 'computed',
