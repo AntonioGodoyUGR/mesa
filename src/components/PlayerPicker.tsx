@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Player } from '../lib/types'
-import { Avatar, ErrorNote } from './ui'
+import { Avatar } from './Avatar'
+import { ErrorNote } from './ui'
 
 /**
  * Selección de los jugadores de la partida: chips con los del grupo y alta
@@ -59,6 +60,7 @@ export function PlayerPicker({
             >
               <Avatar
                 name={player.display_name}
+                avatar={player.avatar_url}
                 size={26}
                 registered={!!player.user_id}
               />

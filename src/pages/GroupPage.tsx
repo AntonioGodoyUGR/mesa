@@ -6,7 +6,8 @@ import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { useLibrary } from '../context/LibraryContext'
 import { api, isDemoMode, queryKeys } from '../lib/api'
-import { Avatar, ErrorNote, PageHeader } from '../components/ui'
+import { Avatar } from '../components/Avatar'
+import { ErrorNote, PageHeader } from '../components/ui'
 
 export function GroupPage() {
   const navigate = useNavigate()
@@ -109,7 +110,12 @@ export function GroupPage() {
         <ul className="card divide-y divide-[var(--color-border)]">
           {(membersQuery.data ?? []).map((member) => (
             <li key={member.user_id} className="flex items-center gap-3 px-4 py-3">
-              <Avatar name={member.profile?.display_name ?? '?'} size={32} registered />
+              <Avatar
+                name={member.profile?.display_name ?? '?'}
+                avatar={member.profile?.avatar_url}
+                size={32}
+                registered
+              />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">
                 {member.profile?.display_name ?? 'Sin nombre'}
                 {member.user_id === user?.id && (
@@ -142,6 +148,7 @@ export function GroupPage() {
               >
                 <Avatar
                   name={player.display_name}
+                  avatar={player.avatar_url}
                   size={32}
                   registered={!!player.user_id}
                 />

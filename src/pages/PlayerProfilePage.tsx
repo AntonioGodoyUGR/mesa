@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   computeHeadToHead,
   computePlayerStats,
@@ -8,15 +9,23 @@ import {
   matchesOf,
 } from '../lib/stats'
 import { MatchCard } from '../components/MatchCard'
-import { Avatar, EmptyState, Spinner, Stat } from '../components/ui'
+import { Avatar } from '../components/Avatar'
+import { AvatarEditor } from '../components/AvatarEditor'
+import { EmptyState, ErrorNote, Spinner, Stat } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
+import { hasAvatar, parseAvatar, serializeAvatar, type AvatarLook } from '../lib/avatar'
 
 export function PlayerProfilePage() {
   const { id } = useParams()
+  const queryClient = useQueryClient()
   const { group, players, me } = useGroup()
   const { getGame } = useGames()
+
+  // Mientras se compone, el muñeco vive aquí; al guardar se convierte en la cadena
+  // que va a `avatar_url` y el borrador desaparece.
+  const [draft, setDraft] = useState<AvatarLook | null>(null)
 
   const matchesQuery = useQuery({
     queryKey: queryKeys.matches(group?.id ?? ''),
@@ -25,6 +34,15 @@ export function PlayerProfilePage() {
   })
 
   const player = players.find((candidate) => candidate.id === id)
+
+  const saveAvatar = useMutation({
+    mutationFn: (value: string | null) => api.setPlayerAvatar(player!.id, value),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.players(group!.id) })
+      setDraft(null)
+    },
+  })
+
   if (!player) {
     return (
       <EmptyState
@@ -47,8 +65,13 @@ export function PlayerProfilePage() {
   return (
     <div className="flex flex-col gap-5">
       <header className="flex items-center gap-4">
-        <Avatar name={player.display_name} size={56} registered={!!player.user_id} />
-        <div className="min-w-0">
+        <Avatar
+          name={player.display_name}
+          avatar={player.avatar_url}
+          size={56}
+          registered={!!player.user_id}
+        />
+        <div className="min-w-0 flex-1">
           <h1 className="display truncate text-xl">
             {player.display_name}
           </h1>
@@ -57,7 +80,48 @@ export function PlayerProfilePage() {
             {stats.currentStreak > 1 && ` · 🔥 ${stats.currentStreak} seguidas`}
           </p>
         </div>
+        {/* El avatar de cualquiera del grupo lo puede cambiar cualquiera del grupo,
+            igual que el nombre: los invitados no tienen cuenta con la que hacerlo. */}
+        <button
+          type="button"
+          className="btn btn-ghost shrink-0 px-3 py-1.5 text-sm"
+          onClick={() =>
+            setDraft(
+              draft ? null : parseAvatar(player.avatar_url, player.display_name),
+            )
+          }
+        >
+          {draft ? 'Cerrar' : '🎨 Avatar'}
+        </button>
       </header>
+
+      {draft && (
+        <section className="card flex flex-col gap-4 p-4">
+          <AvatarEditor look={draft} onChange={setDraft} />
+
+          <ErrorNote error={saveAvatar.error} />
+
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={saveAvatar.isPending}
+            onClick={() => saveAvatar.mutate(serializeAvatar(draft))}
+          >
+            {saveAvatar.isPending ? 'Guardando…' : 'Guardar avatar'}
+          </button>
+
+          {hasAvatar(player.avatar_url) && (
+            <button
+              type="button"
+              className="btn btn-ghost text-[var(--color-danger)]"
+              disabled={saveAvatar.isPending}
+              onClick={() => saveAvatar.mutate(null)}
+            >
+              Volver al de siempre
+            </button>
+          )}
+        </section>
+      )}
 
       {matchesQuery.isLoading && <Spinner />}
 

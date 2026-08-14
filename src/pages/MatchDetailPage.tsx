@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { computeBreakdown } from '../games/registry'
 import { formatDate } from '../lib/stats'
 import { GameCover } from '../components/GameCover'
-import { Avatar, EmptyState, ErrorNote, Spinner } from '../components/ui'
+import { Avatar } from '../components/Avatar'
+import { EmptyState, ErrorNote, Spinner } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
@@ -141,6 +142,7 @@ function PlayerBreakdown({
         </span>
         <Avatar
           name={entry.player.display_name}
+          avatar={entry.player.avatar_url}
           size={34}
           registered={!!entry.player.user_id}
         />

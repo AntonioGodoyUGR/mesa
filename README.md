@@ -194,6 +194,21 @@ cuenta** (lo valida el RPC `save_match`, no solo la interfaz) y no hay máximo. 
 un invitado se registra y entra al grupo con el código, `join_group` enlaza su ficha con la
 cuenta y conserva todo el histórico.
 
+### Avatares
+
+Cada jugador tiene un muñeco —busto dentro de un círculo, al estilo de Gartic Phone— que se
+compone desde su ficha (**🎨 Avatar**): fondo, tono de piel, camiseta, seis peinados con su
+color, seis sombreros y seis complementos, con un botón de **🎲 Sorpréndeme**. El dibujo es
+SVG escrito a mano en `src/components/Avatar.tsx` sobre un lienzo de 100×100, así que se ve
+igual a 24 px en la barra que a 160 px en el editor y no descarga nada.
+
+**No hay columna nueva ni imágenes que subir.** Un avatar es una lista corta de opciones que
+`src/lib/avatar.ts` serializa como texto en el `avatar_url` de siempre, con esquema propio
+(`mesa:1?bg=4&sk=1&…`). Eso lo hace válido también para un invitado sin cuenta, y lo que no
+se entienda al leerlo —un rasgo que falte, un valor inventado— se sustituye rasgo a rasgo por
+el que toca por el nombre, nunca por una pantalla rota. Quien no haya elegido el suyo recibe
+justo ese: derivado del nombre, estable en cualquier dispositivo y sin guardar nada.
+
 ### Sin conexión
 
 La caché de TanStack Query se persiste en `localStorage`, así que las reglas y las partidas ya

@@ -38,6 +38,11 @@ export interface MesaApi {
   listPlayers(groupId: string): Promise<Player[]>
   addPlayer(groupId: string, displayName: string): Promise<Player>
   renamePlayer(playerId: string, displayName: string): Promise<void>
+  /**
+   * Guarda el muñeco de un jugador (`lib/avatar.ts` decide qué significa la cadena).
+   * Con `null` vuelve al que le toca por su nombre.
+   */
+  setPlayerAvatar(playerId: string, avatar: string | null): Promise<void>
 
   listMatches(groupId: string): Promise<MatchWithPlayers[]>
   saveMatch(input: SaveMatchInput): Promise<string>

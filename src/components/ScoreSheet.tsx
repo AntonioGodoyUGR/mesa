@@ -2,12 +2,14 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import { computeTotal } from '../games/registry'
 import type { GameDefinition, ScoreValues } from '../games/types'
 import { ScoreFieldInput } from './ScoreFieldInput'
-import { Avatar } from './ui'
+import { Avatar } from './Avatar'
 
 export interface ScoreRow {
   playerId: string
   name: string
   registered: boolean
+  /** Lo guardado en `players.avatar_url`; sin él, el muñeco sale del nombre. */
+  avatar?: string | null
   scores: ScoreValues
 }
 
@@ -133,7 +135,12 @@ function PlayerCard({
       <header
         className={`flex items-center gap-3 px-4 py-3 ${leading ? 'game-tint' : ''}`}
       >
-        <Avatar name={row.name} size={34} registered={row.registered} />
+        <Avatar
+          name={row.name}
+          avatar={row.avatar}
+          size={34}
+          registered={row.registered}
+        />
 
         <span className="min-w-0 flex-1">
           <span className="block truncate font-semibold">{row.name}</span>

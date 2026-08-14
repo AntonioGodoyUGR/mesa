@@ -318,6 +318,12 @@ export const demoApi: MesaApi = {
     commit()
   },
 
+  async setPlayerAvatar(playerId, avatar) {
+    const player = db().players.find((entry) => entry.id === playerId)
+    if (player) player.avatar_url = avatar
+    commit()
+  },
+
   async listMatches(groupId) {
     const matches = db()
       .matches.filter((match) => match.group_id === groupId)

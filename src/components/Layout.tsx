@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useGroup } from '../context/GroupContext'
 import { isDemoMode } from '../lib/api'
 import { getStoredTheme, resolveTheme, setTheme } from '../lib/theme'
-import { Avatar } from './ui'
+import { Avatar } from './Avatar'
 
 interface Tab {
   to: string
@@ -58,7 +58,7 @@ function DemoBanner() {
 
 export function Layout() {
   const { user } = useAuth()
-  const { group } = useGroup()
+  const { group, me } = useGroup()
   const location = useLocation()
 
   // Una pestaña que lleva a una pantalla vetada es una promesa incumplida: la
@@ -96,8 +96,17 @@ export function Layout() {
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             {user ? (
-              <Link to="/grupo" aria-label="Tu grupo y tu cuenta">
-                <Avatar name={user.displayName} size={36} registered />
+              // Con grupo, el avatar lleva a tu propia ficha, que es donde se cambia.
+              <Link
+                to={me ? `/jugadores/${me.id}` : '/grupo'}
+                aria-label={me ? 'Tu ficha y tu avatar' : 'Tu grupo y tu cuenta'}
+              >
+                <Avatar
+                  name={me?.display_name ?? user.displayName}
+                  avatar={me?.avatar_url}
+                  size={36}
+                  registered
+                />
               </Link>
             ) : (
               <Link to="/login" className="btn btn-primary px-3 py-1.5 text-sm">

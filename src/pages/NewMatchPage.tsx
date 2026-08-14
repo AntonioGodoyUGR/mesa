@@ -51,6 +51,7 @@ export function NewMatchPage() {
           playerId,
           name: player?.display_name ?? 'Jugador',
           registered: !!player?.user_id,
+          avatar: player?.avatar_url,
           scores: scoresById[playerId] ?? {},
         }
       }),

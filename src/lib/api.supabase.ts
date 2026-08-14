@@ -136,6 +136,14 @@ export const supabaseApi: MesaApi = {
     if (error) fail('No se ha podido renombrar al jugador', error)
   },
 
+  async setPlayerAvatar(playerId, avatar) {
+    const { error } = await supabase
+      .from('players')
+      .update({ avatar_url: avatar })
+      .eq('id', playerId)
+    if (error) fail('No se ha podido guardar el avatar', error)
+  },
+
   async listMatches(groupId) {
     const { data, error } = await supabase
       .from('matches')

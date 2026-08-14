@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { computeLeaderboard, formatPercent } from '../lib/stats'
-import { Avatar, ErrorNote, PageHeader, Spinner } from '../components/ui'
+import { Avatar } from '../components/Avatar'
+import { ErrorNote, PageHeader, Spinner } from '../components/ui'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
@@ -39,6 +40,7 @@ export function PlayersPage() {
 
               <Avatar
                 name={player.display_name}
+                avatar={player.avatar_url}
                 size={36}
                 registered={!!player.user_id}
               />
