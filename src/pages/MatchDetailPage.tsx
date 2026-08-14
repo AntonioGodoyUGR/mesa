@@ -133,55 +133,75 @@ function PlayerBreakdown({
     : []
 
   return (
-    <section className={`card overflow-hidden ${entry.is_winner ? 'hard-lift' : ''}`}>
-      <header
-        className={`flex items-center gap-3 px-4 py-3 ${entry.is_winner ? 'game-tint' : ''}`}
-      >
-        <span className="tnum w-5 text-center text-sm font-bold text-[var(--color-muted)]">
-          {entry.rank}
-        </span>
-        <Avatar
-          name={entry.player.display_name}
-          avatar={entry.player.avatar_url}
-          size={34}
-          registered={!!entry.player.user_id}
+    // Mismo vestido que la hoja donde se anotó: filete del color del juego,
+    // portada tenue por detrás y su icono asomando por la esquina.
+    <section
+      className={`card game-edge relative overflow-hidden ${entry.is_winner ? 'hard-lift' : ''}`}
+    >
+      {game?.imageUrl && (
+        <span
+          className="game-photo"
+          style={{ backgroundImage: `url(${game.imageUrl})` }}
+          aria-hidden="true"
         />
-        <Link
-          to={`/jugadores/${entry.player_id}`}
-          className="min-w-0 flex-1 truncate font-semibold"
-        >
-          {entry.is_winner && '🏆 '}
-          {entry.player.display_name}
-        </Link>
-        <span className="text-right">
-          <span className="game-ink tnum block text-2xl font-black leading-none">
-            {entry.total}
-          </span>
-          <span className="block text-[11px] text-[var(--color-muted)]">
-            {game?.scoreLabelShort ?? 'pts'}
-          </span>
-        </span>
-      </header>
-
-      {breakdown.length > 0 && (
-        <ul className="divide-y divide-[var(--color-border)] border-t border-[var(--color-border)] px-4">
-          {breakdown.map((row) => (
-            <li key={row.field.key} className="flex items-center gap-3 py-2 text-sm">
-              <span aria-hidden="true">{row.field.icon}</span>
-              <span className="min-w-0 flex-1 truncate">{row.field.label}</span>
-              <span className="tnum font-semibold">
-                {row.field.type === 'toggle' ? 'Sí' : row.value}
-              </span>
-              {row.contribution !== null && row.field.points !== undefined && (
-                <span className="tnum w-12 text-right text-xs text-[var(--color-muted)]">
-                  {row.contribution >= 0 ? '+' : ''}
-                  {row.contribution}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
       )}
+
+      <div className="relative">
+        <header
+          className={`flex items-center gap-3 px-4 py-3 ${entry.is_winner ? 'game-tint' : ''}`}
+        >
+          {game && (
+            <span className="game-glyph" aria-hidden="true">
+              {game.icon}
+            </span>
+          )}
+
+          <span className="tnum w-5 text-center text-sm font-bold text-[var(--color-muted)]">
+            {entry.rank}
+          </span>
+          <Avatar
+            name={entry.player.display_name}
+            avatar={entry.player.avatar_url}
+            size={34}
+            registered={!!entry.player.user_id}
+          />
+          <Link
+            to={`/jugadores/${entry.player_id}`}
+            className="min-w-0 flex-1 truncate font-semibold"
+          >
+            {entry.is_winner && '🏆 '}
+            {entry.player.display_name}
+          </Link>
+          <span className="text-right">
+            <span className="game-ink tnum block text-2xl font-black leading-none">
+              {entry.total}
+            </span>
+            <span className="block text-[11px] text-[var(--color-muted)]">
+              {game?.scoreLabelShort ?? 'pts'}
+            </span>
+          </span>
+        </header>
+
+        {breakdown.length > 0 && (
+          <ul className="divide-y divide-[var(--color-border)] border-t border-[var(--color-border)] px-4">
+            {breakdown.map((row) => (
+              <li key={row.field.key} className="flex items-center gap-3 py-2 text-sm">
+                <span aria-hidden="true">{row.field.icon}</span>
+                <span className="min-w-0 flex-1 truncate">{row.field.label}</span>
+                <span className="tnum font-semibold">
+                  {row.field.type === 'toggle' ? 'Sí' : row.value}
+                </span>
+                {row.contribution !== null && row.field.points !== undefined && (
+                  <span className="tnum w-12 text-right text-xs text-[var(--color-muted)]">
+                    {row.contribution >= 0 ? '+' : ''}
+                    {row.contribution}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   )
 }

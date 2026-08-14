@@ -43,6 +43,12 @@
   --game-tint-mix: 10%;
   --game-ink-mix: 100%;
   --game-ink-base: #071219;
+
+  /* Cuánto asoman la portada y el icono por detrás de la hoja de
+     puntuación. En oscuro hace falta subirlos para que se intuyan, pero
+     el texto aguanta menos: por eso son dos valores y no uno. */
+  --game-photo-opacity: 0.09;
+  --game-glyph-opacity: 0.16;
 }
 
 .dark {
@@ -66,6 +72,9 @@
   --game-tint-mix: 22%;
   --game-ink-mix: 55%;
   --game-ink-base: #ffffff;
+
+  --game-photo-opacity: 0.14;
+  --game-glyph-opacity: 0.22;
 }
 
 html,
@@ -157,6 +166,29 @@ body {
   border-left: 6px solid color-mix(in srgb, var(--game) var(--game-ink-mix), var(--game-ink-base));
 }
 
+/* La portada del juego colada por detrás de una tarjeta. La imagen entra como
+   `background-image` en línea; aquí solo se decide cuánto se deja ver. */
+@utility game-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: var(--game-photo-opacity);
+  pointer-events: none;
+}
+
+/* El icono del juego asomando por la esquina de la tarjeta, del tamaño de una
+   ficha de verdad. Decorativo: siempre con `aria-hidden`. */
+@utility game-glyph {
+  position: absolute;
+  top: -0.15rem;
+  right: 0.5rem;
+  font-size: 2.75rem;
+  line-height: 1;
+  opacity: var(--game-glyph-opacity);
+  pointer-events: none;
+}
+
 @layer components {
   .card {
     background: var(--color-surface);
@@ -169,6 +201,36 @@ body {
      si no la lista parece un montón de cartas caídas. */
   .card-flat {
     box-shadow: none;
+  }
+
+  /* Banda de portada que encabeza la hoja de puntuación. */
+  .sheet-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 8rem;
+    overflow: hidden;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: 4px 4px 0 var(--color-hard);
+  }
+
+  /* El degradado muere en el color de la tarjeta, no en negro. Ese es el truco
+     que hace legible el titular igual sobre una portada clara que sobre una
+     oscura, y en los dos modos, sin tocar el color del texto. La segunda capa
+     tiñe la foto con el color del juego para que la banda no sea una imagen
+     pegada, sino parte de la hoja. */
+  .sheet-banner-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        var(--color-surface) 4%,
+        color-mix(in oklab, var(--color-surface) 72%, transparent) 46%,
+        transparent 82%
+      ),
+      linear-gradient(to top, color-mix(in oklab, var(--game) 34%, transparent), transparent 60%);
   }
 
   .btn {

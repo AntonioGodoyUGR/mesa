@@ -131,12 +131,16 @@ export function NewMatchPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* En el paso 2 la hoja se encabeza sola con la banda de portada, así que
+          aquí no se repiten ni la carátula ni el nombre del juego. */}
       <header className="flex items-center gap-3">
-        <GameCover game={game} size={52} />
+        {step === 1 && <GameCover game={game} size={52} />}
         <div className="min-w-0">
-          <h1 className="display truncate text-xl">{game.name}</h1>
+          <h1 className="display truncate text-xl">
+            {step === 1 ? game.name : 'Puntuaciones'}
+          </h1>
           <p className="text-sm text-[var(--color-muted)]">
-            {step === 1 ? 'Paso 1 · ¿Quién jugó?' : `Paso 2 · ${game.scoreLabel}`}
+            {step === 1 ? 'Paso 1 · ¿Quién jugó?' : 'Paso 2 de 2'}
           </p>
         </div>
         <button

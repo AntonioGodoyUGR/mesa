@@ -106,9 +106,9 @@ describe('App', () => {
 
     fireEvent.click(create)
 
-    // Vuelve a la portada y el juego nuevo ya está entre los del grupo.
-    const tile = await screen.findByText('Chinchón')
-    fireEvent.click(tile)
+    // Vuelve a la portada y el juego nuevo ya está entre los del grupo. Se busca
+    // en la rejilla: la vista previa de la hoja también lleva su nombre.
+    fireEvent.click(await (await gameGrid()).findByText('Chinchón'))
 
     expect(await screen.findByRole('button', { name: 'Apuntar puntuaciones' })).toBeVisible()
   })
