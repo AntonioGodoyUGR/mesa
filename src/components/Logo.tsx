@@ -13,15 +13,21 @@
 interface LogoProps {
   /** Apilado en dos líneas para las portadas; en una sola para la cabecera. */
   stacked?: boolean
+  /**
+   * Anima la entrada: las piezas de cada palabra convergen hacia el centro y el
+   * dado cae encima. Solo la portada de login lo usa; la cabecera va quieta.
+   * Los `@keyframes` viven en `index.css` y respetan `prefers-reduced-motion`.
+   */
+  animated?: boolean
   className?: string
 }
 
 /** El meeple que hace de «A». Un pelo más alto que la mayúscula, como un asta. */
-function Meeple() {
+function Meeple({ className = '' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 64 64"
-      className="h-[0.84em] w-[0.86em] shrink-0 text-[var(--color-accent)]"
+      className={`h-[0.84em] w-[0.86em] shrink-0 text-[var(--color-accent)] ${className}`}
       fill="currentColor"
       aria-hidden="true"
     >
@@ -32,11 +38,11 @@ function Meeple() {
 }
 
 /** El dado que separa las dos palabras, escorado como si acabara de caer. */
-function Die() {
+function Die({ className = '' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 64 64"
-      className="mx-[0.16em] h-[0.74em] w-[0.74em] shrink-0 -rotate-6"
+      className={`mx-[0.16em] h-[0.74em] w-[0.74em] shrink-0 -rotate-6 ${className}`}
       aria-hidden="true"
     >
       <rect
@@ -58,21 +64,36 @@ function Die() {
   )
 }
 
-export function Logo({ stacked = false, className = '' }: LogoProps) {
+export function Logo({ stacked = false, animated = false, className = '' }: LogoProps) {
+  // Cada palabra se compone convergiendo: su mitad izquierda entra por la
+  // izquierda y la derecha por la derecha. Sin animar, las clases quedan vacías
+  // y no pintan nada. El detalle del movimiento vive en `index.css`.
+  const left = animated ? 'logo-part-l' : ''
+  const right = animated ? 'logo-part-r' : ''
+  const die = animated ? 'logo-die' : ''
+
   // Las letras se parten en trozos para colar los iconos donde iría su letra.
   // Fuera del `aria-label` no hay texto que leer: suelto, «T BLE» no dice nada.
   const table = (
     <>
-      <span aria-hidden="true">T</span>
-      <Meeple />
-      <span aria-hidden="true">BLE</span>
+      <span aria-hidden="true" className={left}>
+        T
+      </span>
+      <Meeple className={left} />
+      <span aria-hidden="true" className={right}>
+        BLE
+      </span>
     </>
   )
   const tracker = (
     <>
-      <span aria-hidden="true">TR</span>
-      <Meeple />
-      <span aria-hidden="true">CKER</span>
+      <span aria-hidden="true" className={left}>
+        TR
+      </span>
+      <Meeple className={left} />
+      <span aria-hidden="true" className={right}>
+        CKER
+      </span>
     </>
   )
 
@@ -85,7 +106,7 @@ export function Logo({ stacked = false, className = '' }: LogoProps) {
       >
         <span className="flex items-baseline">
           {table}
-          <Die />
+          <Die className={die} />
         </span>
         <span className="flex items-baseline">{tracker}</span>
       </span>
@@ -99,7 +120,7 @@ export function Logo({ stacked = false, className = '' }: LogoProps) {
       className={`display inline-flex items-baseline leading-none ${className}`}
     >
       {table}
-      <Die />
+      <Die className={die} />
       {tracker}
     </span>
   )

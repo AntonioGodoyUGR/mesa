@@ -18,8 +18,17 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
-- Rama `main`, limpia. Todo en verde: `npm run lint && npm test && npm run build` pasa
+- Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
   (141 tests, build OK). Comprobado 2026-08-15.
+- **Portada de login con logo animado + invitado**: `<Logo>` acepta ahora
+  `animated?: boolean` (por defecto `false`; la cabecera sigue quieta). Con `animated`,
+  cada palabra converge —mitad izquierda desde la izquierda, derecha desde la derecha— y
+  el dado cae encima con un rebote corto. Movimiento en `src/index.css` (`@keyframes
+  logo-from-left/right/-die-drop` + clases `.logo-part-l/-r`, `.logo-die`), respetando
+  `prefers-reduced-motion` (estado final, sin animar). `LoginPage.tsx` usa `<Logo stacked
+  animated>` y añade, tras el formulario, un divisor «o» (`aria-hidden`) y un botón
+  «Continuar como invitado» (`.btn .btn-ghost`) que hace `navigate('/')` (modo invitado
+  ya existente, sin tocar `AuthContext`).
 - **Avatares con animales (estilo Gartic Phone)**: además del `humano` de siempre hay 8
   bichos (`gato`, `perro`, `zorro`, `oso`, `panda`, `conejo`, `rana`, `pinguino`), cada uno
   con color y una de 5 expresiones. Compatible hacia atrás: lo guardado sin `k=` sigue
@@ -42,3 +51,5 @@ quedó a medias y lo siguiente que toca.
   completa (verde). Creado este `ESTADO.md` como puente entre sesiones.
 - **2026-08-15** — Gustavo: avatares con animales estilo Gartic Phone + expresiones,
   compatible hacia atrás. Todo en verde.
+- **2026-08-15** — Gustavo: animación de entrada del logotipo (`Logo animated`) y botón
+  «Continuar como invitado» en la portada de login. Todo en verde (141 tests, build OK).

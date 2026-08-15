@@ -351,11 +351,82 @@ body {
   }
 }
 
+/* ------------------------------------------------------------------
+   Entrada del logotipo (solo `<Logo animated/>`, la portada de login).
+   Cada palabra se compone: su mitad izquierda entra deslizando desde la
+   izquierda y la derecha desde la derecha, hasta juntarse en el centro.
+   Cuando ya está el nombre, el dado cae encima con un rebote corto, como
+   si acabara de dar en la mesa. Bordes duros, nada de desenfoque: la
+   caída es puro desplazamiento y un pelín de giro sobre el `-rotate-6`
+   que el dado ya lleva puesto.
+   ------------------------------------------------------------------ */
+@keyframes logo-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-0.55em);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes logo-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(0.55em);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes logo-die-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.9em) rotate(-14deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(0.06em) rotate(3deg);
+  }
+  75% {
+    transform: translateY(-0.03em) rotate(-1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+.logo-part-l {
+  animation: logo-from-left 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo-part-r {
+  animation: logo-from-right 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* El dado espera a que el nombre esté puesto (`both` lo mantiene oculto
+   durante el retardo) y entonces cae con un rebote elástico. */
+.logo-die {
+  animation: logo-die-drop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) 0.34s both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Quien pide menos movimiento ve el logotipo ya compuesto: sin caída ni
+     deslizamiento, directo a su estado final. */
+  .logo-part-l,
+  .logo-part-r,
+  .logo-die {
+    animation: none !important;
   }
 }

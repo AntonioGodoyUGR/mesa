@@ -43,7 +43,7 @@ export function LoginPage() {
     <div className="mx-auto flex max-w-sm flex-col gap-5 pt-6">
       <div className="text-center">
         <h1 className="text-[var(--color-brand)]">
-          <Logo stacked className="text-4xl" />
+          <Logo stacked animated className="text-4xl" />
         </h1>
         <p className="mt-1 text-sm text-[var(--color-muted)]">
           Los resultados de vuestras partidas, en un sitio.
@@ -124,6 +124,16 @@ export function LoginPage() {
           {busy ? 'Un momento…' : mode === 'signin' ? 'Entrar' : 'Crear cuenta'}
         </button>
       </form>
+
+      <div className="flex items-center gap-3" aria-hidden="true">
+        <span className="h-0.5 flex-1 bg-[var(--color-border)]" />
+        <span className="overline text-xs text-[var(--color-muted)]">o</span>
+        <span className="h-0.5 flex-1 bg-[var(--color-border)]" />
+      </div>
+
+      <button type="button" className="btn btn-ghost" onClick={() => navigate('/')}>
+        Continuar como invitado
+      </button>
 
       <p className="text-center text-xs text-[var(--color-muted)]">
         Solo hace falta una cuenta por partida: el resto pueden jugar como invitados.
