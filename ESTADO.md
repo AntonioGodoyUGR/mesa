@@ -53,3 +53,10 @@ quedó a medias y lo siguiente que toca.
   compatible hacia atrás. Todo en verde.
 - **2026-08-15** — Gustavo: animación de entrada del logotipo (`Logo animated`) y botón
   «Continuar como invitado» en la portada de login. Todo en verde (141 tests, build OK).
+- **2026-08-15** — Gustavo: «Código Secreto» (Codenames) asciende a juego con hoja propia
+  (`definitions/codigo-secreto.ts`, slug `codenames` para conservar portada e IDs), borrada
+  su fila de `catalog.data.ts` y regenerado `seed_games.sql` (393 juegos, 24 con chuleta).
+  Puntuación mapeada a por-jugador: campo `agents_contacted` (0–9, 1 pt) como total —el bando
+  ganador contacta a todos sus agentes y se lleva la mayor—, más `spymaster` (informativo) y
+  `assassin` (−99, la derrota instantánea manda al último puesto). Todo en verde (141 tests,
+  build OK).

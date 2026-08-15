@@ -335,7 +335,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Fiesta, palabras y deducción social
   // ---------------------------------------------------------------------------
-  ['codenames', 'Codenames', '🕵️', 'Una palabra, un número y una cara de espanto en tu equipo', 2, 8, 15, 15, 'easy', 'teams'],
   ['decrypto', 'Decrypto', '🔐', 'Pistas para los tuyos que el otro equipo no debe descifrar', 3, 8, 15, 45, 'medium', 'teams'],
   ['wavelength', 'Wavelength', '📻', 'Poner el dial entre «frío» y «caliente» y rezar', 2, 12, 30, 45, 'easy', 'teams'],
   ['just-one', 'Just One', '☝️', 'Todos escriben una pista y las repetidas se tachan', 3, 7, 20, 20, 'easy', 'coop'],

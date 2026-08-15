@@ -31,6 +31,7 @@ import { azul } from './definitions/azul'
 import { splendor } from './definitions/splendor'
 import { kingOfTokyo } from './definitions/king-of-tokyo'
 import { dixit } from './definitions/dixit'
+import { codigoSecreto } from './definitions/codigo-secreto'
 import { patchwork } from './definitions/patchwork'
 import { sevenWonders } from './definitions/7-wonders'
 import { sevenWondersDuel } from './definitions/7-wonders-duel'
@@ -58,6 +59,7 @@ export const CURATED_GAMES: GameDefinition[] = [
   splendor,
   kingOfTokyo,
   dixit,
+  codigoSecreto,
   patchwork,
   sevenWonders,
   sevenWondersDuel,
