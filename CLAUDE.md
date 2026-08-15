@@ -4,6 +4,14 @@ Marcador de juegos de mesa: React 19 + TypeScript + Vite + Tailwind v4, datos en
 PWA. El `README.md` explica **qué** es la app y **por qué** está montada así; este fichero
 recoge las reglas de trabajo. Ante la duda, manda el README.
 
+## Antes de nada: lee `ESTADO.md`
+
+`ESTADO.md` es el puente de contexto entre sesiones (Gustavo en OpenClaw y Claude en el
+terminal trabajan sobre el mismo repo pero con conversaciones separadas). **Léelo al
+empezar cualquier tarea** y **actualízalo al terminar o al dejar algo a medias**: qué está
+hecho, qué quedó pendiente y por qué. El código se comparte por git; el contexto de la
+charla, no — por eso se escribe ahí.
+
 ## Comprobar antes de dar nada por bueno
 
 ```bash
