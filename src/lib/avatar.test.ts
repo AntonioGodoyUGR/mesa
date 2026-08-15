@@ -8,9 +8,11 @@ import { describe, expect, it } from 'vitest'
 import {
   ACCESSORIES,
   BACKGROUNDS,
+  EXPRESSIONS,
   HAIR_COLORS,
   HAIR_STYLES,
   HATS,
+  KINDS,
   SHIRT_COLORS,
   SKIN_TONES,
   hasAvatar,
@@ -22,6 +24,7 @@ import {
 } from './avatar'
 
 const look: AvatarLook = {
+  kind: 'gato',
   background: 3,
   skin: 2,
   shirt: 5,
@@ -29,10 +32,12 @@ const look: AvatarLook = {
   hairColor: 4,
   hat: 'corona',
   accessory: 'gafas',
+  expression: 'guino',
 }
 
 /** Todo rasgo tiene que caer dentro de su paleta o de su lista de opciones. */
 function expectValid(candidate: AvatarLook) {
+  expect(KINDS.map((kind) => kind.id)).toContain(candidate.kind)
   expect(candidate.background).toBeLessThan(BACKGROUNDS.length)
   expect(candidate.skin).toBeLessThan(SKIN_TONES.length)
   expect(candidate.shirt).toBeLessThan(SHIRT_COLORS.length)
@@ -40,6 +45,7 @@ function expectValid(candidate: AvatarLook) {
   expect(HAIR_STYLES.map((style) => style.id)).toContain(candidate.hair)
   expect(HATS.map((hat) => hat.id)).toContain(candidate.hat)
   expect(ACCESSORIES.map((accessory) => accessory.id)).toContain(candidate.accessory)
+  expect(EXPRESSIONS.map((expression) => expression.id)).toContain(candidate.expression)
 }
 
 describe('serializeAvatar / parseAvatar', () => {

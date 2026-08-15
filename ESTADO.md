@@ -20,7 +20,13 @@ quedó a medias y lo siguiente que toca.
 
 - Rama `main`, limpia. Todo en verde: `npm run lint && npm test && npm run build` pasa
   (141 tests, build OK). Comprobado 2026-08-15.
-- No hay nada a medias.
+- **Avatares con animales (estilo Gartic Phone)**: además del `humano` de siempre hay 8
+  bichos (`gato`, `perro`, `zorro`, `oso`, `panda`, `conejo`, `rana`, `pinguino`), cada uno
+  con color y una de 5 expresiones. Compatible hacia atrás: lo guardado sin `k=` sigue
+  siendo humano. Modelo en `lib/avatar.ts` (`AvatarKind`, `Expression`, `KINDS`,
+  `EXPRESSIONS`), dibujo en `components/Avatar.tsx` (`Humano` + `Animal`/`Eyes`), edición en
+  `components/AvatarEditor.tsx` (fila «Personaje»; los rasgos humanos solo salen si es
+  humano, la «Expresión» solo si es animal).
 
 ## Pendiente / ideas (sin prioridad asignada)
 
@@ -34,3 +40,5 @@ quedó a medias y lo siguiente que toca.
 
 - **2026-08-15** — Gustavo: primer contacto con el proyecto. Corrida la comprobación
   completa (verde). Creado este `ESTADO.md` como puente entre sesiones.
+- **2026-08-15** — Gustavo: avatares con animales estilo Gartic Phone + expresiones,
+  compatible hacia atrás. Todo en verde.

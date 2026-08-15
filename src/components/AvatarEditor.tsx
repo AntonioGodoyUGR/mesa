@@ -2,9 +2,11 @@ import { AvatarFace } from './Avatar'
 import {
   ACCESSORIES,
   BACKGROUNDS,
+  EXPRESSIONS,
   HAIR_COLORS,
   HAIR_STYLES,
   HATS,
+  KINDS,
   SHIRT_COLORS,
   SKIN_TONES,
   randomAvatar,
@@ -26,6 +28,8 @@ export function AvatarEditor({
   look: AvatarLook
   onChange: (next: AvatarLook) => void
 }) {
+  const humano = look.kind === 'humano'
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col items-center gap-3">
@@ -42,6 +46,14 @@ export function AvatarEditor({
         </button>
       </div>
 
+      <Looks
+        label="Personaje"
+        options={KINDS}
+        selected={look.kind}
+        preview={(kind) => ({ ...look, kind })}
+        onPick={(kind) => onChange({ ...look, kind })}
+      />
+
       <Colors
         label="Fondo"
         colors={BACKGROUNDS}
@@ -49,48 +61,59 @@ export function AvatarEditor({
         onPick={(background) => onChange({ ...look, background })}
       />
       <Colors
-        label="Piel"
-        colors={SKIN_TONES}
-        selected={look.skin}
-        onPick={(skin) => onChange({ ...look, skin })}
-      />
-      <Colors
-        label="Camiseta"
+        label={humano ? 'Camiseta' : 'Color'}
         colors={SHIRT_COLORS}
         selected={look.shirt}
         onPick={(shirt) => onChange({ ...look, shirt })}
       />
 
-      <Looks
-        label="Pelo"
-        options={HAIR_STYLES}
-        selected={look.hair}
-        preview={(hair) => ({ ...look, hair })}
-        onPick={(hair) => onChange({ ...look, hair })}
-      />
-      {look.hair !== 'calvo' && (
-        <Colors
-          label="Color del pelo"
-          colors={HAIR_COLORS}
-          selected={look.hairColor}
-          onPick={(hairColor) => onChange({ ...look, hairColor })}
+      {humano ? (
+        <>
+          <Colors
+            label="Piel"
+            colors={SKIN_TONES}
+            selected={look.skin}
+            onPick={(skin) => onChange({ ...look, skin })}
+          />
+          <Looks
+            label="Pelo"
+            options={HAIR_STYLES}
+            selected={look.hair}
+            preview={(hair) => ({ ...look, hair })}
+            onPick={(hair) => onChange({ ...look, hair })}
+          />
+          {look.hair !== 'calvo' && (
+            <Colors
+              label="Color del pelo"
+              colors={HAIR_COLORS}
+              selected={look.hairColor}
+              onPick={(hairColor) => onChange({ ...look, hairColor })}
+            />
+          )}
+          <Looks
+            label="Sombrero"
+            options={HATS}
+            selected={look.hat}
+            preview={(hat) => ({ ...look, hat })}
+            onPick={(hat) => onChange({ ...look, hat })}
+          />
+          <Looks
+            label="Complemento"
+            options={ACCESSORIES}
+            selected={look.accessory}
+            preview={(accessory) => ({ ...look, accessory })}
+            onPick={(accessory) => onChange({ ...look, accessory })}
+          />
+        </>
+      ) : (
+        <Looks
+          label="Expresión"
+          options={EXPRESSIONS}
+          selected={look.expression}
+          preview={(expression) => ({ ...look, expression })}
+          onPick={(expression) => onChange({ ...look, expression })}
         />
       )}
-
-      <Looks
-        label="Sombrero"
-        options={HATS}
-        selected={look.hat}
-        preview={(hat) => ({ ...look, hat })}
-        onPick={(hat) => onChange({ ...look, hat })}
-      />
-      <Looks
-        label="Complemento"
-        options={ACCESSORIES}
-        selected={look.accessory}
-        preview={(accessory) => ({ ...look, accessory })}
-        onPick={(accessory) => onChange({ ...look, accessory })}
-      />
     </div>
   )
 }

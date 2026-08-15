@@ -20,15 +20,39 @@ export type AccessoryId =
   | 'bigote'
   | 'mascarilla'
 
+/**
+ * Qué es el avatar. `humano` conserva el muñeco de siempre (pelo, sombrero,
+ * complemento); el resto son bichos estilo Gartic Phone que solo gastan color y
+ * expresión. Los ids van en ASCII a propósito: viajan cortos y sin escapar en la URI.
+ */
+export type AvatarKind =
+  | 'humano'
+  | 'gato'
+  | 'perro'
+  | 'zorro'
+  | 'oso'
+  | 'panda'
+  | 'conejo'
+  | 'rana'
+  | 'pinguino'
+
+/** La cara. Para los animales cambia ojos y guiño; el humano va siempre contento. */
+export type Expression = 'feliz' | 'risa' | 'guino' | 'asombro' | 'dormido'
+
 export interface AvatarLook {
+  /** Qué criatura es: manda sobre qué rasgos se dibujan y cuáles se editan. */
+  kind: AvatarKind
   /** Índices en las paletas de abajo, no colores: así el avatar ocupa cuatro letras. */
   background: number
   skin: number
+  /** Para el humano es la camiseta; para un animal, el color del propio bicho. */
   shirt: number
   hair: HairStyle
   hairColor: number
   hat: HatId
   accessory: AccessoryId
+  /** Solo la usan los animales; el humano la ignora. */
+  expression: Expression
 }
 
 /** Fondos del círculo. Tienen que aguantar el muñeco encima en claro y en oscuro. */
@@ -103,6 +127,26 @@ export const ACCESSORIES: { id: AccessoryId; label: string }[] = [
   { id: 'mascarilla', label: 'Mascarilla' },
 ]
 
+export const KINDS: { id: AvatarKind; label: string }[] = [
+  { id: 'humano', label: 'Humano' },
+  { id: 'gato', label: 'Gato' },
+  { id: 'perro', label: 'Perro' },
+  { id: 'zorro', label: 'Zorro' },
+  { id: 'oso', label: 'Oso' },
+  { id: 'panda', label: 'Panda' },
+  { id: 'conejo', label: 'Conejo' },
+  { id: 'rana', label: 'Rana' },
+  { id: 'pinguino', label: 'Pingüino' },
+]
+
+export const EXPRESSIONS: { id: Expression; label: string }[] = [
+  { id: 'feliz', label: 'Feliz' },
+  { id: 'risa', label: 'Risa' },
+  { id: 'guino', label: 'Guiño' },
+  { id: 'asombro', label: 'Asombro' },
+  { id: 'dormido', label: 'Dormido' },
+]
+
 /** Esquema propio: distingue un avatar compuesto aquí de una foto subida a un bucket. */
 const PREFIX = 'mesa:1?'
 
@@ -110,9 +154,12 @@ const PREFIX = 'mesa:1?'
 const HAIR_IDS = HAIR_STYLES.map((style) => style.id)
 const HAT_IDS = HATS.map((hat) => hat.id)
 const ACCESSORY_IDS = ACCESSORIES.map((accessory) => accessory.id)
+const KIND_IDS = KINDS.map((kind) => kind.id)
+const EXPRESSION_IDS = EXPRESSIONS.map((expression) => expression.id)
 
 export function serializeAvatar(look: AvatarLook): string {
   const params = new URLSearchParams({
+    k: look.kind,
     bg: String(look.background),
     sk: String(look.skin),
     sh: String(look.shirt),
@@ -120,6 +167,7 @@ export function serializeAvatar(look: AvatarLook): string {
     hc: String(look.hairColor),
     ht: look.hat,
     ac: look.accessory,
+    ex: look.expression,
   })
   return PREFIX + params.toString()
 }
@@ -147,6 +195,7 @@ export function parseAvatar(value: string | null | undefined, name: string): Ava
   }
 
   return {
+    kind: option('k', KIND_IDS, fallback.kind),
     background: index('bg', BACKGROUNDS.length, fallback.background),
     skin: index('sk', SKIN_TONES.length, fallback.skin),
     shirt: index('sh', SHIRT_COLORS.length, fallback.shirt),
@@ -154,6 +203,7 @@ export function parseAvatar(value: string | null | undefined, name: string): Ava
     hairColor: index('hc', HAIR_COLORS.length, fallback.hairColor),
     hat: option('ht', HAT_IDS, fallback.hat),
     accessory: option('ac', ACCESSORY_IDS, fallback.accessory),
+    expression: option('ex', EXPRESSION_IDS, fallback.expression),
   }
 }
 
@@ -178,6 +228,9 @@ export function lookFromName(name: string): AvatarLook {
   const pick = (length: number, shift: number) => Math.floor(hash / shift) % length
 
   return {
+    // Quien no ha elegido sale de humano: así ningún jugador antiguo cambia de especie
+    // solo. Los bichos se eligen a mano en el editor.
+    kind: 'humano',
     background: pick(BACKGROUNDS.length, 1),
     skin: pick(SKIN_TONES.length, 7),
     shirt: pick(SHIRT_COLORS.length, 31),
@@ -185,6 +238,7 @@ export function lookFromName(name: string): AvatarLook {
     hairColor: pick(HAIR_COLORS.length, 211),
     hat: 'ninguno',
     accessory: 'ninguno',
+    expression: 'feliz',
   }
 }
 
@@ -194,6 +248,7 @@ export function randomAvatar(random: () => number = Math.random): AvatarLook {
     options[Math.floor(random() * options.length)]
 
   return {
+    kind: pick(KIND_IDS),
     background: Math.floor(random() * BACKGROUNDS.length),
     skin: Math.floor(random() * SKIN_TONES.length),
     shirt: Math.floor(random() * SHIRT_COLORS.length),
@@ -201,5 +256,6 @@ export function randomAvatar(random: () => number = Math.random): AvatarLook {
     hairColor: Math.floor(random() * HAIR_COLORS.length),
     hat: pick(HAT_IDS),
     accessory: pick(ACCESSORY_IDS),
+    expression: pick(EXPRESSION_IDS),
   }
 }

@@ -5,6 +5,7 @@ import {
   SKIN_TONES,
   parseAvatar,
   type AvatarLook,
+  type Expression,
 } from '../lib/avatar'
 
 /**
@@ -62,20 +63,25 @@ export function AvatarFace({
   look: AvatarLook
   className?: string
 }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} role="presentation">
+      <rect width="100" height="100" fill={BACKGROUNDS[look.background]} />
+      {look.kind === 'humano' ? <Humano look={look} /> : <Animal look={look} />}
+    </svg>
+  )
+}
+
+/** El muñeco de siempre: busto con piel, camiseta, pelo, sombrero y complemento. */
+function Humano({ look }: { look: AvatarLook }) {
   const skin = SKIN_TONES[look.skin]
   const shirt = SHIRT_COLORS[look.shirt]
   const hair = HAIR_COLORS[look.hairColor]
 
   return (
-    <svg viewBox="0 0 100 100" className={className} role="presentation">
-      <rect width="100" height="100" fill={BACKGROUNDS[look.background]} />
-
+    <>
       {/* Cuello y torso primero: la cabeza se apoya encima. */}
       <rect x="43" y="54" width="14" height="16" rx="6" fill={skin} />
-      <path
-        d="M16 100 v-6 c0-16 15-28 34-28 s34 12 34 28 v6 z"
-        fill={shirt}
-      />
+      <path d="M16 100 v-6 c0-16 15-28 34-28 s34 12 34 28 v6 z" fill={shirt} />
 
       <HairBack look={look} color={hair} />
 
@@ -97,7 +103,269 @@ export function AvatarFace({
 
       <Accessory look={look} color={hair} />
       <Hat look={look} shirt={shirt} />
-    </svg>
+    </>
+  )
+}
+
+const INK = '#2b2118'
+
+/** Un color de la paleta, más oscuro: orejas, sombras y huecos sin pedir otra paleta. */
+function darken(hex: string, factor: number): string {
+  const n = parseInt(hex.slice(1), 16)
+  const r = Math.round(((n >> 16) & 255) * factor)
+  const g = Math.round(((n >> 8) & 255) * factor)
+  const b = Math.round((n & 255) * factor)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+/**
+ * Los ojos de los bichos, que es donde vive la expresión. Cada especie dice dónde
+ * van (`lx`/`rx`/`y`) y de qué tamaño (`r`); el gesto es común a todas.
+ */
+function Eyes({
+  expression,
+  lx = 38,
+  rx = 62,
+  y = 48,
+  r = 5,
+  ink = INK,
+}: {
+  expression: Expression
+  lx?: number
+  rx?: number
+  y?: number
+  r?: number
+  ink?: string
+}) {
+  if (expression === 'dormido') {
+    return (
+      <g fill="none" stroke={ink} strokeWidth="2.4" strokeLinecap="round">
+        <path d={`M${lx - 5} ${y} h10`} />
+        <path d={`M${rx - 5} ${y} h10`} />
+      </g>
+    )
+  }
+  if (expression === 'risa') {
+    return (
+      <g fill="none" stroke={ink} strokeWidth="2.4" strokeLinecap="round">
+        <path d={`M${lx - 5} ${y + 2} q5 -7 10 0`} />
+        <path d={`M${rx - 5} ${y + 2} q5 -7 10 0`} />
+      </g>
+    )
+  }
+  if (expression === 'guino') {
+    return (
+      <g>
+        <path
+          d={`M${lx - 5} ${y + 2} q5 -7 10 0`}
+          fill="none"
+          stroke={ink}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        <circle cx={rx} cy={y} r={r} fill={ink} />
+      </g>
+    )
+  }
+  const rr = expression === 'asombro' ? r * 1.3 : r
+  return (
+    <g fill={ink}>
+      <circle cx={lx} cy={y} r={rr} />
+      <circle cx={rx} cy={y} r={rr} />
+    </g>
+  )
+}
+
+const LIGHT = 'rgba(255, 255, 255, 0.92)'
+
+/** Reparte cada especie a su dibujo; todas comen del mismo color y expresión. */
+function Animal({ look }: { look: AvatarLook }) {
+  const color = SHIRT_COLORS[look.shirt]
+  const shade = darken(color, 0.72)
+  const props = { color, shade, expression: look.expression }
+
+  switch (look.kind) {
+    case 'perro':
+      return <Perro {...props} />
+    case 'zorro':
+      return <Zorro {...props} />
+    case 'oso':
+      return <Oso {...props} />
+    case 'panda':
+      return <Panda {...props} />
+    case 'conejo':
+      return <Conejo {...props} />
+    case 'rana':
+      return <Rana {...props} />
+    case 'pinguino':
+      return <Pinguino {...props} />
+    default:
+      return <Gato {...props} />
+  }
+}
+
+interface Beast {
+  color: string
+  shade: string
+  expression: Expression
+}
+
+function Gato({ color, expression }: Beast) {
+  return (
+    <>
+      <path d="M24 36 L30 8 L50 30 Z" fill={color} />
+      <path d="M76 36 L70 8 L50 30 Z" fill={color} />
+      <path d="M31 30 L34 15 L45 28 Z" fill={LIGHT} />
+      <path d="M69 30 L66 15 L55 28 Z" fill={LIGHT} />
+      <ellipse cx="50" cy="56" rx="33" ry="30" fill={color} />
+      <Eyes expression={expression} y={50} />
+      <path d="M46 60 L54 60 L50 65 Z" fill="#e0748a" />
+      <path
+        d="M50 65 q-6 5 -11 1 M50 65 q6 5 11 1"
+        fill="none"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <g stroke={INK} strokeWidth="1.4" strokeLinecap="round" opacity="0.75">
+        <path d="M20 57 h13 M20 63 h13 M80 57 h-13 M80 63 h-13" />
+      </g>
+    </>
+  )
+}
+
+function Perro({ color, shade, expression }: Beast) {
+  return (
+    <>
+      <path d="M20 38 q-13 6 -9 30 q10 6 16 -4 z" fill={shade} />
+      <path d="M80 38 q13 6 9 30 q-10 6 -16 -4 z" fill={shade} />
+      <ellipse cx="50" cy="56" rx="32" ry="30" fill={color} />
+      <ellipse cx="50" cy="64" rx="16" ry="12" fill={LIGHT} />
+      <Eyes expression={expression} y={48} />
+      <ellipse cx="50" cy="59" rx="6" ry="4.5" fill={INK} />
+      <path
+        d="M50 63 v5 M50 68 q-6 4 -11 0 M50 68 q6 4 11 0"
+        fill="none"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </>
+  )
+}
+
+function Zorro({ color, expression }: Beast) {
+  return (
+    <>
+      <path d="M22 34 L26 6 L48 26 Z" fill={color} />
+      <path d="M78 34 L74 6 L52 26 Z" fill={color} />
+      <path d="M28 25 L30 13 L41 25 Z" fill={INK} />
+      <path d="M72 25 L70 13 L59 25 Z" fill={INK} />
+      <ellipse cx="50" cy="54" rx="32" ry="29" fill={color} />
+      <path d="M50 46 L34 80 Q50 86 66 80 Z" fill={LIGHT} />
+      <Eyes expression={expression} y={48} />
+      <path d="M45 66 L55 66 L50 73 Z" fill={INK} />
+    </>
+  )
+}
+
+function Oso({ color, shade, expression }: Beast) {
+  return (
+    <>
+      <circle cx="26" cy="30" r="13" fill={color} />
+      <circle cx="74" cy="30" r="13" fill={color} />
+      <circle cx="26" cy="30" r="6.5" fill={shade} />
+      <circle cx="74" cy="30" r="6.5" fill={shade} />
+      <ellipse cx="50" cy="56" rx="34" ry="31" fill={color} />
+      <ellipse cx="50" cy="64" rx="15" ry="11" fill={LIGHT} />
+      <Eyes expression={expression} y={50} />
+      <ellipse cx="50" cy="59" rx="5.5" ry="4" fill={INK} />
+      <path
+        d="M50 63 v4 M50 67 q-5 4 -9 0 M50 67 q5 4 9 0"
+        fill="none"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </>
+  )
+}
+
+function Panda({ color, expression }: Beast) {
+  return (
+    <>
+      <circle cx="26" cy="28" r="12" fill="#2b2f38" />
+      <circle cx="74" cy="28" r="12" fill="#2b2f38" />
+      <ellipse cx="50" cy="56" rx="34" ry="31" fill={color} />
+      <ellipse cx="37" cy="50" rx="9" ry="12" fill="#2b2f38" transform="rotate(-18 37 50)" />
+      <ellipse cx="63" cy="50" rx="9" ry="12" fill="#2b2f38" transform="rotate(18 63 50)" />
+      <circle cx="37" cy="50" r="4.5" fill="#fff" />
+      <circle cx="63" cy="50" r="4.5" fill="#fff" />
+      <Eyes expression={expression} lx={37} rx={63} y={50} r={3} />
+      <ellipse cx="50" cy="60" rx="4.5" ry="3.5" fill={INK} />
+      <path
+        d="M50 63 v3 M50 66 q-5 4 -9 0 M50 66 q5 4 9 0"
+        fill="none"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </>
+  )
+}
+
+function Conejo({ color, expression }: Beast) {
+  return (
+    <>
+      <ellipse cx="39" cy="20" rx="7" ry="20" fill={color} transform="rotate(-8 39 20)" />
+      <ellipse cx="61" cy="20" rx="7" ry="20" fill={color} transform="rotate(8 61 20)" />
+      <ellipse cx="39" cy="22" rx="3.2" ry="13" fill="#e79bb0" transform="rotate(-8 39 22)" />
+      <ellipse cx="61" cy="22" rx="3.2" ry="13" fill="#e79bb0" transform="rotate(8 61 22)" />
+      <ellipse cx="50" cy="58" rx="30" ry="28" fill={color} />
+      <Eyes expression={expression} y={52} />
+      <path d="M47 62 L53 62 L50 66 Z" fill="#e0748a" />
+      <path
+        d="M50 66 v3 M50 69 q-4 3 -7 0 M50 69 q4 3 7 0"
+        fill="none"
+        stroke={INK}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </>
+  )
+}
+
+function Rana({ color, expression }: Beast) {
+  return (
+    <>
+      <ellipse cx="50" cy="60" rx="34" ry="26" fill={color} />
+      <circle cx="33" cy="36" r="13" fill={color} />
+      <circle cx="67" cy="36" r="13" fill={color} />
+      <circle cx="33" cy="36" r="8" fill="#fff" />
+      <circle cx="67" cy="36" r="8" fill="#fff" />
+      <Eyes expression={expression} lx={33} rx={67} y={36} r={4} />
+      <path
+        d="M28 64 q22 16 44 0"
+        fill="none"
+        stroke={INK}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <circle cx="43" cy="58" r="1.6" fill={INK} />
+      <circle cx="57" cy="58" r="1.6" fill={INK} />
+    </>
+  )
+}
+
+function Pinguino({ color, expression }: Beast) {
+  return (
+    <>
+      <ellipse cx="50" cy="56" rx="32" ry="31" fill={color} />
+      <ellipse cx="50" cy="60" rx="21" ry="25" fill={LIGHT} />
+      <Eyes expression={expression} lx={43} rx={57} y={46} r={4} />
+      <path d="M43 54 L57 54 L50 64 Z" fill="#f2a03d" />
+      <path d="M47 60 L53 60 L50 64 Z" fill="#d67e1e" />
+    </>
   )
 }
 
