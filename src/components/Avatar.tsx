@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import {
   BACKGROUNDS,
   HAIR_COLORS,
@@ -9,15 +10,17 @@ import {
 } from '../lib/avatar'
 
 /**
- * El muñeco de un jugador: busto dentro de un círculo, dibujado con SVG.
+ * El muñeco de un jugador: un busto o un bicho dentro de un disco, dibujado con SVG.
  *
  * Nada de imágenes ni de red: el avatar es la cadena que viene en `avatar_url`
  * (`lib/avatar.ts` decide qué significa) y aquí solo se pinta. Quien no tenga
  * ninguno guardado recibe el que le toca por su nombre, así que ningún jugador
  * antiguo se queda sin cara.
  *
- * Todo se dibuja sobre un lienzo de 100×100 y se escala con `size`: en la lista de
- * jugadores mide 40 y en el editor 160, con el mismo trazo relativo.
+ * Todo se dibuja sobre un lienzo de 100×100 y se escala con `size`. El disco de
+ * fondo es el marco; las orejas, las crestas y los sombreros SALEN de él a
+ * propósito —estilo Gartic Phone—, así que el SVG deja desbordar y el círculo no
+ * recorta lo que asoma por arriba.
  */
 export function Avatar({
   name,
@@ -35,17 +38,14 @@ export function Avatar({
 
   return (
     <span
-      className="relative inline-flex shrink-0"
+      className="relative inline-flex shrink-0 overflow-visible"
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
-      <AvatarFace
-        look={look}
-        className="h-full w-full rounded-full border-2 border-[var(--color-border)]"
-      />
+      <AvatarFace look={look} className="h-full w-full" />
       {!registered && (
         <span
-          className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[8px] text-[var(--color-muted)]"
+          className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface-2)] text-[8px] text-[var(--color-muted)]"
           title="Invitado sin cuenta"
         >
           ·
@@ -55,7 +55,12 @@ export function Avatar({
   )
 }
 
-/** El dibujo pelado, sin el marco ni la marca de invitado: lo que usa el editor. */
+/**
+ * El dibujo pelado, con su propio disco y su aro: lo que usa el editor.
+ *
+ * Trae el marco dentro (disco con degradado + aro), así que quien lo llame NO debe
+ * ponerle `rounded-full` ni `border`: recortarían las orejas que asoman.
+ */
 export function AvatarFace({
   look,
   className,
@@ -63,15 +68,59 @@ export function AvatarFace({
   look: AvatarLook
   className?: string
 }) {
+  // `useId` da claves únicas por instancia: dos avatares en la misma pantalla no
+  // pueden compartir el id del degradado o se pisarían.
+  const uid = useId().replace(/:/g, '')
+  const bgId = `bg-${uid}`
+  const base = BACKGROUNDS[look.background]
+
   return (
-    <svg viewBox="0 0 100 100" className={className} role="presentation">
-      <rect width="100" height="100" fill={BACKGROUNDS[look.background]} />
-      {look.kind === 'humano' ? <Humano look={look} /> : <Animal look={look} />}
+    <svg
+      viewBox="0 0 100 100"
+      className={className}
+      role="presentation"
+      style={{ overflow: 'visible' }}
+    >
+      <defs>
+        {/* Fondo con luz arriba: el disco deja de ser un color plano y coge cuerpo. */}
+        <radialGradient id={bgId} cx="50%" cy="36%" r="72%">
+          <stop offset="0%" stopColor={lighten(base, 1.22)} />
+          <stop offset="62%" stopColor={base} />
+          <stop offset="100%" stopColor={darken(base, 0.86)} />
+        </radialGradient>
+        <clipPath id={`disc-${uid}`}>
+          <circle cx="50" cy="50" r="50" />
+        </clipPath>
+      </defs>
+
+      <circle cx="50" cy="50" r="50" fill={`url(#${bgId})`} />
+      {/* El aro va antes del muñeco: lo que sobresale se dibuja por encima y lo cruza. */}
+      <circle
+        cx="50"
+        cy="50"
+        r="49"
+        fill="none"
+        strokeWidth="2.5"
+        style={{ stroke: 'var(--color-border)' }}
+      />
+
+      {look.kind === 'humano' ? (
+        // El humano sí se recorta al disco: su busto llega a los bordes y, sin el
+        // recorte, las esquinas asomarían como un babero.
+        <>
+          <g clipPath={`url(#disc-${uid})`}>
+            <Humano look={look} />
+          </g>
+          <Hat look={look} shirt={SHIRT_COLORS[look.shirt]} />
+        </>
+      ) : (
+        <Animal look={look} />
+      )}
     </svg>
   )
 }
 
-/** El muñeco de siempre: busto con piel, camiseta, pelo, sombrero y complemento. */
+/** El muñeco de siempre: busto con piel, camiseta, pelo y complemento. */
 function Humano({ look }: { look: AvatarLook }) {
   const skin = SKIN_TONES[look.skin]
   const shirt = SHIRT_COLORS[look.shirt]
@@ -82,27 +131,45 @@ function Humano({ look }: { look: AvatarLook }) {
       {/* Cuello y torso primero: la cabeza se apoya encima. */}
       <rect x="43" y="54" width="14" height="16" rx="6" fill={skin} />
       <path d="M16 100 v-6 c0-16 15-28 34-28 s34 12 34 28 v6 z" fill={shirt} />
+      {/* Un pliegue de luz en la camiseta: se nota que hay tela. */}
+      <path
+        d="M50 72 c-12 0 -22 7 -27 17"
+        fill="none"
+        stroke={lighten(shirt, 1.28)}
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
 
       <HairBack look={look} color={hair} />
 
       <circle cx="28" cy="42" r="4.5" fill={skin} />
       <circle cx="72" cy="42" r="4.5" fill={skin} />
       <ellipse cx="50" cy="40" rx="21" ry="23" fill={skin} />
+      {/* Un reflejo suave arriba para que la cara no sea un óvalo plano. */}
+      <ellipse cx="44" cy="33" rx="11" ry="9" fill={lighten(skin, 1.12)} opacity="0.5" />
+
+      <Cheeks lx={37} rx={63} y={45} />
 
       <HairFront look={look} color={hair} />
 
-      <circle cx="42" cy="38" r="3" fill="#2b2118" />
-      <circle cx="58" cy="38" r="3" fill="#2b2118" />
+      <g fill={INK}>
+        <circle cx="42" cy="38" r="3.2" />
+        <circle cx="58" cy="38" r="3.2" />
+      </g>
+      <g fill="#ffffff">
+        <circle cx="41" cy="37" r="1.1" />
+        <circle cx="57" cy="37" r="1.1" />
+      </g>
       <path
         d="M43 49 q7 6 14 0"
         fill="none"
-        stroke="#2b2118"
+        stroke={INK}
         strokeWidth="2.5"
         strokeLinecap="round"
       />
 
       <Accessory look={look} color={hair} />
-      <Hat look={look} shirt={shirt} />
     </>
   )
 }
@@ -118,9 +185,30 @@ function darken(hex: string, factor: number): string {
   return `rgb(${r}, ${g}, ${b})`
 }
 
+/** El mismo color, con más luz: brillos, reflejos y el centro del disco. */
+function lighten(hex: string, factor: number): string {
+  const n = parseInt(hex.slice(1), 16)
+  const clamp = (v: number) => Math.min(255, Math.round(v))
+  const r = clamp(((n >> 16) & 255) * factor)
+  const g = clamp(((n >> 8) & 255) * factor)
+  const b = clamp((n & 255) * factor)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+/** Dos mofletes sonrosados: el detalle que más «cariño» le da a la cara. */
+function Cheeks({ lx, rx, y }: { lx: number; rx: number; y: number }) {
+  return (
+    <g fill="#ff7a95" opacity="0.42">
+      <ellipse cx={lx} cy={y} rx="5.5" ry="3.4" />
+      <ellipse cx={rx} cy={y} rx="5.5" ry="3.4" />
+    </g>
+  )
+}
+
 /**
  * Los ojos de los bichos, que es donde vive la expresión. Cada especie dice dónde
- * van (`lx`/`rx`/`y`) y de qué tamaño (`r`); el gesto es común a todas.
+ * van (`lx`/`rx`/`y`) y de qué tamaño (`r`); el gesto es común a todas. Los ojos
+ * redondos llevan un brillo blanco: la diferencia entre «vivo» y «botón de peluche».
  */
 function Eyes({
   expression,
@@ -153,6 +241,9 @@ function Eyes({
       </g>
     )
   }
+  const shine = (cx: number, cy: number, rr: number) => (
+    <circle cx={cx - rr * 0.34} cy={cy - rr * 0.34} r={rr * 0.32} fill="#ffffff" />
+  )
   if (expression === 'guino') {
     return (
       <g>
@@ -164,14 +255,19 @@ function Eyes({
           strokeLinecap="round"
         />
         <circle cx={rx} cy={y} r={r} fill={ink} />
+        {shine(rx, y, r)}
       </g>
     )
   }
   const rr = expression === 'asombro' ? r * 1.3 : r
   return (
-    <g fill={ink}>
-      <circle cx={lx} cy={y} r={rr} />
-      <circle cx={rx} cy={y} r={rr} />
+    <g>
+      <g fill={ink}>
+        <circle cx={lx} cy={y} r={rr} />
+        <circle cx={rx} cy={y} r={rr} />
+      </g>
+      {shine(lx, y, rr)}
+      {shine(rx, y, rr)}
     </g>
   )
 }
@@ -182,7 +278,8 @@ const LIGHT = 'rgba(255, 255, 255, 0.92)'
 function Animal({ look }: { look: AvatarLook }) {
   const color = SHIRT_COLORS[look.shirt]
   const shade = darken(color, 0.72)
-  const props = { color, shade, expression: look.expression }
+  const glow = lighten(color, 1.24)
+  const props = { color, shade, glow, expression: look.expression }
 
   switch (look.kind) {
     case 'perro':
@@ -207,17 +304,21 @@ function Animal({ look }: { look: AvatarLook }) {
 interface Beast {
   color: string
   shade: string
+  glow: string
   expression: Expression
 }
 
-function Gato({ color, expression }: Beast) {
+function Gato({ color, glow, expression }: Beast) {
   return (
     <>
-      <path d="M24 36 L30 8 L50 30 Z" fill={color} />
-      <path d="M76 36 L70 8 L50 30 Z" fill={color} />
-      <path d="M31 30 L34 15 L45 28 Z" fill={LIGHT} />
-      <path d="M69 30 L66 15 L55 28 Z" fill={LIGHT} />
+      {/* Orejas puntiagudas que ASOMAN por encima del aro (tip en y negativo). */}
+      <path d="M23 34 L27 -2 L50 28 Z" fill={color} />
+      <path d="M77 34 L73 -2 L50 28 Z" fill={color} />
+      <path d="M30 28 L32 7 L44 27 Z" fill={LIGHT} />
+      <path d="M70 28 L68 7 L56 27 Z" fill={LIGHT} />
       <ellipse cx="50" cy="56" rx="33" ry="30" fill={color} />
+      <ellipse cx="50" cy="48" rx="26" ry="20" fill={glow} opacity="0.35" />
+      <Cheeks lx={31} rx={69} y={60} />
       <Eyes expression={expression} y={50} />
       <path d="M46 60 L54 60 L50 65 Z" fill="#e0748a" />
       <path
@@ -227,22 +328,25 @@ function Gato({ color, expression }: Beast) {
         strokeWidth="2"
         strokeLinecap="round"
       />
-      <g stroke={INK} strokeWidth="1.4" strokeLinecap="round" opacity="0.75">
+      <g stroke={INK} strokeWidth="1.4" strokeLinecap="round" opacity="0.7">
         <path d="M20 57 h13 M20 63 h13 M80 57 h-13 M80 63 h-13" />
       </g>
     </>
   )
 }
 
-function Perro({ color, shade, expression }: Beast) {
+function Perro({ color, shade, glow, expression }: Beast) {
   return (
     <>
       <path d="M20 38 q-13 6 -9 30 q10 6 16 -4 z" fill={shade} />
       <path d="M80 38 q13 6 9 30 q-10 6 -16 -4 z" fill={shade} />
       <ellipse cx="50" cy="56" rx="32" ry="30" fill={color} />
+      <ellipse cx="50" cy="47" rx="24" ry="18" fill={glow} opacity="0.32" />
       <ellipse cx="50" cy="64" rx="16" ry="12" fill={LIGHT} />
+      <Cheeks lx={29} rx={71} y={62} />
       <Eyes expression={expression} y={48} />
       <ellipse cx="50" cy="59" rx="6" ry="4.5" fill={INK} />
+      <ellipse cx="48" cy="57.5" rx="1.8" ry="1.3" fill="#ffffff" opacity="0.8" />
       <path
         d="M50 63 v5 M50 68 q-6 4 -11 0 M50 68 q6 4 11 0"
         fill="none"
@@ -257,29 +361,34 @@ function Perro({ color, shade, expression }: Beast) {
 function Zorro({ color, expression }: Beast) {
   return (
     <>
-      <path d="M22 34 L26 6 L48 26 Z" fill={color} />
-      <path d="M78 34 L74 6 L52 26 Z" fill={color} />
-      <path d="M28 25 L30 13 L41 25 Z" fill={INK} />
-      <path d="M72 25 L70 13 L59 25 Z" fill={INK} />
+      {/* Orejas de zorro, grandes y por fuera del marco, con el interior oscuro. */}
+      <path d="M21 32 L25 -4 L48 24 Z" fill={color} />
+      <path d="M79 32 L75 -4 L52 24 Z" fill={color} />
+      <path d="M27 22 L29 6 L40 24 Z" fill={INK} />
+      <path d="M73 22 L71 6 L60 24 Z" fill={INK} />
       <ellipse cx="50" cy="54" rx="32" ry="29" fill={color} />
-      <path d="M50 46 L34 80 Q50 86 66 80 Z" fill={LIGHT} />
+      <path d="M50 46 L33 82 Q50 88 67 82 Z" fill={LIGHT} />
+      <Cheeks lx={30} rx={70} y={58} />
       <Eyes expression={expression} y={48} />
       <path d="M45 66 L55 66 L50 73 Z" fill={INK} />
     </>
   )
 }
 
-function Oso({ color, shade, expression }: Beast) {
+function Oso({ color, shade, glow, expression }: Beast) {
   return (
     <>
-      <circle cx="26" cy="30" r="13" fill={color} />
-      <circle cx="74" cy="30" r="13" fill={color} />
-      <circle cx="26" cy="30" r="6.5" fill={shade} />
-      <circle cx="74" cy="30" r="6.5" fill={shade} />
+      <circle cx="26" cy="28" r="13" fill={color} />
+      <circle cx="74" cy="28" r="13" fill={color} />
+      <circle cx="26" cy="28" r="6.5" fill={shade} />
+      <circle cx="74" cy="28" r="6.5" fill={shade} />
       <ellipse cx="50" cy="56" rx="34" ry="31" fill={color} />
+      <ellipse cx="50" cy="47" rx="25" ry="19" fill={glow} opacity="0.3" />
       <ellipse cx="50" cy="64" rx="15" ry="11" fill={LIGHT} />
+      <Cheeks lx={28} rx={72} y={60} />
       <Eyes expression={expression} y={50} />
       <ellipse cx="50" cy="59" rx="5.5" ry="4" fill={INK} />
+      <ellipse cx="48.3" cy="58" rx="1.5" ry="1.1" fill="#ffffff" opacity="0.8" />
       <path
         d="M50 63 v4 M50 67 q-5 4 -9 0 M50 67 q5 4 9 0"
         fill="none"
@@ -294,13 +403,14 @@ function Oso({ color, shade, expression }: Beast) {
 function Panda({ color, expression }: Beast) {
   return (
     <>
-      <circle cx="26" cy="28" r="12" fill="#2b2f38" />
-      <circle cx="74" cy="28" r="12" fill="#2b2f38" />
+      <circle cx="25" cy="26" r="12" fill="#2b2f38" />
+      <circle cx="75" cy="26" r="12" fill="#2b2f38" />
       <ellipse cx="50" cy="56" rx="34" ry="31" fill={color} />
       <ellipse cx="37" cy="50" rx="9" ry="12" fill="#2b2f38" transform="rotate(-18 37 50)" />
       <ellipse cx="63" cy="50" rx="9" ry="12" fill="#2b2f38" transform="rotate(18 63 50)" />
       <circle cx="37" cy="50" r="4.5" fill="#fff" />
       <circle cx="63" cy="50" r="4.5" fill="#fff" />
+      <Cheeks lx={28} rx={72} y={62} />
       <Eyes expression={expression} lx={37} rx={63} y={50} r={3} />
       <ellipse cx="50" cy="60" rx="4.5" ry="3.5" fill={INK} />
       <path
@@ -314,14 +424,17 @@ function Panda({ color, expression }: Beast) {
   )
 }
 
-function Conejo({ color, expression }: Beast) {
+function Conejo({ color, glow, expression }: Beast) {
   return (
     <>
-      <ellipse cx="39" cy="20" rx="7" ry="20" fill={color} transform="rotate(-8 39 20)" />
-      <ellipse cx="61" cy="20" rx="7" ry="20" fill={color} transform="rotate(8 61 20)" />
-      <ellipse cx="39" cy="22" rx="3.2" ry="13" fill="#e79bb0" transform="rotate(-8 39 22)" />
-      <ellipse cx="61" cy="22" rx="3.2" ry="13" fill="#e79bb0" transform="rotate(8 61 22)" />
+      {/* Orejas largas que salen bien por encima del aro. */}
+      <ellipse cx="38" cy="14" rx="7" ry="24" fill={color} transform="rotate(-8 38 14)" />
+      <ellipse cx="62" cy="14" rx="7" ry="24" fill={color} transform="rotate(8 62 14)" />
+      <ellipse cx="38" cy="16" rx="3.2" ry="16" fill="#e79bb0" transform="rotate(-8 38 16)" />
+      <ellipse cx="62" cy="16" rx="3.2" ry="16" fill="#e79bb0" transform="rotate(8 62 16)" />
       <ellipse cx="50" cy="58" rx="30" ry="28" fill={color} />
+      <ellipse cx="50" cy="50" rx="22" ry="17" fill={glow} opacity="0.32" />
+      <Cheeks lx={30} rx={70} y={62} />
       <Eyes expression={expression} y={52} />
       <path d="M47 62 L53 62 L50 66 Z" fill="#e0748a" />
       <path
@@ -335,15 +448,18 @@ function Conejo({ color, expression }: Beast) {
   )
 }
 
-function Rana({ color, expression }: Beast) {
+function Rana({ color, glow, expression }: Beast) {
   return (
     <>
       <ellipse cx="50" cy="60" rx="34" ry="26" fill={color} />
-      <circle cx="33" cy="36" r="13" fill={color} />
-      <circle cx="67" cy="36" r="13" fill={color} />
-      <circle cx="33" cy="36" r="8" fill="#fff" />
-      <circle cx="67" cy="36" r="8" fill="#fff" />
-      <Eyes expression={expression} lx={33} rx={67} y={36} r={4} />
+      {/* Ojos saltones que asoman por encima del aro. */}
+      <circle cx="31" cy="26" r="14" fill={color} />
+      <circle cx="69" cy="26" r="14" fill={color} />
+      <circle cx="31" cy="26" r="8.5" fill="#fff" />
+      <circle cx="69" cy="26" r="8.5" fill="#fff" />
+      <ellipse cx="50" cy="58" rx="24" ry="15" fill={glow} opacity="0.28" />
+      <Eyes expression={expression} lx={31} rx={69} y={26} r={4} />
+      <Cheeks lx={30} rx={70} y={60} />
       <path
         d="M28 64 q22 16 44 0"
         fill="none"
@@ -362,6 +478,7 @@ function Pinguino({ color, expression }: Beast) {
     <>
       <ellipse cx="50" cy="56" rx="32" ry="31" fill={color} />
       <ellipse cx="50" cy="60" rx="21" ry="25" fill={LIGHT} />
+      <Cheeks lx={30} rx={70} y={54} />
       <Eyes expression={expression} lx={43} rx={57} y={46} r={4} />
       <path d="M43 54 L57 54 L50 64 Z" fill="#f2a03d" />
       <path d="M47 60 L53 60 L50 64 Z" fill="#d67e1e" />
@@ -493,8 +610,9 @@ function Hat({ look, shirt }: { look: AvatarLook; shirt: string }) {
 
     case 'corona':
       return (
+        // Sube por encima del aro: la corona corona de verdad.
         <path
-          d="M30 22 v-14 l8 6 l12 -11 l12 11 l8 -6 v14 z"
+          d="M30 22 v-18 l8 8 l12 -13 l12 13 l8 -8 v18 z"
           fill="#f2c14e"
           stroke="#a97c1a"
           strokeWidth="1.5"
@@ -505,7 +623,7 @@ function Hat({ look, shirt }: { look: AvatarLook; shirt: string }) {
     case 'chistera':
       return (
         <g>
-          <rect x="32" y="2" width="36" height="21" fill="#2b2f38" />
+          <rect x="32" y="-4" width="36" height="27" fill="#2b2f38" />
           <rect x="32" y="15" width="36" height="6" fill="#a52233" />
           <rect x="20" y="21" width="60" height="6" rx="3" fill="#2b2f38" />
         </g>
@@ -516,15 +634,15 @@ function Hat({ look, shirt }: { look: AvatarLook; shirt: string }) {
         <g fill={shirt}>
           <path d="M28 31 a22 21 0 0 1 44 0 z" />
           <rect x="26" y="27" width="48" height="8" rx="4" />
-          <circle cx="50" cy="9" r="6" fill="#eceff4" />
+          <circle cx="50" cy="3" r="6" fill="#eceff4" />
         </g>
       )
 
     case 'cuernos':
       return (
         <g fill="#b8452f">
-          <path d="M32 26 c-7 -5 -10 -14 -6 -21 c7 3 12 10 12 17 z" />
-          <path d="M68 26 c7 -5 10 -14 6 -21 c-7 3 -12 10 -12 17 z" />
+          <path d="M32 26 c-7 -5 -11 -16 -7 -25 c8 3 13 11 13 19 z" />
+          <path d="M68 26 c7 -5 11 -16 7 -25 c-8 3 -13 11 -13 19 z" />
         </g>
       )
 

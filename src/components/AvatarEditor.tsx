@@ -33,10 +33,7 @@ export function AvatarEditor({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col items-center gap-3">
-        <AvatarFace
-          look={look}
-          className="hard h-40 w-40 rounded-full border-2 border-[var(--color-border)]"
-        />
+        <AvatarFace look={look} className="h-40 w-40" />
         <button
           type="button"
           className="btn btn-ghost px-3 py-1.5 text-sm"
@@ -172,7 +169,7 @@ function Looks<T extends string>({
   return (
     <div className="flex flex-col gap-2">
       <span className="label">{label}</span>
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 pt-4">
         {options.map((option) => (
           <button
             key={option.id}
@@ -186,10 +183,7 @@ function Looks<T extends string>({
                 : 'border-transparent text-[var(--color-muted)]'
             }`}
           >
-            <AvatarFace
-              look={preview(option.id)}
-              className="h-12 w-12 rounded-full border-2 border-[var(--color-border)]"
-            />
+            <AvatarFace look={preview(option.id)} className="h-12 w-12 shrink-0" />
             {option.label}
           </button>
         ))}
