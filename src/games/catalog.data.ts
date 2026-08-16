@@ -15,8 +15,10 @@
  * Jugadores y duración son los de la caja del juego base (sin expansiones). La
  * dificultad es cuánto cuesta ponerse a jugar, no cuánto cuesta ganar.
  *
- * Los juegos con hoja de puntuación detallada y chuleta de reglas NO van aquí:
- * van en `definitions/`. Si un juego está en los dos sitios, manda `definitions/`.
+ * Los juegos con hoja de puntuación DETALLADA (con los conceptos propios del juego) van
+ * en `definitions/`, no aquí. Una chuleta de reglas por sí sola no basta para promocionar
+ * un juego: los más jugados del catálogo la llevan sin salir de aquí, escrita aparte en
+ * `catalog.rules.ts`. Si un juego está en los dos sitios, manda `definitions/`.
  */
 import type { GameDifficulty } from './types'
 

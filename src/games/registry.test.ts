@@ -49,9 +49,9 @@ describe('coherencia de las definiciones', () => {
     }
   })
 
-  // `rules` es opcional en el tipo: no la traen ni los juegos que crea un usuario ni los
-  // del catálogo amplio (`catalog.data.ts`), que se declaran en una línea y enseñan «Sin
-  // chuleta de reglas» en vez de inventarse un resumen. Los escritos a mano en
+  // `rules` es opcional en el tipo: no la traen los juegos que crea un usuario. Los del
+  // catálogo amplio PUEDEN llevarla —los más jugados la tienen en `catalog.rules.ts`— o
+  // quedarse sin ella y enseñar «Sin chuleta de reglas». Los escritos a mano en
   // `definitions/` sí están obligados a llevar la chuleta entera: es lo que los distingue.
   it('la chuleta de reglas está completa en todos los juegos escritos a mano', () => {
     for (const game of CURATED_GAMES) {

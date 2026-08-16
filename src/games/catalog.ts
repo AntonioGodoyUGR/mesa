@@ -16,6 +16,7 @@
  * la definición escrita a mano.
  */
 import { CATALOG_ROWS, type CatalogRow, type SheetId } from './catalog.data'
+import { CATALOG_RULES } from './catalog.rules'
 import type { GameDefinition, GameTheme, ScoreField } from './types'
 
 /**
@@ -214,13 +215,17 @@ function expand(row: CatalogRow): GameDefinition {
     // Las hojas se comparten entre juegos: se copian los campos para que nadie pueda
     // mutar la de todo el catálogo sin querer.
     fields: sheet.fields.map((field) => ({ ...field })),
+    // Chuleta de reglas, si el juego la tiene escrita en `catalog.rules.ts`. Los que no
+    // están en el mapa quedan con `rules: undefined` y enseñan «Sin chuleta de reglas».
+    rules: CATALOG_RULES[slug],
   }
 }
 
 /**
  * El catálogo entero, ya expandido.
  *
- * No lleva `rules`: son juegos sin chuleta escrita, y la pantalla de reglas lo dice
- * («Sin chuleta de reglas») en vez de inventarse un resumen.
+ * Los juegos más jugados llevan su chuleta de reglas, escrita aparte en
+ * `catalog.rules.ts` y enganchada por `slug` al expandir. El resto se queda sin ella y
+ * la pantalla lo dice («Sin chuleta de reglas») en vez de inventarse un resumen.
  */
 export const CATALOG_GAMES: GameDefinition[] = CATALOG_ROWS.map(expand)

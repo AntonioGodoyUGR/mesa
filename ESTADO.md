@@ -19,7 +19,14 @@ quedó a medias y lo siguiente que toca.
 ## Estado actual
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
-  (141 tests, build OK). Comprobado 2026-08-15.
+  (141 tests, build OK). Comprobado 2026-08-16.
+- **Chuletas de reglas en el catálogo (oleada 1)**: los juegos de `catalog.data.ts` ya
+  pueden llevar `RuleSheet` sin promocionarse a `definitions/`. Viven en
+  `src/games/catalog.rules.ts` (`CATALOG_RULES: Record<slug, RuleSheet>`) y `catalog.ts`
+  las engancha en `expand()` con `rules: CATALOG_RULES[slug]`; el slug que no está en el
+  mapa se queda con «Sin chuleta de reglas». Hecha la **primera oleada: 50 juegos** (los
+  más jugados). Las reglas NO tocan BD: `seed-games.ts` solo cuenta chuletas para un log,
+  no las persiste, así que no hace falta `npm run seed:games`.
 - **Portada de login con logo animado + invitado**: `<Logo>` acepta ahora
   `animated?: boolean` (por defecto `false`; la cabecera sigue quieta). Con `animated`,
   cada palabra converge —mitad izquierda desde la izquierda, derecha desde la derecha— y
@@ -39,6 +46,10 @@ quedó a medias y lo siguiente que toca.
 
 ## Pendiente / ideas (sin prioridad asignada)
 
+- [ ] **Chuletas del catálogo, oleadas siguientes**: quedan sin chuleta el resto de las
+      filas de `catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
+      terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
+      `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
 - [ ] Bundle JS en un solo chunk de ~759 kB (216 gzip). Se podría code-splitear con
       `import()` dinámico. No urge.
 - [ ] 6 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
@@ -60,3 +71,8 @@ quedó a medias y lo siguiente que toca.
   ganador contacta a todos sus agentes y se lleva la mayor—, más `spymaster` (informativo) y
   `assassin` (−99, la derrota instantánea manda al último puesto). Todo en verde (141 tests,
   build OK).
+- **2026-08-16** — Gustavo: chuletas de reglas para el catálogo (oleada 1). Nuevo
+  `catalog.rules.ts` con `CATALOG_RULES` (50 juegos más jugados), enganchado en `catalog.ts`
+  vía `rules: CATALOG_RULES[slug]`. Actualizados los comentarios de `catalog.ts`,
+  `catalog.data.ts` y `registry.test.ts` (el catálogo ya PUEDE llevar chuleta). Sin cambios
+  de BD. Todo en verde (141 tests, build OK).
