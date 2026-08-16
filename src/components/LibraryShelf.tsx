@@ -62,7 +62,7 @@ function Shelf({ info, games }: { info: LibraryStatusInfo; games: GameDefinition
           {games.slice(0, SHELF).map((game) => (
             <li key={game.slug}>
               <Link
-                to={`/reglas/${game.slug}`}
+                to={`/juegos/${game.slug}`}
                 className="card game-edge flex items-center gap-2 p-2"
                 style={{ '--game': game.theme.primary } as CSSProperties}
               >

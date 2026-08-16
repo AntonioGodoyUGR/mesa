@@ -64,7 +64,9 @@ describe('App', () => {
   it('permite elegir jugadores y puntuar una partida de Catán', async () => {
     renderApp()
 
+    // Tocar el juego abre su ficha; «Crear partida» es lo que lleva al marcador.
     fireEvent.click((await gameGrid()).getByText('Catán'))
+    fireEvent.click(await screen.findByRole('link', { name: /Crear partida/ }))
 
     // Paso 1: los jugadores del grupo.
     const button = await screen.findByRole('button', { name: 'Apuntar puntuaciones' })
@@ -107,8 +109,9 @@ describe('App', () => {
     fireEvent.click(create)
 
     // Vuelve a la portada y el juego nuevo ya está entre los del grupo. Se busca
-    // en la rejilla: la vista previa de la hoja también lleva su nombre.
+    // en la rejilla, se abre su ficha y desde ahí se crea la partida.
     fireEvent.click(await (await gameGrid()).findByText('Chinchón'))
+    fireEvent.click(await screen.findByRole('link', { name: /Crear partida/ }))
 
     expect(await screen.findByRole('button', { name: 'Apuntar puntuaciones' })).toBeVisible()
   })
@@ -159,12 +162,17 @@ describe('App', () => {
     expect(screen.queryByRole('heading', { name: 'Tu biblioteca' })).toBeNull()
   })
 
-  it('las chuletas de reglas son accesibles desde la barra inferior', async () => {
+  it('la ficha de un juego enseña sus reglas de entrada, sin pestaña propia en la barra', async () => {
     renderApp()
 
-    fireEvent.click(await screen.findByRole('link', { name: /Reglas/ }))
-    fireEvent.click(await screen.findByText('Carcassonne'))
+    // La página de Reglas independiente desapareció: ya no hay pestaña «Reglas»
+    // en la barra inferior, se entra por la ficha de cada juego.
+    expect(screen.queryByRole('link', { name: /Reglas/ })).toBeNull()
 
+    fireEvent.click(await screen.findByRole('link', { name: /Inicio/ }))
+    fireEvent.click((await gameGrid()).getByText('Carcassonne'))
+
+    // «Reglas» es la pestaña por defecto de la ficha.
     expect(await screen.findByText('Preparación')).toBeVisible()
     expect(screen.getByText('Puntuación')).toBeVisible()
   })
@@ -172,9 +180,9 @@ describe('App', () => {
   it('la ficha de un juego reúne tus estadísticas y las de toda la app', async () => {
     renderApp()
 
-    fireEvent.click(await screen.findByRole('link', { name: /Reglas/ }))
-    fireEvent.click(await screen.findByText('Carcassonne'))
-    fireEvent.click(await screen.findByRole('link', { name: /Estadísticas de Carcassonne/ }))
+    fireEvent.click(await screen.findByRole('link', { name: /Inicio/ }))
+    fireEvent.click((await gameGrid()).getByText('Carcassonne'))
+    fireEvent.click(await screen.findByRole('tab', { name: 'Estadísticas' }))
 
     expect(await screen.findByRole('heading', { name: 'Tus partidas' })).toBeVisible()
 
@@ -184,7 +192,8 @@ describe('App', () => {
     expect(await within(global).findByText('Grupos')).toBeVisible()
     expect(within(global).getByText('91')).toBeVisible()
 
-    // Y desde la ficha se vuelve a la chuleta.
-    expect(screen.getByRole('link', { name: /Chuleta de reglas/ })).toBeVisible()
+    // Y se puede volver a las reglas sin salir de la ficha.
+    fireEvent.click(screen.getByRole('tab', { name: 'Reglas' }))
+    expect(await screen.findByText('Preparación')).toBeVisible()
   })
 })

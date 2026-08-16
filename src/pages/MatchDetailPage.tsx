@@ -84,7 +84,7 @@ export function MatchDetailPage() {
         </div>
         {game && (
           <Link
-            to={`/reglas/${game.slug}`}
+            to={`/juegos/${game.slug}?tab=reglas`}
             className="btn btn-ghost shrink-0 px-3 py-1.5 text-sm"
           >
             Reglas

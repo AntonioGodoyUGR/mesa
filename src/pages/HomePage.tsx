@@ -63,15 +63,13 @@ export function HomePage() {
   const results = usePaged(found)
   const catalogue = usePaged(rest)
 
-  // Media portada depende de si hay grupo, empezando por a dónde lleva cada
-  // juego. Mientras no se sepa no se pinta: es la espera que antes hacían los
-  // guardianes de la ruta, no una nueva.
+  // Media portada depende de si hay grupo. Mientras no se sepa no se pinta: es
+  // la espera que antes hacían los guardianes de la ruta, no una nueva.
   if (authLoading || groupLoading) return <Spinner label="Comprobando sesión…" />
 
-  // Con grupo, tocar un juego abre el marcador; sin él, su ficha, que es lo
-  // único que se puede hacer con un juego sin nadie con quien jugarlo.
-  const tileLink = (game: GameDefinition) =>
-    group ? `/nueva/${game.slug}` : `/juegos/${game.slug}`
+  // Tocar un juego siempre abre su ficha: ahí están las reglas, las
+  // estadísticas y el botón «Crear partida», con o sin grupo.
+  const tileLink = (game: GameDefinition) => `/juegos/${game.slug}`
 
   return (
     <div className="flex flex-col gap-6">
@@ -80,7 +78,7 @@ export function HomePage() {
           <h1 className="display text-xl">{group ? 'Nueva partida' : 'Juegos'}</h1>
           <p className="mt-0.5 text-sm text-[var(--color-muted)]">
             {group
-              ? 'Elige el juego para apuntar el resultado.'
+              ? 'Elige un juego para ver su ficha y crear una partida.'
               : 'Reglas y estadísticas de cada juego, sin cuenta.'}
           </p>
         </div>

@@ -160,8 +160,8 @@ function GameRow({
       className="card game-edge flex items-center gap-3 p-3"
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
-      {/* El nombre lleva a su chuleta; los botones quedan fuera del enlace a propósito. */}
-      <Link to={`/reglas/${game.slug}`} className="flex min-w-0 flex-1 items-center gap-3">
+      {/* El nombre lleva a su ficha; los botones quedan fuera del enlace a propósito. */}
+      <Link to={`/juegos/${game.slug}`} className="flex min-w-0 flex-1 items-center gap-3">
         <GameCover game={game} size={40} />
         <span className="min-w-0 flex-1">
           <span className="block truncate font-semibold">{game.name}</span>

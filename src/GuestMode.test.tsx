@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -50,9 +50,10 @@ describe('sin sesión', () => {
     renderApp()
 
     expect(await screen.findByRole('link', { name: /Inicio/ })).toBeVisible()
-    expect(screen.getByRole('link', { name: /Reglas/ })).toBeVisible()
     expect(screen.getByRole('link', { name: /Empezar/ })).toBeVisible()
 
+    // La barra ya no lleva pestaña de Reglas: viven en la ficha de cada juego.
+    expect(screen.queryByRole('link', { name: /Reglas/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Partidas/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Jugadores/ })).toBeNull()
   })
@@ -62,11 +63,16 @@ describe('sin sesión', () => {
     renderApp()
 
     expect(await screen.findByRole('heading', { name: 'Carcassonne' })).toBeVisible()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Estadísticas' }))
     expect(await screen.findByRole('heading', { name: 'En toda la app' })).toBeVisible()
     expect(screen.getByText(/Inicia sesión para ver cómo se te da/)).toBeVisible()
 
-    // Sin grupo no aparece el botón de jugar.
-    expect(screen.queryByRole('link', { name: 'Jugar' })).toBeNull()
+    // Sin sesión, «Crear partida» manda a entrar antes de nada.
+    expect(screen.getByRole('link', { name: /Crear partida/ })).toHaveAttribute(
+      'href',
+      '/login',
+    )
   })
 
   it('las pantallas del grupo siguen pidiendo sesión', async () => {

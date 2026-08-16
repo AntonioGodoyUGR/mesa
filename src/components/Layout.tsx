@@ -22,7 +22,6 @@ const TABS: Tab[] = [
   { to: '/', label: 'Inicio', icon: '🎲', end: true },
   { to: '/partidas', label: 'Partidas', icon: '📋', end: false, needsGroup: true },
   { to: '/jugadores', label: 'Jugadores', icon: '👥', end: false, needsGroup: true },
-  { to: '/reglas', label: 'Reglas', icon: '📖', end: false },
   { to: '/grupo/nuevo', label: 'Empezar', icon: '✨', end: false, guestOnly: true },
 ]
 

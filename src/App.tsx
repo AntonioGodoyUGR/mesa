@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { GroupProvider } from './context/GroupContext'
 import { GamesProvider } from './context/GamesContext'
@@ -15,11 +15,15 @@ import { MatchesPage } from './pages/MatchesPage'
 import { MatchDetailPage } from './pages/MatchDetailPage'
 import { PlayersPage } from './pages/PlayersPage'
 import { PlayerProfilePage } from './pages/PlayerProfilePage'
-import { RulesIndexPage } from './pages/RulesIndexPage'
-import { RuleSheetPage } from './pages/RuleSheetPage'
 import { CustomGamePage } from './pages/CustomGamePage'
 import { GamePage } from './pages/GamePage'
 import { LibraryPage } from './pages/LibraryPage'
+
+/** `/reglas/:slug` ya no existe: cae en la pestaña «Reglas» de la ficha del juego. */
+function RuleSheetRedirect() {
+  const { slug } = useParams()
+  return <Navigate to={`/juegos/${slug}?tab=reglas`} replace />
+}
 
 export default function App() {
   // GitHub Pages sirve la app bajo /table-tracker/; el dev server y Vercel, bajo /.
@@ -37,8 +41,11 @@ export default function App() {
                       empiezan a existir datos tuyos —tu perfil, tu grupo, tus
                       juegos—, no antes. */}
                   <Route index element={<HomePage />} />
-                  <Route path="reglas" element={<RulesIndexPage />} />
-                  <Route path="reglas/:slug" element={<RuleSheetPage />} />
+                  {/* La página de Reglas independiente desapareció: la ficha del
+                      juego la absorbió como pestaña. Se conservan redirecciones
+                      para no romper enlaces guardados ni la caché de la PWA. */}
+                  <Route path="reglas" element={<Navigate to="/" replace />} />
+                  <Route path="reglas/:slug" element={<RuleSheetRedirect />} />
                   {/* `juegos/nuevo` gana a `juegos/:slug` aunque se declare
                       después: un tramo fijo pesa más que uno dinámico. */}
                   <Route path="juegos/:slug" element={<GamePage />} />

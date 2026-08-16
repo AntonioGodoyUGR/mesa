@@ -20,6 +20,23 @@ quedó a medias y lo siguiente que toca.
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
   (141 tests, build OK). Comprobado 2026-08-16.
+- **Ficha de juego única, maqueta B (pestañas)**: la página de Reglas independiente
+  (`RulesIndexPage`, `RuleSheetPage`) desapareció. `GamePage.tsx` (`src/pages/GamePage.tsx`)
+  ahora es la única ficha: hero fijo arriba (portada + nombre + tagline + chips de meta) con
+  el botón «＋ Crear partida» siempre visible justo debajo —lleva a `/nueva/:slug` con grupo,
+  a `/grupo/nuevo` con sesión sin grupo, o a `/login` sin sesión—, y debajo tres pestañas
+  (`role="tablist"`, estado local `useState`) Reglas / Estadísticas / Partidas. Reglas es la
+  pestaña por defecto; se puede abrir directo en cualquiera con `?tab=reglas|estadisticas|partidas`
+  (`useSearchParams`), que es justo lo que usa el redirector de rutas viejas. `App.tsx` conserva
+  `reglas` → `/` y `reglas/:slug` → `/juegos/:slug?tab=reglas` (componente `RuleSheetRedirect`)
+  para no romper enlaces guardados ni la caché de la PWA; los ficheros de las páginas viejas se
+  borraron. Toda la app enlaza ya a la ficha, no a las rutas de reglas: `HomePage.tileLink`
+  siempre es `/juegos/:slug` (antes `/nueva/:slug` con grupo), `LibraryPage`, `LibraryShelf` y
+  `MatchDetailPage` apuntan a `/juegos/:slug` en vez de `/reglas/:slug`. `MatchCard` ya no es un
+  único `<Link>`: la portada y el nombre del juego enlazan a su ficha, y el resto de la fila
+  (fecha, jugadores, resultado, `›`) a la partida — dos `<a>` en paralelo dentro de la misma
+  tarjeta, nunca uno anidado en el otro. `App.test.tsx` y `GuestMode.test.tsx` actualizados al
+  nuevo recorrido (tocar un juego abre su ficha; «Crear partida» es lo que lleva al marcador).
 - **Chuletas de reglas en el catálogo (oleada 1)**: los juegos de `catalog.data.ts` ya
   pueden llevar `RuleSheet` sin promocionarse a `definitions/`. Viven en
   `src/games/catalog.rules.ts` (`CATALOG_RULES: Record<slug, RuleSheet>`) y `catalog.ts`
@@ -58,6 +75,11 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-16** — Claude (terminal): ficha de juego única con pestañas (maqueta B del
+  comparador, elegida por Toni). Fuera la página de Reglas independiente, con redirecciones
+  desde `/reglas` y `/reglas/:slug`. Título e imagen del juego enlazan siempre a su ficha
+  (`MatchCard`, `MatchDetailPage`, `LibraryPage`, `LibraryShelf`, `HomePage`). Tests
+  actualizados. Todo en verde (141 tests, build OK).
 - **2026-08-15** — Gustavo: primer contacto con el proyecto. Corrida la comprobación
   completa (verde). Creado este `ESTADO.md` como puente entre sesiones.
 - **2026-08-15** — Gustavo: avatares con animales estilo Gartic Phone + expresiones,
