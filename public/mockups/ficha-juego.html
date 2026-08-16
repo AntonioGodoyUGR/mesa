@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Table Tracker · Comparador ficha «Juego»</title>
+<style>
+  :root{
+    --bg:#d5f2ff; --surface:#f4fdff; --surface2:#a5e2ff;
+    --border:#071219; --text:#071219; --muted:#5e707a;
+    --brand:#1461d1; --brand-ink:#fff; --brand-soft:#d0e4f8;
+    --accent:#d95f00; --accent-ink:#071219;
+    --success:#1f7a45; --danger:#c02a1c;
+    --game:#d95f00; /* color del juego de ejemplo (Catán) */
+  }
+  html[data-theme="dark"]{
+    --bg:#0b1720; --surface:#12222e; --surface2:#1a2f3e;
+    --border:#e2f5ff; --text:#e2f5ff; --muted:#8898a1;
+    --brand:#4d9bff; --brand-ink:#071219; --brand-soft:#1b354f;
+    --accent:#ffab3d; --accent-ink:#071219;
+    --success:#5ad195; --danger:#ff7264;
+    --game:#ffab3d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,sans-serif;
+    padding:16px 12px 60px;
+    transition:background .2s;
+  }
+  .display{font-family:'Arial Black','Segoe UI Variable Display',Impact,system-ui,sans-serif;letter-spacing:-.02em}
+
+  /* ---- barra de control del comparador ---- */
+  .toolbar{
+    max-width:960px;margin:0 auto 18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
+  }
+  .toolbar h1{font-size:15px;margin:0 auto 0 4px;flex:1 1 100%}
+  .toolbar small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:2px}
+  .seg{display:flex;border:2px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:3px 3px 0 var(--border)}
+  .seg button{
+    font:inherit;font-weight:800;font-size:13px;border:0;padding:8px 12px;cursor:pointer;
+    background:var(--surface);color:var(--text)
+  }
+  .seg button+button{border-left:2px solid var(--border)}
+  .seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+  .ghost{
+    font:inherit;font-weight:800;font-size:13px;padding:8px 12px;cursor:pointer;
+    background:var(--surface);color:var(--text);border:2px solid var(--border);border-radius:8px;box-shadow:3px 3px 0 var(--border)
+  }
+
+  /* ---- marco de móvil ---- */
+  .stage{display:flex;justify-content:center}
+  .phone{
+    width:100%;max-width:412px;background:var(--surface);
+    border:3px solid var(--border);border-radius:20px;box-shadow:8px 8px 0 var(--border);
+    overflow:hidden;position:relative;min-height:720px
+  }
+  .screen{max-height:740px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .screen::-webkit-scrollbar{width:8px}
+  .screen::-webkit-scrollbar-thumb{background:var(--muted);border-radius:8px}
+
+  /* topbar de la app */
+  .app-top{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:2px solid var(--border);background:var(--surface2)}
+  .app-top .back{font-weight:900;font-size:18px;text-decoration:none;color:var(--text)}
+  .app-top .crumb{font-size:12px;color:var(--muted);font-weight:700}
+
+  /* hero del juego */
+  .hero{position:relative;padding:16px 14px;border-bottom:2px solid var(--border);
+    background:color-mix(in oklab, var(--game) 22%, var(--surface))}
+  .hero .row{display:flex;gap:14px;align-items:center}
+  .cover{
+    width:88px;height:88px;flex:0 0 88px;border:2px solid var(--border);border-radius:10px;
+    box-shadow:4px 4px 0 var(--border);display:grid;place-items:center;font-size:44px;
+    background:color-mix(in oklab, var(--game) 55%, var(--surface))
+  }
+  .cover.link{cursor:pointer}
+  .hero h2{margin:0;font-size:26px;line-height:1}
+  .hero .tag{margin:6px 0 0;font-size:13px;color:var(--muted)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chip{font-size:12px;font-weight:800;border:2px solid var(--border);border-radius:999px;padding:4px 10px;background:var(--surface)}
+
+  /* botón crear partida */
+  .cta{
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    font-family:'Arial Black',system-ui;font-size:17px;letter-spacing:-.01em;
+    padding:14px;margin-top:14px;cursor:pointer;color:var(--accent-ink);
+    background:var(--accent);border:2px solid var(--border);border-radius:12px;box-shadow:5px 5px 0 var(--border)
+  }
+  .cta:active{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--border)}
+
+  section.blk{padding:16px 14px;border-bottom:2px solid var(--border)}
+  section.blk h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;gap:8px}
+  section.blk h3 .n{color:var(--game)}
+
+  .kv{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:14px}
+  .kv .k{color:var(--muted)}
+  .kv .v{font-weight:800;text-align:right}
+  ul.clean{margin:0;padding-left:18px;font-size:14px;line-height:1.5}
+  ul.clean li{margin:3px 0}
+
+  /* estadísticas */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{border:2px solid var(--border);border-radius:10px;padding:10px;background:var(--surface);box-shadow:3px 3px 0 var(--border)}
+  .stat .big{font-family:'Arial Black',system-ui;font-size:24px;line-height:1}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+  .bars{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .bar{display:grid;grid-template-columns:70px 1fr 28px;align-items:center;gap:8px;font-size:13px}
+  .bar .track{height:14px;border:2px solid var(--border);border-radius:6px;background:var(--surface);overflow:hidden}
+  .bar .fill{height:100%;background:var(--brand)}
+  .bar b{text-align:right}
+
+  /* historial partidas */
+  .match{display:flex;align-items:center;gap:10px;border:2px solid var(--border);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--surface);box-shadow:3px 3px 0 var(--border);cursor:pointer;text-decoration:none;color:inherit}
+  .match .mini{width:34px;height:34px;flex:0 0 34px;border:2px solid var(--border);border-radius:7px;display:grid;place-items:center;font-size:18px;background:color-mix(in oklab, var(--game) 45%, var(--surface))}
+  .match .who{font-weight:800;font-size:14px}
+  .match .sub{font-size:12px;color:var(--muted)}
+  .match .win{margin-left:auto;font-weight:900;font-size:12px;color:var(--success);white-space:nowrap}
+  .linknote{font-size:11px;color:var(--game);font-weight:800;margin-top:6px}
+
+  /* pestañas (versión B) */
+  .tabs{position:sticky;top:0;z-index:2;display:flex;background:var(--surface2);border-bottom:2px solid var(--border)}
+  .tabs button{flex:1;font:inherit;font-weight:800;font-size:13px;border:0;background:transparent;color:var(--muted);padding:12px 4px;cursor:pointer;border-bottom:3px solid transparent}
+  .tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--game)}
+  .tabpane{display:none}
+  .tabpane.on{display:block}
+
+  /* acordeón (versión C) */
+  .acc{border-bottom:2px solid var(--border)}
+  .acc>button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;font:inherit;font-weight:900;font-size:15px;background:var(--surface);color:var(--text);border:0;padding:15px 14px;cursor:pointer}
+  .acc>button .ico{font-size:13px;color:var(--muted);transition:transform .15s}
+  .acc[open]>button .ico{transform:rotate(90deg)}
+  .acc .body{padding:0 14px 16px;display:none}
+  .acc[open] .body{display:block}
+  .fab{position:sticky;bottom:0;padding:10px;background:linear-gradient(transparent, var(--surface) 40%)}
+
+  .hint{max-width:412px;margin:14px auto 0;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+  .badge{display:inline-block;font-size:11px;font-weight:800;color:var(--game);border:2px solid var(--game);border-radius:999px;padding:1px 8px;margin-bottom:8px}
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1 class="display">Table Tracker · nueva ficha «Juego»
+      <small>Compara 3 maquetas. Todas: botón «Crear partida» arriba + reglas + estadísticas + historial en la misma página. La de «Reglas» del inicio desaparece.</small>
+    </h1>
+    <div class="seg" role="group" aria-label="Versión">
+      <button data-v="A" aria-pressed="true">A · Scroll único</button>
+      <button data-v="B" aria-pressed="false">B · Pestañas</button>
+      <button data-v="C" aria-pressed="false">C · Acordeón + FAB</button>
+    </div>
+    <button class="ghost" id="theme">🌙 / ☀️ Tema</button>
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="screen" id="screen"><!-- render aquí --></div>
+    </div>
+  </div>
+
+  <p class="hint" id="hint"></p>
+
+<script>
+  // ---- datos de ejemplo (Catán) ----
+  const G = {
+    icon:'🎲', name:'Catán', tag:'Construye, comercia y coloniza la isla',
+    players:'3–4 jugadores', time:'60–90 min', diff:'Media', target:'10 puntos'
+  }
+
+  const rules = `
+    <div class="kv">
+      <span class="k">Jugadores</span><span class="v">3–4</span>
+      <span class="k">Duración</span><span class="v">60–90 min</span>
+      <span class="k">Meta</span><span class="v">10 puntos de victoria</span>
+    </div>
+    <h4 style="margin:14px 0 6px;font-size:13px">Preparación</h4>
+    <ul class="clean">
+      <li>Monta la isla con las losetas y pon los números.</li>
+      <li>Cada uno coloca 2 poblados y 2 caminos.</li>
+      <li>Repartís la primera ronda de recursos.</li>
+    </ul>
+    <h4 style="margin:14px 0 6px;font-size:13px">El turno</h4>
+    <ul class="clean">
+      <li>Tiras los dados → todos cobran recursos.</li>
+      <li>Comercias con banco o jugadores.</li>
+      <li>Construyes: camino, poblado, ciudad o carta.</li>
+    </ul>
+    <h4 style="margin:14px 0 6px;font-size:13px">Recordatorios</h4>
+    <ul class="clean">
+      <li>Un 7 mueve el ladrón y roba a quien tenga +7 cartas.</li>
+      <li>Camino más largo y mayor ejército: 2 puntos cada uno.</li>
+    </ul>
+    <p class="linknote">↗ Reglas oficiales (Devir)</p>`
+
+  const stats = `
+    <div class="stat-grid">
+      <div class="stat"><div class="big">37</div><div class="lbl">Partidas jugadas</div></div>
+      <div class="stat"><div class="big">12</div><div class="lbl">Victorias tuyas</div></div>
+      <div class="stat"><div class="big">11</div><div class="lbl">Récord de puntos</div></div>
+      <div class="stat"><div class="big">72′</div><div class="lbl">Duración media</div></div>
+    </div>
+    <h4 style="margin:16px 0 8px;font-size:13px">Quién gana más</h4>
+    <div class="bars">
+      <div class="bar"><span>Toni</span><div class="track"><div class="fill" style="width:80%"></div></div><b>12</b></div>
+      <div class="bar"><span>María</span><div class="track"><div class="fill" style="width:60%"></div></div><b>9</b></div>
+      <div class="bar"><span>Luis</span><div class="track"><div class="fill" style="width:47%"></div></div><b>7</b></div>
+      <div class="bar"><span>Ana</span><div class="track"><div class="fill" style="width:40%"></div></div><b>6</b></div>
+    </div>`
+
+  const history = `
+    <a class="match" href="#"><span class="mini">🎲</span><span><div class="who">Ganó Toni · 10 pts</div><div class="sub">12 ago · 4 jugadores · 68 min</div></span><span class="win">🏆 VICTORIA</span></a>
+    <a class="match" href="#"><span class="mini">🎲</span><span><div class="who">Ganó María · 10 pts</div><div class="sub">5 ago · 3 jugadores · 55 min</div></span><span class="win" style="color:var(--muted)">2º Toni</span></a>
+    <a class="match" href="#"><span class="mini">🎲</span><span><div class="who">Ganó Toni · 11 pts</div><div class="sub">28 jul · 4 jugadores · 80 min</div></span><span class="win">🏆 RÉCORD</span></a>
+    <p class="linknote">↗ Cada partida y cada título/imagen lleva de vuelta a esta ficha</p>`
+
+  const topbar = `
+    <div class="app-top"><a class="back" href="#">←</a><span class="crumb">Inicio · Juegos › <b>${G.name}</b></span></div>`
+
+  const heroInner = (withCta)=>`
+    <div class="row">
+      <div class="cover link" title="La imagen también enlaza a la ficha">${G.icon}</div>
+      <div>
+        <h2 class="display">${G.name}</h2>
+        <p class="tag">${G.tag}</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip">👥 ${G.players}</span>
+      <span class="chip">⏱️ ${G.time}</span>
+      <span class="chip">🎯 ${G.diff}</span>
+    </div>
+    ${withCta?`<button class="cta">＋ Crear partida</button>`:''}`
+
+  // ---- Versión A: scroll único ----
+  const A = ()=>`
+    ${topbar}
+    <div class="hero">${heroInner(true)}</div>
+    <section class="blk"><h3><span class="n">▸</span> Reglas</h3>${rules}</section>
+    <section class="blk"><h3><span class="n">▸</span> Estadísticas</h3>${stats}</section>
+    <section class="blk"><h3><span class="n">▸</span> Últimas partidas</h3>${history}</section>`
+
+  // ---- Versión B: pestañas ----
+  const B = ()=>`
+    ${topbar}
+    <div class="hero">${heroInner(true)}</div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-p="r" aria-selected="true">Reglas</button>
+      <button role="tab" data-p="s" aria-selected="false">Estadísticas</button>
+      <button role="tab" data-p="h" aria-selected="false">Partidas</button>
+    </div>
+    <section class="blk tabpane on" data-pane="r">${rules}</section>
+    <section class="blk tabpane" data-pane="s">${stats}</section>
+    <section class="blk tabpane" data-pane="h">${history}</section>`
+
+  // ---- Versión C: acordeón + botón flotante ----
+  const C = ()=>`
+    ${topbar}
+    <div class="hero">${heroInner(false)}</div>
+    <div class="acc" open><button>📜 Reglas <span class="ico">▸</span></button><div class="body">${rules}</div></div>
+    <div class="acc"><button>📊 Estadísticas <span class="ico">▸</span></button><div class="body">${stats}</div></div>
+    <div class="acc"><button>🗂️ Últimas partidas <span class="ico">▸</span></button><div class="body">${history}</div></div>
+    <div class="fab"><button class="cta" style="margin:0">＋ Crear partida</button></div>`
+
+  const HINTS = {
+    A:'Versión A · «Todo a la vista»: bajas y lo tienes todo en orden (botón arriba → reglas → stats → historial). La más simple y directa; scroll largo.',
+    B:'Versión B · «Pestañas»: hero fijo con el botón siempre visible y pestañas para saltar entre Reglas / Estadísticas / Partidas sin scroll infinito. La más ordenada.',
+    C:'Versión C · «Acordeón + botón flotante»: ves todos los apartados plegados y despliegas lo que te interese; el botón «Crear partida» va flotando abajo, siempre a mano. La más compacta.'
+  }
+
+  const screen = document.getElementById('screen')
+  const hint = document.getElementById('hint')
+  const views = {A,B,C}
+
+  function wire(){
+    // pestañas
+    screen.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+      screen.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected', x===b))
+      screen.querySelectorAll('.tabpane').forEach(p=>p.classList.toggle('on', p.dataset.pane===b.dataset.p))
+    })
+    // acordeón
+    screen.querySelectorAll('.acc>button').forEach(b=>b.onclick=()=>{
+      const el=b.parentElement; el.toggleAttribute('open')
+    })
+  }
+  function render(v){
+    screen.innerHTML=views[v](); screen.scrollTop=0; wire()
+    hint.textContent=HINTS[v]
+    document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===v))
+  }
+  document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>render(b.dataset.v))
+  document.getElementById('theme').onclick=()=>{
+    const h=document.documentElement
+    h.dataset.theme = h.dataset.theme==='dark' ? '' : 'dark'
+  }
+  render('A')
+</script>
+</body>
+</html>
