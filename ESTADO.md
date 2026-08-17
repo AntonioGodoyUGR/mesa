@@ -20,6 +20,17 @@ quedó a medias y lo siguiente que toca.
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
   (141 tests, build OK). Comprobado 2026-08-17.
+- **Carátulas del catálogo vía BGG**: Toni consiguió token de la XML API2 de BGG
+  (`BGG_API_TOKEN` en `.env`, sin `VITE_` — solo lo leen los scripts). Ejecutados
+  `npm run ids` y `npm run covers` de una tacada. `external-ids.generated.ts`:
+  366/393 juegos con ID de BGG (231 Wikidata + 135 búsqueda BGG); 27 sin resolver
+  quedan comentados con `?` para revisar a mano en `scripts/bgg-ids.overrides.ts`.
+  `covers.generated.ts` + `public/covers/*.webp`: 368/393 juegos con portada
+  real (364 BGG, 1 Wikipedia, 3 manuales); 25 juegos (Go, Mindbug, KeyForge,
+  Villainous, Unmatched sueltos, EXIT, etc. — ver lista en el log del script) se
+  quedan con el icono por defecto, sin ficha en BGG o sin match claro. No se ha
+  commiteado nada de esto todavía. Todo en verde (141 tests, build OK) tras la
+  descarga.
 - **Cambiar/añadir grupo también desde «Jugadores»**: `PlayersPage.tsx` repite ahora el
   control de grupo que ya vivía solo en `GroupPage.tsx` (`/grupo`), para no obligar a saltar
   de pestaña. Debajo del `PageHeader`: chips «Cambiar de grupo» (solo si `groups.length > 1`,
@@ -81,6 +92,12 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-17** — Gustavo: descargadas carátulas reales del catálogo con la BGG XML API2
+  (token de Toni en `.env`). `npm run ids` → 366/393 con ID de BGG. `npm run covers` →
+  368/393 (94 %) con portada real, 25 se quedan con icono (sin ficha en BGG/Wikidata o sin
+  match fiable). Todo en verde (141 tests, build OK). Sin commitear — 366 `.webp` +
+  `external-ids.generated.ts` + `covers.generated.ts` a la espera de que Toni confirme si
+  quiere que se suba.
 - **2026-08-17** — Claude (terminal): sección para cambiar/añadir grupo también en la
   pestaña «Jugadores» (`PlayersPage.tsx`), reutilizando `GroupContext` tal cual —igual que
   ya existía en `GroupPage.tsx`, ahora accesible desde ambos sitios. Todo en verde
