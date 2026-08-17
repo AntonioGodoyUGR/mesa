@@ -10,7 +10,7 @@ import { api, queryKeys } from '../lib/api'
 const MEDALS = ['🥇', '🥈', '🥉']
 
 export function PlayersPage() {
-  const { group, players, me } = useGroup()
+  const { group, groups, setGroupId, players, me } = useGroup()
   const { getGame } = useGames()
 
   const matchesQuery = useQuery({
@@ -24,6 +24,28 @@ export function PlayersPage() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Jugadores" subtitle="Clasificación por victorias" />
+
+      {groups.length > 1 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="display text-base">Cambiar de grupo</h2>
+          <div className="flex flex-wrap gap-2">
+            {groups.map((candidate) => (
+              <button
+                key={candidate.id}
+                type="button"
+                onClick={() => setGroupId(candidate.id)}
+                className={`chip ${candidate.id === group?.id ? 'chip-on' : ''}`}
+              >
+                {candidate.name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Link to="/grupo/nuevo" className="btn btn-ghost">
+        Crear o unirme a otro grupo
+      </Link>
 
       <ErrorNote error={matchesQuery.error} />
       {matchesQuery.isLoading && <Spinner />}

@@ -19,7 +19,13 @@ quedó a medias y lo siguiente que toca.
 ## Estado actual
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
-  (141 tests, build OK). Comprobado 2026-08-16.
+  (141 tests, build OK). Comprobado 2026-08-17.
+- **Cambiar/añadir grupo también desde «Jugadores»**: `PlayersPage.tsx` repite ahora el
+  control de grupo que ya vivía solo en `GroupPage.tsx` (`/grupo`), para no obligar a saltar
+  de pestaña. Debajo del `PageHeader`: chips «Cambiar de grupo» (solo si `groups.length > 1`,
+  usa `setGroupId` de `GroupContext`) y siempre el link «Crear o unirme a otro grupo» hacia
+  `/grupo/nuevo`. Misma lógica y contexto que `GroupPage`, sin tocar `GroupContext.tsx`; la
+  sección de `GroupPage` se queda igual, es un segundo acceso por comodidad.
 - **Ficha de juego única, maqueta B (pestañas)**: la página de Reglas independiente
   (`RulesIndexPage`, `RuleSheetPage`) desapareció. `GamePage.tsx` (`src/pages/GamePage.tsx`)
   ahora es la única ficha: hero fijo arriba (portada + nombre + tagline + chips de meta) con
@@ -75,6 +81,10 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-17** — Claude (terminal): sección para cambiar/añadir grupo también en la
+  pestaña «Jugadores» (`PlayersPage.tsx`), reutilizando `GroupContext` tal cual —igual que
+  ya existía en `GroupPage.tsx`, ahora accesible desde ambos sitios. Todo en verde
+  (141 tests, build OK).
 - **2026-08-16** — Claude (terminal): ficha de juego única con pestañas (maqueta B del
   comparador, elegida por Toni). Fuera la página de Reglas independiente, con redirecciones
   desde `/reglas` y `/reglas/:slug`. Título e imagen del juego enlazan siempre a su ficha
