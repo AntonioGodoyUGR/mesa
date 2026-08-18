@@ -58,7 +58,7 @@ function Shelf({ info, games }: { info: LibraryStatusInfo; games: GameDefinition
           {info.empty}
         </p>
       ) : (
-        <ul className="grid grid-cols-2 gap-2">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {games.slice(0, SHELF).map((game) => (
             <li key={game.slug}>
               <Link

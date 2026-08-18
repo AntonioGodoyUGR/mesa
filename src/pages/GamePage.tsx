@@ -113,7 +113,7 @@ export function GamePage() {
     >
       <header className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <GameCover game={game} size={64} />
+          <GameCover game={game} size={88} />
           <div className="min-w-0 flex-1">
             <h1 className="game-ink display truncate text-xl">{game.name}</h1>
             <p className="truncate text-sm text-[var(--color-muted)]">{game.tagline}</p>
@@ -133,18 +133,14 @@ export function GamePage() {
         </Link>
       </header>
 
-      <div role="tablist" aria-label="Secciones del juego" className="flex border-b-2 border-[var(--color-border)]">
+      <div role="tablist" aria-label="Secciones del juego" className="tabs">
         {TABS.map((entry) => (
           <button
             key={entry.id}
             type="button"
             role="tab"
             aria-selected={tab === entry.id}
-            className={`flex-1 border-b-[3px] py-2.5 text-sm font-extrabold transition-colors ${
-              tab === entry.id
-                ? 'border-[var(--game)] text-[var(--color-text)]'
-                : 'border-transparent text-[var(--color-muted)]'
-            }`}
+            className={`tab ${tab === entry.id ? 'tab-on game-wash' : ''}`}
             onClick={() => setTab(entry.id)}
           >
             {entry.label}

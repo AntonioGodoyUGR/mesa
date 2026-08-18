@@ -26,10 +26,10 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
     // El color del juego se declara una vez aquí: `--game` se hereda, así que las
     // utilidades `game-tint` e `game-ink` de dentro lo encuentran sin pasarlo a mano.
     <article
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start"
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
-      <div className="flex flex-wrap gap-2 text-xs">
+      <div className="flex flex-wrap gap-2 text-xs lg:col-span-2">
         {rules.players && <Chip icon="👥" text={rules.players} />}
         {/* La duración escrita a mano en la chuleta manda sobre la del buscador. */}
         {(rules.duration || game.playTime) && (
@@ -52,7 +52,7 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       </div>
 
       {!hasContent && (
-        <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
+        <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)] lg:col-span-2">
           Este juego todavía no tiene chuleta de reglas.
         </p>
       )}

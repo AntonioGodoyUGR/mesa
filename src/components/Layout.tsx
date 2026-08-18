@@ -47,12 +47,12 @@ function ThemeToggle() {
 function DemoBanner() {
   if (!isDemoMode) return null
   return (
-    <div className="overline border-b-2 border-[var(--color-border)] bg-[var(--color-accent)] px-4 py-1.5 text-center text-[0.6875rem] text-[var(--color-accent-ink)]">
-      Modo demostración · los datos se guardan solo en este navegador.{' '}
-      <Link to="/grupo" className="underline">
-        Cómo conectar Supabase
-      </Link>
-    </div>
+    <Link
+      to="/grupo"
+      className="overline block truncate border-b-2 border-[var(--color-border)] bg-[var(--color-accent)] px-4 py-1.5 text-center text-[0.6875rem] text-[var(--color-accent-ink)]"
+    >
+      Demostración · datos solo en este navegador · <u>conectar Supabase</u>
+    </Link>
   )
 }
 
@@ -77,8 +77,8 @@ export function Layout() {
     <div className="flex min-h-dvh flex-col">
       <DemoBanner />
 
-      <header className="safe-top sticky top-0 z-20 border-b-2 border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 py-3">
+      <header className="safe-top sticky top-0 z-20 border-b-2 border-[var(--color-border)] bg-[var(--color-bg)]">
+        <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3">
           <Link to="/" className="shrink-0 text-[var(--color-brand)]">
             <Logo className="text-[0.95rem] sm:text-lg" />
           </Link>
@@ -89,7 +89,27 @@ export function Layout() {
             </Link>
           )}
 
-          <div className="ml-auto flex items-center gap-2">
+          {/* La barra de secciones vive aquí en el marcado, pero en móvil `.tabbar`
+              la clava abajo, al alcance del pulgar. Ver `src/index.css`. */}
+          <nav className="tabbar" aria-label="Secciones">
+            {tabs.map((tab) => (
+              <NavLink
+                key={tab.to}
+                to={tab.to}
+                end={tab.end}
+                className={({ isActive }) =>
+                  `overline tabbar-link ${isActive ? 'tabbar-link-on' : ''}`
+                }
+              >
+                <span className="tabbar-icon" aria-hidden="true">
+                  {tab.icon}
+                </span>
+                {tab.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-2 md:ml-2">
             <ThemeToggle />
             {user ? (
               // Con grupo, el avatar lleva a tu propia ficha, que es donde se cambia.
@@ -113,33 +133,9 @@ export function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-4">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-4 md:pb-10">
         <Outlet />
       </main>
-
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t-2 border-[var(--color-border)] bg-[var(--color-surface)]">
-        <div className="mx-auto flex w-full max-w-3xl">
-          {tabs.map((tab) => (
-            <NavLink
-              key={tab.to}
-              to={tab.to}
-              end={tab.end}
-              className={({ isActive }) =>
-                `overline flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors ${
-                  isActive
-                    ? 'text-[var(--color-brand)]'
-                    : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
-                }`
-              }
-            >
-              <span className="text-lg leading-none" aria-hidden="true">
-                {tab.icon}
-              </span>
-              {tab.label}
-            </NavLink>
-          ))}
-        </div>
-      </nav>
     </div>
   )
 }

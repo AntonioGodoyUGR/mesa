@@ -19,7 +19,30 @@ quedó a medias y lo siguiente que toca.
 ## Estado actual
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
-  (141 tests, build OK). Comprobado 2026-08-17.
+  (141 tests, build OK). Comprobado 2026-08-18.
+- **Repaso de interfaz (9 cambios, revisados uno a uno con Toni en el navegador)**. Sin
+  commitear todavía. Lo gordo es la **hoja de puntuación del revés**: `ScoreSheet.tsx`
+  ya no apila una ficha larga por jugador, sino un bloque por **concepto** con un control
+  por jugador dentro (`FieldGroup` → `FieldBlock`), que es como se cuenta en la mesa
+  («¿cuántos pueblos tenéis?» y vuelta a la mesa). Encima, un **marcador fijo**
+  (`Scoreboard`, clase `.scoreboard`, pegado bajo la cabecera con `--app-header-h`) que
+  ordena solo por total y respeta `winnerRule: 'lowest'`; cuando toca decidir el ganador a
+  mano, sus casillas se vuelven botones. `ScoreFieldInput.tsx` pasó a
+  **`ScoreFieldControl.tsx`** (`git mv`): ahora solo pinta el widget —el concepto lo nombra
+  la hoja— y recibe `owner` (el nombre del jugador) para que los `aria-label` sigan siendo
+  únicos: «Añadir 1 a Ciudades de Ana». El resto: contadores −/+ a 44 px con el signo en
+  el color del texto (`.stepper*`); fuera la marca de agua de la portada de las tarjetas de
+  desglose (borrada la utilidad `game-photo` y su variable `--game-photo-opacity`, la
+  portada se queda en la banda); los chips de `PlayerPicker` reservan el hueco del número de
+  orden para no crecer bajo el dedo; **una sola barra de secciones** en el marcado
+  (`.tabbar`) que está fija abajo en móvil y dentro de la cabecera desde `md` —por eso la
+  cabecera perdió el `backdrop-blur`, que creaba bloque contenedor y habría anclado la barra
+  fija a la cabecera en vez de al viewport—; contenedores a `max-w-5xl`; rejillas de juegos
+  a `lg:grid-cols-4/5`, listas de partidas y desgloses a `lg:grid-cols-2`, chuleta de reglas
+  a dos columnas desde `lg`; pestañas de `GamePage` con recuadro y sombra (`.tabs`/`.tab`/
+  `.tab-on` + `game-wash`) y portada del hero a 88 px; la fila de filtros de `/partidas` usa
+  la utilidad nueva `scroll-x` (esconde la barra del navegador); el aviso de demostración
+  cabe en una línea y toda la franja enlaza a `/grupo`.
 - **Carátulas del catálogo vía BGG**: Toni consiguió token de la XML API2 de BGG
   (`BGG_API_TOKEN` en `.env`, sin `VITE_` — solo lo leen los scripts). Ejecutados
   `npm run ids` y `npm run covers` de una tacada. `external-ids.generated.ts`:
@@ -92,6 +115,13 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-18** — Claude (terminal): repaso de interfaz a partir de una revisión visual de
+  la app levantada en modo demostración (`VITE_SUPABASE_*` vacíos, puerto 5174, para no
+  tocar los datos reales de Toni). Nueve cambios aceptados uno a uno, el mayor la hoja de
+  puntuación invertida (bloque por concepto + marcador fijo) y el renombrado
+  `ScoreFieldInput` → `ScoreFieldControl` con `owner`. `App.test.tsx` actualizado: cada
+  concepto aparece una vez y los `aria-label` llevan «de ‹nombre›». Todo en verde
+  (141 tests, build OK).
 - **2026-08-17** — Gustavo: descargadas carátulas reales del catálogo con la BGG XML API2
   (token de Toni en `.env`). `npm run ids` → 366/393 con ID de BGG. `npm run covers` →
   368/393 (94 %) con portada real, 25 se quedan con icono (sin ficha en BGG/Wikidata o sin

@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import { computeTotal } from '../games/registry'
-import type { GameDefinition, ScoreValues } from '../games/types'
-import { ScoreFieldInput } from './ScoreFieldInput'
+import type { GameDefinition, ScoreField, ScoreValues } from '../games/types'
+import { ScoreFieldControl } from './ScoreFieldControl'
 import { useCover } from './GameCover'
 import { Avatar } from './Avatar'
 
@@ -15,16 +15,19 @@ export interface ScoreRow {
 }
 
 /**
- * Hoja de puntuación: una ficha por jugador con los campos del juego agrupados.
+ * Hoja de puntuación: un bloque por concepto y, dentro, un control por jugador.
  *
- * En el móvil una tabla de jugadores × campos no cabe, así que se apila por
- * jugador. Los grupos (`field.group`) salen de la definición del juego.
+ * Está montada como se cuenta en la mesa, no como se guarda la partida. Nadie
+ * pregunta «Ana, dime todo lo tuyo»: se pregunta «¿cuántos pueblos tenéis?» y se
+ * da la vuelta a la mesa. Apilar una ficha larga por jugador obligaba además a
+ * recorrer la pantalla entera para saber cómo iba la cosa; eso lo resuelve ahora
+ * el marcador fijo de arriba, que es lo único que hay que mirar mientras se juega.
  *
- * La hoja se viste del juego que se está anotando —banda de portada arriba, esa
- * misma portada muy tenue por detrás de cada ficha, su icono en la esquina y el
- * filete lateral de su color—, pero sigue sin conocer ninguno: todo sale de la
- * `GameDefinition`. Sin portada, `useCover` deja el icono sobre `game-wash` y el
- * resto se mantiene, que es el caso de la mayoría del catálogo.
+ * La hoja se viste del juego que se está anotando —banda de portada arriba,
+ * filete lateral de su color y su icono en la esquina—, pero sigue sin conocer
+ * ninguno: los conceptos, sus grupos y su forma de puntuar salen todos de la
+ * `GameDefinition`. Sin portada, `useCover` deja el icono sobre `game-wash`, que
+ * es el caso de buena parte del catálogo.
  */
 export function ScoreSheet({
   game,
@@ -48,13 +51,18 @@ export function ScoreSheet({
     return [...map.entries()]
   }, [game])
 
+  // Los grupos secundarios (desgloses opcionales) arrancan plegados para que la
+  // pantalla no abrume: lo normal es apuntar solo el primero.
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(groups.map(([name], index) => [name, index === 0])),
+  )
+
   // Hay juegos donde no gana quien más puntúa (Monopoly, King of Tokyo: gana el
   // último en pie), así que el ganador se puede marcar a mano siempre, no solo
   // cuando hay empate.
   const [manualWinner, setManualWinner] = useState(false)
 
-  // La portada se resuelve una sola vez para toda la hoja: si falla, se caen a
-  // la vez la banda y el velo de las fichas, en lugar de quedar a medias.
+  // La portada se resuelve una sola vez para toda la hoja.
   const cover = useCover(game)
 
   const totals = rows.map((row) => computeTotal(game, row.scores))
@@ -67,32 +75,45 @@ export function ScoreSheet({
   const picking = tied || manualWinner || winnerPlayerId !== null
 
   return (
-    // `--game` se declara una vez arriba y lo heredan la banda y todas las fichas.
+    // `--game` se declara una vez arriba y lo heredan la banda y todos los bloques.
     <div
       className="flex flex-col gap-3"
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
       <SheetBanner game={game} cover={cover} />
 
-      {rows.map((row, index) => (
-        <PlayerCard
-          key={row.playerId}
+      <Scoreboard
+        game={game}
+        rows={rows}
+        totals={totals}
+        best={best}
+        picking={picking}
+        winnerPlayerId={winnerPlayerId}
+        onPickWinner={onPickWinner}
+      />
+
+      {groups.map(([groupName, fields]) => (
+        <FieldGroup
+          key={groupName || 'sin-grupo'}
           game={game}
-          row={row}
-          groups={groups}
-          coverSrc={cover.src}
-          total={totals[index]}
-          leading={totals[index] === best}
-          isWinner={winnerPlayerId === row.playerId}
-          showWinnerPicker={picking}
-          onPickWinner={() => onPickWinner(row.playerId)}
-          onFieldChange={(fieldKey, value) => onFieldChange(index, fieldKey, value)}
+          groupName={groupName}
+          fields={fields}
+          rows={rows}
+          open={openGroups[groupName] ?? true}
+          onToggle={() =>
+            setOpenGroups((current) => ({
+              ...current,
+              [groupName]: !(current[groupName] ?? true),
+            }))
+          }
+          onFieldChange={onFieldChange}
         />
       ))}
 
       {tied && (
         <p className="note note-warn">
-          Hay empate a {best} {game.scoreLabelShort}. Marca a mano quién ganó.
+          Hay empate a {best} {game.scoreLabelShort}. Marca a mano quién ganó tocando su
+          casilla en el marcador.
         </p>
       )}
 
@@ -157,144 +178,212 @@ function SheetBanner({
   )
 }
 
-function PlayerCard({
+/**
+ * Cómo va la partida, pegado bajo la cabecera de la aplicación. Se ordena solo:
+ * la primera casilla es la de quien va ganando, y en un juego al revés
+ * (`winnerRule: 'lowest'`) la de quien menos lleva.
+ *
+ * Cuando toca decidir el ganador a mano —empate, o un juego donde no gana quien
+ * más puntúa— las casillas se vuelven botones y se marca aquí mismo, sin tener
+ * que bajar a buscar a nadie.
+ */
+function Scoreboard({
   game,
-  row,
-  groups,
-  coverSrc,
-  total,
-  leading,
-  isWinner,
-  showWinnerPicker,
+  rows,
+  totals,
+  best,
+  picking,
+  winnerPlayerId,
   onPickWinner,
+}: {
+  game: GameDefinition
+  rows: ScoreRow[]
+  totals: number[]
+  best: number
+  picking: boolean
+  winnerPlayerId: string | null
+  onPickWinner: (playerId: string) => void
+}) {
+  const ranked = rows
+    .map((row, index) => ({ row, total: totals[index] }))
+    .sort((a, b) => (game.winnerRule === 'lowest' ? a.total - b.total : b.total - a.total))
+
+  if (ranked.length === 0) return null
+
+  return (
+    <div className="scoreboard scroll-x" aria-label="Cómo va la partida">
+      {ranked.map(({ row, total }, position) => {
+        const leading = total === best
+        const isWinner = winnerPlayerId === row.playerId
+        const reachedTarget = game.targetScore !== undefined && total >= game.targetScore
+
+        const inside = (
+          <>
+            <span className="tnum shrink-0 text-xs font-bold text-[var(--color-muted)]">
+              {position + 1}
+            </span>
+
+            <Avatar
+              name={row.name}
+              avatar={row.avatar}
+              size={26}
+              registered={row.registered}
+            />
+
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[11px] font-semibold leading-tight">
+                {isWinner && (
+                  <span className="mr-0.5" aria-hidden="true">
+                    🏆
+                  </span>
+                )}
+                {row.name}
+              </span>
+              <span
+                className={`tnum block text-lg font-black leading-none ${leading ? 'game-ink' : ''}`}
+              >
+                {total}
+                <span className="ml-1 text-[10px] font-semibold text-[var(--color-muted)]">
+                  {game.scoreLabelShort}
+                  {reachedTarget && ' ✓'}
+                </span>
+              </span>
+            </span>
+          </>
+        )
+
+        const dressing = `scoreboard-pill ${leading ? 'game-tint' : ''} ${
+          isWinner ? 'hard-sm' : ''
+        }`
+
+        return picking ? (
+          <button
+            key={row.playerId}
+            type="button"
+            aria-pressed={isWinner}
+            aria-label={`Marcar que ganó ${row.name}`}
+            onClick={() => onPickWinner(row.playerId)}
+            className={dressing}
+          >
+            {inside}
+          </button>
+        ) : (
+          <div key={row.playerId} className={dressing}>
+            {inside}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/**
+ * Un grupo de conceptos de la definición («Construcciones», «Bonos»…) con sus
+ * campos dentro. El grupo sin nombre no lleva cabecera ni se pliega.
+ */
+function FieldGroup({
+  game,
+  groupName,
+  fields,
+  rows,
+  open,
+  onToggle,
   onFieldChange,
 }: {
   game: GameDefinition
-  row: ScoreRow
-  groups: [string, GameDefinition['fields']][]
-  /** Ya resuelta por la hoja; `undefined` si el juego no tiene o si falló. */
-  coverSrc: string | undefined
-  total: number
-  leading: boolean
-  isWinner: boolean
-  showWinnerPicker: boolean
-  onPickWinner: () => void
-  onFieldChange: (fieldKey: string, value: number | boolean) => void
+  groupName: string
+  fields: ScoreField[]
+  rows: ScoreRow[]
+  open: boolean
+  onToggle: () => void
+  onFieldChange: (rowIndex: number, fieldKey: string, value: number | boolean) => void
 }) {
-  // Los grupos secundarios (desgloses opcionales) arrancan plegados para que la
-  // pantalla no abrume: lo normal es teclear solo el total.
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(groups.map(([name], index) => [name, index === 0])),
-  )
-
-  const reachedTarget = game.targetScore !== undefined && total >= game.targetScore
-
   return (
-    // Quien va ganando se levanta de la pila: sombra más larga y cabecera teñida
-    // del color del juego.
-    <section
-      className={`card game-edge relative overflow-hidden ${leading ? 'hard-lift' : ''}`}
-    >
-      {coverSrc && (
-        <span
-          className="game-photo"
-          style={{ backgroundImage: `url(${coverSrc})` }}
-          aria-hidden="true"
-        />
+    <section className="card game-edge relative overflow-hidden">
+      <span className="game-glyph" aria-hidden="true">
+        {game.icon}
+      </span>
+
+      {groupName && (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="relative flex w-full items-center gap-1.5 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]"
+        >
+          <span
+            className="inline-block transition-transform"
+            style={{ transform: open ? 'rotate(90deg)' : undefined }}
+            aria-hidden="true"
+          >
+            ›
+          </span>
+          {groupName}
+        </button>
       )}
 
-      <div className="relative">
-        <header
-          className={`flex items-center gap-3 px-4 py-3 ${leading ? 'game-tint' : ''}`}
-        >
-          <span className="game-glyph" aria-hidden="true">
-            {game.icon}
-          </span>
-
-          <Avatar
-            name={row.name}
-            avatar={row.avatar}
-            size={34}
-            registered={row.registered}
-          />
-
-          <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold">{row.name}</span>
-            {!row.registered && (
-              <span className="text-[11px] text-[var(--color-muted)]">Invitado</span>
-            )}
-          </span>
-
-          {showWinnerPicker && (
-            <button
-              type="button"
-              onClick={onPickWinner}
-              className={`chip shrink-0 text-xs ${
-                isWinner
-                  ? 'hard-sm bg-[var(--color-accent)] text-[var(--color-accent-ink)]'
-                  : ''
-              }`}
-            >
-              🏆 Ganó
-            </button>
-          )}
-
-          <span className="text-right">
-            <span
-              className={`tnum block text-2xl font-black leading-none ${leading ? 'game-ink' : ''}`}
-            >
-              {total}
-            </span>
-            <span className="block text-[11px] text-[var(--color-muted)]">
-              {game.scoreLabelShort}
-              {reachedTarget && ' ✓'}
-            </span>
-          </span>
-        </header>
-
-        <div className="border-t border-[var(--color-border)] px-4 pb-2">
-          {groups.map(([groupName, fields]) => {
-            const open = openGroups[groupName] ?? true
-
-            return (
-              <div key={groupName || 'sin-grupo'}>
-                {groupName && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOpenGroups((current) => ({ ...current, [groupName]: !open }))
-                    }
-                    className="flex w-full items-center gap-1.5 pt-3 text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]"
-                    aria-expanded={open}
-                  >
-                    <span
-                      className="inline-block transition-transform"
-                      style={{ transform: open ? 'rotate(90deg)' : undefined }}
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                    {groupName}
-                  </button>
-                )}
-
-                {open && (
-                  <div className="divide-y divide-[var(--color-border)]">
-                    {fields.map((field) => (
-                      <ScoreFieldInput
-                        key={field.key}
-                        field={field}
-                        value={row.scores[field.key] ?? (field.type === 'toggle' ? false : 0)}
-                        onChange={(value) => onFieldChange(field.key, value)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+      {open && (
+        <div className="relative">
+          {fields.map((field) => (
+            <FieldBlock
+              key={field.key}
+              field={field}
+              rows={rows}
+              onFieldChange={onFieldChange}
+            />
+          ))}
         </div>
-      </div>
+      )}
     </section>
+  )
+}
+
+/**
+ * Un concepto y la vuelta a la mesa: su nombre una sola vez y debajo un control
+ * por jugador. En pantalla ancha los jugadores se reparten en columnas.
+ */
+function FieldBlock({
+  field,
+  rows,
+  onFieldChange,
+}: {
+  field: ScoreField
+  rows: ScoreRow[]
+  onFieldChange: (rowIndex: number, fieldKey: string, value: number | boolean) => void
+}) {
+  return (
+    <div className="border-t-2 border-[var(--color-border)] px-4 py-3">
+      <h3 className="flex items-baseline gap-2">
+        <span className="text-base leading-none" aria-hidden="true">
+          {field.icon}
+        </span>
+        <span className="text-sm font-semibold">{field.label}</span>
+        {field.hint && (
+          <span className="min-w-0 truncate text-[11px] text-[var(--color-muted)]">
+            {field.hint}
+          </span>
+        )}
+      </h3>
+
+      <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map((row, index) => (
+          <li key={row.playerId} className="flex items-center gap-2">
+            <Avatar
+              name={row.name}
+              avatar={row.avatar}
+              size={28}
+              registered={row.registered}
+            />
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">{row.name}</span>
+            <ScoreFieldControl
+              field={field}
+              owner={row.name}
+              value={row.scores[field.key] ?? (field.type === 'toggle' ? false : 0)}
+              onChange={(value) => onFieldChange(index, field.key, value)}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }

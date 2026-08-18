@@ -65,11 +65,17 @@ export function PlayerPicker({
                 registered={!!player.user_id}
               />
               <span className="max-w-[9rem] truncate">{player.display_name}</span>
-              {isSelected && (
-                <span className="tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-[11px] font-bold text-[var(--color-brand-ink)]">
-                  {index + 1}
-                </span>
-              )}
+              {/* El hueco del número está siempre, aunque no se vea: si apareciera
+                  al seleccionar, el chip crecería bajo el dedo y correría a los
+                  demás, y el siguiente toque caería en otro jugador. */}
+              <span
+                aria-hidden={!isSelected}
+                className={`tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-[11px] font-bold text-[var(--color-brand-ink)] ${
+                  isSelected ? '' : 'invisible'
+                }`}
+              >
+                {isSelected ? index + 1 : 0}
+              </span>
             </button>
           )
         })}

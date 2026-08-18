@@ -120,7 +120,7 @@ export function HomePage() {
             {group && (
               <>
                 <h2 className="display text-base">Vuestros juegos</h2>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {ours.map((game) => (
                     <GameTile key={game.slug} game={game} to={tileLink(game)} />
                   ))}
@@ -201,7 +201,7 @@ function GameGrid({
   to: (game: GameDefinition) => string
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {games.map((game) => (
         <GameTile key={game.slug} game={game} to={to(game)} />
       ))}

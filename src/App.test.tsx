@@ -78,12 +78,12 @@ describe('App', () => {
     expect(button).toBeEnabled()
     fireEvent.click(button)
 
-    // Paso 2: los campos con su nombre real en el juego.
-    expect(screen.getAllByText('Pueblos')).toHaveLength(3)
-    expect(screen.getAllByText('Ciudades')).toHaveLength(3)
+    // Paso 2: la hoja nombra cada concepto una vez y da un control a cada jugador.
+    expect(screen.getAllByText('Pueblos')).toHaveLength(1)
+    expect(screen.getAllByText('Ciudades')).toHaveLength(1)
 
-    // Dos ciudades del primer jugador = 4 puntos de victoria.
-    const addCity = screen.getAllByLabelText('Añadir 1 a Ciudades')[0]
+    // Dos ciudades de Tú = 4 puntos de victoria.
+    const addCity = screen.getByLabelText('Añadir 1 a Ciudades de Tú')
     fireEvent.click(addCity)
     fireEvent.click(addCity)
 

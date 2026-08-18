@@ -57,7 +57,7 @@ export function LibraryPage() {
         subtitle="Lo que tienes en casa y lo que te falta por comprar."
       />
 
-      <section className="grid grid-cols-2 gap-2">
+      <section className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {LIBRARY_STATUSES.map((info) => (
           <button
             key={info.id}

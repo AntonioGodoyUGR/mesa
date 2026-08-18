@@ -4,7 +4,7 @@ import type { ScoreField, ScoreFieldType } from '../games/types'
 /**
  * Edita UN campo de puntuación del creador de juegos.
  *
- * Es el espejo de `ScoreFieldInput`: allí se rellena el campo en una partida, aquí se
+ * Es el espejo de `ScoreFieldControl`: allí se rellena el campo en una partida, aquí se
  * decide cómo es. La clave interna (`key`) se puede bloquear: si el juego ya tiene
  * partidas apuntadas, cambiarla dejaría huérfanas las puntuaciones guardadas en el jsonb.
  */

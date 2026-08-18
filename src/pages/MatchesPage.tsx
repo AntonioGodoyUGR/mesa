@@ -40,7 +40,7 @@ export function MatchesPage() {
         subtitle={`${matches.length} apuntadas en ${group?.name ?? 'el grupo'}`}
       />
 
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="scroll-x -mx-4 flex gap-2 px-4 pb-1">
         <FilterChip active={filter === null} onClick={() => setFilter(null)}>
           Todas
         </FilterChip>
@@ -67,7 +67,7 @@ export function MatchesPage() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="grid gap-2 lg:grid-cols-2">
         {shown.map((match) => (
           <MatchCard key={match.id} match={match} />
         ))}

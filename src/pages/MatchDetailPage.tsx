@@ -98,7 +98,7 @@ export function MatchDetailPage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="grid gap-3 lg:grid-cols-2">
         {entries.map((entry) => (
           <PlayerBreakdown key={entry.id} entry={entry} game={game} />
         ))}
@@ -133,29 +133,15 @@ function PlayerBreakdown({
     : []
 
   return (
-    // Mismo vestido que la hoja donde se anotó: filete del color del juego,
-    // portada tenue por detrás y su icono asomando por la esquina.
+    // Mismo filete de color que la hoja donde se anotó, y nada más por detrás:
+    // aquí lo que se viene a leer son las cifras.
     <section
       className={`card game-edge relative overflow-hidden ${entry.is_winner ? 'hard-lift' : ''}`}
     >
-      {game?.imageUrl && (
-        <span
-          className="game-photo"
-          style={{ backgroundImage: `url(${game.imageUrl})` }}
-          aria-hidden="true"
-        />
-      )}
-
       <div className="relative">
         <header
           className={`flex items-center gap-3 px-4 py-3 ${entry.is_winner ? 'game-tint' : ''}`}
         >
-          {game && (
-            <span className="game-glyph" aria-hidden="true">
-              {game.icon}
-            </span>
-          )}
-
           <span className="tnum w-5 text-center text-sm font-bold text-[var(--color-muted)]">
             {entry.rank}
           </span>
