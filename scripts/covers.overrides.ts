@@ -15,14 +15,6 @@
  * la portada. Esto es para cuando el ID es correcto y la imagen no.
  */
 export const COVER_OVERRIDES: Record<string, string> = {
-  // Estos tres son juegos escritos a mano que traían su portada puesta a dedo en
-  // `definitions/`. Ni Wikidata ni Wikipedia los resuelven —«Camel Up» y «Terraforming
-  // Mars» no tienen ID de BGG en Wikidata, y a «Aventureros al Tren» le pasa que el
-  // artículo está bajo su título en inglés—, así que sus URLs se conservan aquí para
-  // que sigan teniendo caja. Cuando haya token de BGG, se pueden borrar.
-  'camel-up': 'https://upload.wikimedia.org/wikipedia/en/f/fb/Camel_Up_box_cover.jpg',
-  'aventureros-al-tren':
-    'https://upload.wikimedia.org/wikipedia/en/9/92/Ticket_to_Ride_Board_Game_Box_EN.jpg',
-  'terraforming-mars':
-    'https://upload.wikimedia.org/wikipedia/en/f/f0/Terraforming_Mars_board_game_box_cover.jpg',
+  // Vacío a propósito: con el token de BGG puesto, todas las portadas salen de la API.
+  // 'algun-juego': 'https://…/portada.jpg',
 }

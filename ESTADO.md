@@ -18,6 +18,42 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **Cribado de portadas con personas (2026-08-19)**. Toni pidió quitar las carátulas
+  «donde aparezcan personas» y, al aclararlo, fijó el criterio: **personas REALES**
+  (fotografías); si son personajes dibujados de la propia carátula del juego, se quedan.
+  Se revisaron las 368 portadas montando hojas de contactos con `sharp` (25 por lámina).
+  Resultado: **solo una** incumplía —«Obsession», que colgaba la foto de un juego de
+  madera de los setenta rodeada de fotos de gente— y la causa no era la portada sino el
+  **ID de BGG** (12568, un homónimo). De paso salieron tres más igual de mal
+  identificadas, sin personas: «Canvas» (el de 2010 en vez del de 2021), «The Game»
+  («Wikipedia: The Game About Everything») y «Backgammon» («Zocken»). Los cuatro IDs
+  corregidos en `scripts/bgg-ids.overrides.ts` —que es donde se arregla esto, no en
+  `covers.overrides.ts`: si el ID es el bueno, la portada viene sola— y regenerados
+  `npm run ids` (367/393 con ID, uno nuevo de propina: `iss-vanguard`) y `npm run covers`
+  (369/393 con portada). Lo que **no** se tocó, por el criterio de arriba: Power Grid
+  (el ingeniero de la edición «Recharged»), 7 Wonders (el Coloso), Código Secreto (los
+  dos espías), King of Tokyo y Dixit, que Toni había citado como ejemplos. Si algún día
+  se quiere la edición sin figuras, la API las da: `thing?id=<id>&versions=1` lista todas
+  las ediciones con su imagen (la primera inglesa de Power Grid, 2004, son torres de alta
+  tensión sin nadie).
+- **Las portadas viejas se quedaban pegadas en el móvil (2026-08-19)**. Toni seguía
+  viendo fotos de gente jugando en Rummikub, King of Tokyo, Dixit, Código Secreto,
+  Power Grid, Hansa Teutónica… y pedía cambiarlas por las de la API. No había nada que
+  cambiar: los `.webp` del repo **y los de GitHub Pages** son ya las cajas de BGG
+  (comprobado byte a byte con `curl`). Lo que fallaba era la caché: el service worker
+  guarda `covers/*.webp` con **`CacheFirst`** y 180 días de vida, y hasta el commit
+  `12422f0` esas mismas rutas servían **fotos de Wikimedia** (`Rummikub1.jpg`,
+  `Deskohraní 2012` para King of Tokyo, `Vysoké napětí` para Power Grid…), justo las
+  fotos de gente jugando. Mismo nombre de fichero, contenido nuevo ⇒ el móvil no lo
+  volvía a pedir. Arreglado versionando el nombre de la caché en `vite.config.ts`
+  (`portadas` → `portadas-v2`) y borrando la vieja al arrancar desde
+  `src/lib/caches.ts` (`dropStaleCaches`, llamada en `main.tsx`). **Hasta que esto no se
+  despliegue, Toni seguirá viendo las fotos viejas**; si quiere verlo antes, vale con
+  borrar los datos del sitio en el navegador.
+- **Ya no queda ninguna portada fuera de la API (2026-08-19)**. `scripts/covers.overrides.ts`
+  se ha quedado vacío: «Camel Up» y «Terraforming Mars» ya tenían ID de BGG, y
+  «Aventureros al Tren» (9209) y «Parchís» (2136, «Pachisi») lo han recibido en
+  `bgg-ids.overrides.ts`. Las 369 portadas tienen `source: 'bgg'`.
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
   (146 tests, build OK). Comprobado 2026-08-19.
 - **Tamaño de las tarjetas de juego en móvil (rejilla a 2/3/4 columnas)**. Sale de una
@@ -181,6 +217,15 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-19** — Claude (terminal): las portadas viejas seguían viéndose en el móvil.
+  No era el repo (los webp desplegados son ya los de BGG) sino la caché `CacheFirst` del
+  service worker, que servía las fotos de Wikimedia anteriores a `12422f0`. Caché
+  versionada a `portadas-v2` y borrado de la vieja al arrancar. De paso, fuera las tres
+  últimas portadas de Wikipedia: `covers.overrides.ts` vacío y todo desde la API.
+- **2026-08-19** — Claude (terminal): cribado de las 368 portadas buscando personas
+  reales. Una sola incumplía («Obsession») y las cuatro portadas equivocadas que
+  aparecieron eran homónimos mal resueltos: IDs corregidos en `bgg-ids.overrides.ts`,
+  `npm run ids` + `npm run covers` regenerados. Todo en verde (146 tests, build OK).
 - **2026-08-19** — Claude (terminal): tamaño de las tarjetas de juego en móvil. Primero un
   lienzo de maquetas para contestar a la consulta de Toni (cuatro pantallas de 390 px a
   distintas densidades, la tabla de medidas y el ajuste mockeado con sus costes); Toni pidió

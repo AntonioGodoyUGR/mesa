@@ -5,6 +5,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import App from './App'
 import { applyStoredTheme } from './lib/theme'
+import { dropStaleCaches } from './lib/caches'
 import './index.css'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
@@ -33,6 +34,7 @@ const persister = createSyncStoragePersister({
 })
 
 applyStoredTheme()
+dropStaleCaches()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

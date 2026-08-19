@@ -12,8 +12,8 @@
  * `sourceUrl` es de dónde se sacó la imagen. Las carátulas son de sus editoriales; se
  * guardan a 512 px con fines de identificación (ver la nota del README).
  *
- * Última actualización: 2026-08-17
- * Con portada: 368 de 393
+ * Última actualización: 2026-08-19
+ * Con portada: 369 de 393
  */
 export interface Cover {
   /** Ruta relativa a la base del sitio: `covers/azul.webp`. */
@@ -47,13 +47,13 @@ export const COVERS: Record<string, Cover> = {
   'arkham-horror-lcg': { file: 'covers/arkham-horror-lcg.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/B5F5ulz0UivNgrI9Ky0euA__original/img/guEKCewM_2e5ugltSN3dTSwdZJI=/0x0/filters:format(jpeg)/pic3122349.jpg' },
   'arnak-missing-expedition': { file: 'covers/arnak-missing-expedition.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/TABbfOUUMAuD6R7WEK8PZg__original/img/tVpMJ721tH_l24mgrNcNSEPhVfY=/0x0/filters:format(jpeg)/pic7412877.jpg' },
   'ascension': { file: 'covers/ascension.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/xP9s1W6CzUPW9_etm395lg__original/img/ozzJzhBFNune8ZoLJeVssWkCHGU=/0x0/filters:format(jpeg)/pic1779866.jpg' },
-  'aventureros-al-tren': { file: 'covers/aventureros-al-tren.webp', source: 'manual', sourceUrl: 'https://upload.wikimedia.org/wikipedia/en/9/92/Ticket_to_Ride_Board_Game_Box_EN.jpg' },
+  'aventureros-al-tren': { file: 'covers/aventureros-al-tren.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/kdWYkW-7AqG63HhqPL6ekA__original/img/rWF8r4JXXCQQ7QhiWHhmT-rQ3Pc=/0x0/filters:format(jpeg)/pic8937637.jpg' },
   'axis-allies': { file: 'covers/axis-allies.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/pWUe-w4DpXdcmH6GqbZqCw__original/img/-mqPeX0oe4pkmLxBNyRt3uGyyf0=/0x0/filters:format(jpeg)/pic24006.jpg' },
   'azul': { file: 'covers/azul.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/aPSHJO0d0XOpQR5X-wJonw__original/img/AkbtYVc6xXJF3c9EUrakklcclKw=/0x0/filters:format(png)/pic6973671.png' },
   'azul-queens-garden': { file: 'covers/azul-queens-garden.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/l-NBWJ1gIcfOCfrvAw8qvw__original/img/VaPUWBlEE3Wg_QGYAsHxKV8mBkw=/0x0/filters:format(jpeg)/pic6389125.jpg' },
   'azul-sintra': { file: 'covers/azul-sintra.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/RrYR1xB8H7D1B5GwNV8jgQ__original/img/unI8OEWp9Fdv3D_dLahPPdLG1qc=/0x0/filters:format(jpeg)/pic4212417.jpg' },
   'azul-summer-pavilion': { file: 'covers/azul-summer-pavilion.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/843kZ6WR0HfyXWEybA6L7A__original/img/VtYGvhy_YCSw14FpV8FGzv0eMe4=/0x0/filters:format(jpeg)/pic4930887.jpg' },
-  'backgammon': { file: 'covers/backgammon.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/Rqo5bREF6cHggYxoxNwJXg__original/img/0a_sj75N9kWmGceFyQGtijgQrf4=/0x0/filters:format(jpeg)/pic4314717.jpg' },
+  'backgammon': { file: 'covers/backgammon.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/PournqDRZ4mb9yFpJvAc_Q__original/img/Ifrj-OZIhhfQCrWpC6Aqp2bEV-E=/0x0/filters:format(jpeg)/pic9098768.jpg' },
   'balderdash': { file: 'covers/balderdash.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/hXNqiCcLt9AJzcqBSsyKiQ__original/img/77EMP3lRlpwjMTGP1cHQqv7w5lk=/0x0/filters:format(jpeg)/pic5121000.jpg' },
   'bananagrams': { file: 'covers/bananagrams.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/1QjYPI4bXx4OUMJPlrsNBA__original/img/WA2NRNJx83xq81H2dnnwEDV2Ork=/0x0/filters:format(jpeg)/pic2463443.jpg' },
   'barrage': { file: 'covers/barrage.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/jEPmWvvYpqkWrKOzqIHFsg__original/img/rkHKwkUqpQC7PAGG7n2gbrcQiUY=/0x0/filters:format(png)/pic4336469.png' },
@@ -75,8 +75,8 @@ export const COVERS: Record<string, Cover> = {
   'brass-lancashire': { file: 'covers/brass-lancashire.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/tHVtPzu82mBpeQbbZkV6EA__original/img/3ffdJj5Pz6HQrg09Kh8ecTen-TY=/0x0/filters:format(jpeg)/pic3469216.jpg' },
   'cabo': { file: 'covers/cabo.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/xm0CoWYr8kO0EaqlaVdVWQ__original/img/QrYehty8znj7KnIiguUMhI50A8g=/0x0/filters:format(jpeg)/pic754318.jpg' },
   'calico': { file: 'covers/calico.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/qGkU6XsF1448F_A4P8TY5Q__original/img/sm-qIkkIoKuYRUgkfP6kkXTm1QY=/0x0/filters:format(jpeg)/pic8124431.jpg' },
-  'camel-up': { file: 'covers/camel-up.webp', source: 'manual', sourceUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fb/Camel_Up_box_cover.jpg' },
-  'canvas': { file: 'covers/canvas.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/wdcT3oy7VPlo9xmiY7HgDw__original/img/svMgpnpbACC3PBza3rxO3fs6aAI=/0x0/filters:format(jpeg)/pic798994.jpg' },
+  'camel-up': { file: 'covers/camel-up.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/jVr1bGBQpshqVPcwvZ7CPg__original/img/GlPdJsTvSho-vqwOOYfC4zyvOa0=/0x0/filters:format(jpeg)/pic1918028.jpg' },
+  'canvas': { file: 'covers/canvas.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/kXJLvPqcDF7Id5KRejhnuQ__original/img/jiORb05QSdRMi-eo1Vi_3wjUSWU=/0x0/filters:format(jpeg)/pic7125372.jpg' },
   'carcassonne': { file: 'covers/carcassonne.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/peUgu3A20LRmAXAMyDQfpQ__original/img/bP18m_PYjyFOv1IBGgMOteQUneA=/0x0/filters:format(jpeg)/pic8621446.jpg' },
   'cards-against-humanity': { file: 'covers/cards-against-humanity.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/nYLrPiI9gnvlrwOrKQ4_CA__original/img/EgMpdhoG38LUTApk0kyFFsmoQPk=/0x0/filters:format(jpeg)/pic2909692.jpg' },
   'carnegie': { file: 'covers/carnegie.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/0qxz9DRRhsJrIW1TJ-kz0w__original/img/PzsJsCLfGGo4IG3v43VPvH_etPw=/0x0/filters:format(jpeg)/pic5710736.jpg' },
@@ -189,6 +189,7 @@ export const COVERS: Record<string, Cover> = {
   'insider': { file: 'covers/insider.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/VW7K2SmGbr-Eim9nNhxfJw__original/img/UY2k4aU_0kF24cYks1b0awwE3gU=/0x0/filters:format(jpeg)/pic3325362.jpg' },
   'inventors-south-tigris': { file: 'covers/inventors-south-tigris.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/bQKqrr_k9mbi2v80hwkyPw__original/img/E3SZKiPb1PHiBs-1XyqZp7TKlEU=/0x0/filters:format(png)/pic7282971.png' },
   'isle-of-cats': { file: 'covers/isle-of-cats.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/AuAheDzhkLufiZFE9JaRNA__original/img/pKq-l1Ms78olHwMbZYMa_x6m-fM=/0x0/filters:format(jpeg)/pic4781085.jpg' },
+  'iss-vanguard': { file: 'covers/iss-vanguard.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/1ySeZNVkVwTvqykMGtHFFQ__original/img/WMa7R2ViiGzzWpKWEdJAOv518PU=/0x0/filters:format(jpeg)/pic7245199.jpg' },
   'istanbul': { file: 'covers/istanbul.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/PHH9Mreen2sBcxV6ZsE3ew__original/img/pHIJibqf-DmlOQD3CfT_rAjGmc0=/0x0/filters:format(jpeg)/pic1885326.jpg' },
   'jaipur': { file: 'covers/jaipur.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/_LTujSe_o16nvjDC-J0seA__original/img/zUnAdsgt4dCxvtoRDc_9DHbic0M=/0x0/filters:format(jpeg)/pic5100947.jpg' },
   'john-company': { file: 'covers/john-company.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/TAdE4z_bwAAjJlmPrkmKhA__original/img/V5wLvuhU3mKNr6PUf1cxyeemh00=/0x0/filters:format(jpeg)/pic6601629.jpg' },
@@ -246,7 +247,7 @@ export const COVERS: Record<string, Cover> = {
   'nucleum': { file: 'covers/nucleum.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/fIVUaMvbfy6GCOgfxt7xaw__original/img/dBMnuz3SrgxsDLHT6pwbQFPQBIw=/0x0/filters:format(jpeg)/pic7647168.jpg' },
   'oath': { file: 'covers/oath.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/gTxav_KKQK1rDg-XuCjCSA__original/img/lG-iXVzDlfFrD6VPggvg2WQ7228=/0x0/filters:format(jpeg)/pic5164812.jpg' },
   'oathsworn': { file: 'covers/oathsworn.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/dezQ4YjF03lZVxTdI-UJYw__original/img/smV4u2r1moRbzsSTzykECb06Mpo=/0x0/filters:format(jpeg)/pic6863204.jpg' },
-  'obsession': { file: 'covers/obsession.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/-AbeZjfuhuGPkSZGFhmN_Q__original/img/zBtl60G-VTb-4v4rvbaA09S3w28=/0x0/filters:format(jpeg)/pic1307249.jpg' },
+  'obsession': { file: 'covers/obsession.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/sy89BiuZXfbSnG7Cag9tBQ__original/img/uArsqbWyUALa982zGWsy8QQWnjE=/0x0/filters:format(png)/pic5902073.png' },
   'on-mars': { file: 'covers/on-mars.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/Nm0Iw8NoiM9V8IsifimGBw__original/img/GNjjsgxq7wYO9pSIteDJe6Sxt00=/0x0/filters:format(jpeg)/pic4357658.jpg' },
   'one-night-ultimate-werewolf': { file: 'covers/one-night-ultimate-werewolf.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/rqLju4uaZq-G9z4g91aPPQ__original/img/eOxUlbCuix0lOjuyBYpjtIXVihc=/0x0/filters:format(png)/pic8783294.png' },
   'onitama': { file: 'covers/onitama.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/GJKuOCy5HGAYgVH_Rei5mA__original/img/oRsIxp72iv58128KFdqvjG6Gz64=/0x0/filters:format(jpeg)/pic7070194.jpg' },
@@ -256,7 +257,7 @@ export const COVERS: Record<string, Cover> = {
   'pandemic-legacy-0': { file: 'covers/pandemic-legacy-0.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/y0x1zbkpUXjddzWWnhekYw__original/img/2VlfzwT4b8f1s2HqbilcjR-bM3I=/0x0/filters:format(jpeg)/pic5581457.jpg' },
   'pandemic-legacy-1': { file: 'covers/pandemic-legacy-1.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/-Qer2BBPG7qGGDu6KcVDIw__original/img/PlzAH7swN1nsFxOXbfUvE3TkE5w=/0x0/filters:format(png)/pic2452831.png' },
   'pandemic-legacy-2': { file: 'covers/pandemic-legacy-2.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/Qtkb-UTvHa0-kxt_MK1nKw__original/img/wJiRr7lBmWSKcRS3lPpvKIPMgQQ=/0x0/filters:format(jpeg)/pic3763549.jpg' },
-  'parchis': { file: 'covers/parchis.webp', source: 'wikipedia', sourceUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Parch%C3%ADs.svg' },
+  'parchis': { file: 'covers/parchis.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/45Nb6goQqvPHD9hOut0ntg__original/img/PvDk6RoeXtEl1hsi1eIjeEKZqJk=/0x0/filters:format(jpeg)/pic516869.jpg' },
   'parks': { file: 'covers/parks.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/mF2cSNRk2O6HtE45Sl9TcA__original/img/_KNgPoC_4l7iN0ntbFILexOJpfc=/0x0/filters:format(jpeg)/pic4852372.jpg' },
   'patchwork': { file: 'covers/patchwork.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/xNSaIHCKr_cc7Q2rQSSJPQ__original/img/HJJdVosBV35kj8pQ6wmQMiJRhVA=/0x0/filters:format(jpeg)/pic9273518.jpg' },
   'patchwork-doodle': { file: 'covers/patchwork-doodle.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/8nSMDhVg9QsyesfLBwIxCA__original/img/SLn-yrpjoQXEgzAE8HamdJ0YSvg=/0x0/filters:format(jpeg)/pic4682702.jpg' },
@@ -337,11 +338,11 @@ export const COVERS: Record<string, Cover> = {
   'telestrations': { file: 'covers/telestrations.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/Dd94J37Oi1tgL7HAAaOfAQ__original/img/SAMxnv21q2rwvViEOu2nti4H0Is=/0x0/filters:format(jpeg)/pic8855812.jpg' },
   'teotihuacan': { file: 'covers/teotihuacan.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/wW5xjgBJcFyLaEWZwrYuKA__original/img/72kzn6t41ZxLEr3GFd8ir6hDdH4=/0x0/filters:format(jpeg)/pic4583626.jpg' },
   'terra-mystica': { file: 'covers/terra-mystica.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/bre12I1YiXkZr7elvriz4A__original/img/_dZS7fVfdc4DhJPbqnDpwTT4uF0=/0x0/filters:format(jpeg)/pic5375624.jpg' },
-  'terraforming-mars': { file: 'covers/terraforming-mars.webp', source: 'manual', sourceUrl: 'https://upload.wikimedia.org/wikipedia/en/f/f0/Terraforming_Mars_board_game_box_cover.jpg' },
+  'terraforming-mars': { file: 'covers/terraforming-mars.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__original/img/thIqWDnH9utKuoKVEUqveDixprI=/0x0/filters:format(jpeg)/pic3536616.jpg' },
   'the-chameleon': { file: 'covers/the-chameleon.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/-uBkiypUVyRKxNuOI_-ZpQ__original/img/Y_12y74FIaAXMfiQ0tFhpfkrN1U=/0x0/filters:format(png)/pic3552344.png' },
   'the-crew-planet-nine': { file: 'covers/the-crew-planet-nine.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/98LnQShydr11OBKS46xY-Q__original/img/Q-ZkgnuBu9OTBr7J3qnqPjqamAE=/0x0/filters:format(jpeg)/pic5687013.jpg' },
   'the-gallerist': { file: 'covers/the-gallerist.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/ie1GSt1XV04sXQXt-3O1UQ__original/img/59dZRZePEgtcupkRSA2zohZuHpM=/0x0/filters:format(png)/pic2503200.png' },
-  'the-game': { file: 'covers/the-game.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/mqF7rCWznElkOk43to8yKg__original/img/2RucXG4y_YMTSIiZVnT3ihoskSw=/0x0/filters:format(jpeg)/pic2661981.jpg' },
+  'the-game': { file: 'covers/the-game.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/g4pn1ieUKfIhERl5Ym6joQ__original/img/ZcwvBXraym0wfre1sm9t1d44BBA=/0x0/filters:format(png)/pic4203279.png' },
   'the-loop': { file: 'covers/the-loop.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/NPWdxDD5uLOBLBDdVgdLvA__original/img/zlx0Qqcgt0TLu62F5sKUmYTDNvc=/0x0/filters:format(png)/pic6034093.png' },
   'the-mind': { file: 'covers/the-mind.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/q_JGK291hrhnhiRB0667oA__original/img/8VjZEG278faO9JZwzce3v3EKssI=/0x0/filters:format(png)/pic3979766.png' },
   'the-red-cathedral': { file: 'covers/the-red-cathedral.webp', source: 'bgg', sourceUrl: 'https://cf.geekdo-images.com/-PuiCnbxlBzMSjnUegp9AQ__original/img/hH1AwTR4fdtYY_cO8IYp1-I8dhE=/0x0/filters:format(jpeg)/pic5556025.jpg' },

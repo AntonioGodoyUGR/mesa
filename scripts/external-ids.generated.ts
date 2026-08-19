@@ -5,8 +5,8 @@
  * Identificador de cada juego integrado en BoardGameGeek y en Wikidata. Es lo que
  * permite que `npm run covers` pida la portada por ID en vez de buscarla por nombre.
  *
- * Última actualización: 2026-08-17
- * Con ID de BGG: 366 de 393 · con ítem de Wikidata: 235
+ * Última actualización: 2026-08-19
+ * Con ID de BGG: 369 de 393 · con ítem de Wikidata: 235
  */
 export interface ExternalIds {
   bgg?: number
@@ -14,13 +14,11 @@ export interface ExternalIds {
 }
 
 /**
- * PENDIENTES (24): ningún método los ha resuelto.
+ * PENDIENTES (22): ningún método los ha resuelto.
  * Copia el ID bueno a scripts/bgg-ids.overrides.ts y vuelve a lanzar `npm run ids`.
  * // 'domino': ?,  // Dominó
- * // 'aventureros-al-tren': ?,  // Aventureros al Tren
  * // 'five-tribes': ?,  // Five Tribes
  * // 'middara': ?,  // Middara: Unintentional Malum
- * // 'iss-vanguard': ?,  // ISS Vanguard
  * // 'elden-ring-board-game': ?,  // Elden Ring: The Board Game
  * // 'unmatched-battle-legends': ?,  // Unmatched: Battle of Legends
  * // 'unmatched-jurassic-park': ?,  // Unmatched: Jurassic Park
@@ -67,12 +65,13 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'arkham-horror-lcg': { bgg: 205637, wikidata: 'Q27970574' },
   'arnak-missing-expedition': { bgg: 382350 },
   'ascension': { bgg: 10403 },
+  'aventureros-al-tren': { bgg: 9209 },
   'axis-allies': { bgg: 98, wikidata: 'Q792553' },
   'azul': { bgg: 230802, wikidata: 'Q44367843' },
   'azul-queens-garden': { bgg: 346965 },
   'azul-sintra': { bgg: 256226 },
   'azul-summer-pavilion': { bgg: 287954 },
-  'backgammon': { bgg: 1500, wikidata: 'Q2452586' },
+  'backgammon': { bgg: 2397, wikidata: 'Q2452586' },
   'balderdash': { bgg: 163, wikidata: 'Q1792503' },
   'bananagrams': { bgg: 27225 },
   'barrage': { bgg: 251247, wikidata: 'Q114823683' },
@@ -95,7 +94,7 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'cabo': { bgg: 73664, wikidata: 'Q3514630' },
   'calico': { bgg: 283155, wikidata: 'Q106946550' },
   'camel-up': { bgg: 153938 },
-  'canvas': { bgg: 81703 },
+  'canvas': { bgg: 290236 },
   'carcassonne': { bgg: 822, wikidata: 'Q17262' },
   'cards-against-humanity': { bgg: 50381, wikidata: 'Q5038791' },
   'carnegie': { bgg: 310873, wikidata: 'Q116450997' },
@@ -209,6 +208,7 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'insider': { bgg: 206051, wikidata: 'Q122640564' },
   'inventors-south-tigris': { bgg: 378387 },
   'isle-of-cats': { bgg: 281259, wikidata: 'Q127038367' },
+  'iss-vanguard': { bgg: 325494 },
   'istanbul': { bgg: 148949, wikidata: 'Q18352396' },
   'jaipur': { bgg: 54043, wikidata: 'Q1678774' },
   'john-company': { bgg: 332686, wikidata: 'Q122238495' },
@@ -266,7 +266,7 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'nucleum': { bgg: 396790 },
   'oath': { bgg: 291572 },
   'oathsworn': { bgg: 251661, wikidata: 'Q125788585' },
-  'obsession': { bgg: 12568, wikidata: 'Q7075507' },
+  'obsession': { bgg: 231733, wikidata: 'Q7075507' },
   'on-mars': { bgg: 184267, wikidata: 'Q99769109' },
   'one-night-ultimate-werewolf': { bgg: 147949 },
   'onitama': { bgg: 160477, wikidata: 'Q56457416' },
@@ -276,7 +276,7 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'pandemic-legacy-0': { bgg: 314040, wikidata: 'Q107138671' },
   'pandemic-legacy-1': { bgg: 161936, wikidata: 'Q36816018' },
   'pandemic-legacy-2': { bgg: 221107, wikidata: 'Q96053095' },
-  'parchis': { wikidata: 'Q945556' },
+  'parchis': { bgg: 2136, wikidata: 'Q945556' },
   'parks': { bgg: 266524, wikidata: 'Q105086916' },
   'patchwork': { bgg: 163412, wikidata: 'Q29471714' },
   'patchwork-doodle': { bgg: 264239, wikidata: 'Q138303654' },
@@ -361,7 +361,7 @@ export const EXTERNAL_IDS: Record<string, ExternalIds> = {
   'the-chameleon': { bgg: 227072, wikidata: 'Q116233173' },
   'the-crew-planet-nine': { bgg: 284083, wikidata: 'Q77852578' },
   'the-gallerist': { bgg: 125153, wikidata: 'Q106009367' },
-  'the-game': { bgg: 180459, wikidata: 'Q59876777' },
+  'the-game': { bgg: 173090, wikidata: 'Q59876777' },
   'the-loop': { bgg: 316412 },
   'the-mind': { bgg: 244992, wikidata: 'Q53726996' },
   'the-red-cathedral': { bgg: 227224 },

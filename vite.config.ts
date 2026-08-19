@@ -47,10 +47,15 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /\/covers\/[^/]+\.webp$/,
-            // Una portada no cambia nunca: si está en caché, no hay nada que preguntar.
+            // Se sirven de caché sin preguntar: son cientos y no cambian de un día
+            // para otro. Pero el fichero de una portada sí puede cambiar de contenido
+            // sin cambiar de nombre (`npm run covers` la vuelve a bajar de BGG), y con
+            // CacheFirst el móvil se quedaría con la vieja durante meses. Por eso el
+            // nombre de la caché lleva versión: al subirlo, todo el mundo se baja las
+            // portadas nuevas la próxima vez que abre la app.
             handler: 'CacheFirst',
             options: {
-              cacheName: 'portadas',
+              cacheName: 'portadas-v2',
               expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 180 },
               cacheableResponse: { statuses: [0, 200] },
             },
