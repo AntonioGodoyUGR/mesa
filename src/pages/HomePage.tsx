@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { NO_FILTERS, filterGames, hasActiveFilters, type GameFilters } from '../games/filters'
 import { GameFinder } from '../components/GameFinder'
-import { GameTile } from '../components/GameTile'
+import { GameGrid } from '../components/GameGrid'
+import { GridSizePicker } from '../components/GridSizePicker'
 import { MatchCard } from '../components/MatchCard'
 import { ShowMore, usePaged } from '../components/ShowMore'
 import { Spinner } from '../components/ui'
@@ -11,6 +12,7 @@ import { useAuth } from '../context/AuthContext'
 import { useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
+import { getStoredTileSize, setStoredTileSize, type TileSize } from '../lib/tilesize'
 import type { GameDefinition } from '../games/types'
 
 /**
@@ -20,12 +22,19 @@ import type { GameDefinition } from '../games/types'
  * También es la puerta de entrada de quien llega sin cuenta. Entonces la misma
  * rejilla lleva a la ficha de cada juego en vez de al marcador —no hay grupo con
  * quien jugar todavía— y las secciones que hablan del grupo no se pintan.
+ *
+ * Aquí hay tres rejillas del mismo aspecto haciendo dos trabajos distintos. Las de
+ * arriba —«Los que más jugáis» y «Vuestros juegos»— son un lanzador: seis juegos
+ * como mucho, se tocan a diario y se reconocen por la portada, así que van siempre
+ * grandes. La de abajo es un catálogo de cientos por el que se navega leyendo
+ * nombres, y ahí el tamaño lo decide quien mira, con el mando del titular.
  */
 export function HomePage() {
   const { group, loading: groupLoading } = useGroup()
   const { user, loading: authLoading } = useAuth()
   const { games, builtin, custom } = useGames()
   const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
+  const [tileSize, setTileSize] = useState<TileSize>(getStoredTileSize)
 
   const matchesQuery = useQuery({
     queryKey: queryKeys.matches(group?.id ?? ''),
@@ -63,6 +72,13 @@ export function HomePage() {
   const results = usePaged(found)
   const catalogue = usePaged(rest)
 
+  // El tamaño elegido se queda en este navegador, como el tema: es de quien mira,
+  // no del grupo, y no tiene por qué viajar a la otra pantalla.
+  const chooseTileSize = (size: TileSize) => {
+    setTileSize(size)
+    setStoredTileSize(size)
+  }
+
   // Media portada depende de si hay grupo. Mientras no se sepa no se pinta: es
   // la espera que antes hacían los guardianes de la ruta, no una nueva.
   if (authLoading || groupLoading) return <Spinner label="Comprobando sesión…" />
@@ -94,7 +110,11 @@ export function HomePage() {
         {searching ? (
           found.length > 0 ? (
             <>
-              <GameGrid games={results.shown} to={tileLink} />
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="display text-base">Resultados</h2>
+                <GridSizePicker value={tileSize} onChange={chooseTileSize} />
+              </div>
+              <GameGrid games={results.shown} to={tileLink} size={tileSize} />
               <ShowMore hidden={results.hidden} onClick={results.showMore} />
             </>
           ) : (
@@ -120,10 +140,7 @@ export function HomePage() {
             {group && (
               <>
                 <h2 className="display text-base">Vuestros juegos</h2>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                  {ours.map((game) => (
-                    <GameTile key={game.slug} game={game} to={tileLink(game)} />
-                  ))}
+                <GameGrid games={ours} to={tileLink}>
                   <Link
                     to="/juegos/nuevo"
                     className="card flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
@@ -136,14 +153,17 @@ export function HomePage() {
                       Con vuestras reglas
                     </span>
                   </Link>
-                </div>
+                </GameGrid>
               </>
             )}
 
-            <h2 className="display text-base">
-              {group ? 'Del catálogo' : 'Todos los juegos'}
-            </h2>
-            <GameGrid games={catalogue.shown} to={tileLink} />
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="display text-base">
+                {group ? 'Del catálogo' : 'Todos los juegos'}
+              </h2>
+              <GridSizePicker value={tileSize} onChange={chooseTileSize} />
+            </div>
+            <GameGrid games={catalogue.shown} to={tileLink} size={tileSize} />
             <ShowMore hidden={catalogue.hidden} onClick={catalogue.showMore} />
           </>
         )}
@@ -189,22 +209,6 @@ export function HomePage() {
           </Link>
         </section>
       )}
-    </div>
-  )
-}
-
-function GameGrid({
-  games,
-  to,
-}: {
-  games: GameDefinition[]
-  to: (game: GameDefinition) => string
-}) {
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      {games.map((game) => (
-        <GameTile key={game.slug} game={game} to={to(game)} />
-      ))}
     </div>
   )
 }

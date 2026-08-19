@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useCover } from './GameCover'
 import { isCustomGame, type GameDefinition } from '../games/types'
+import type { TileSize } from '../lib/tilesize'
 
 /**
  * Tarjeta de un juego en la pantalla principal.
@@ -12,18 +13,47 @@ import { isCustomGame, type GameDefinition } from '../games/types'
  * centro, ver `scripts/fetch-covers.ts`): cualquier otra proporción se comería un
  * trozo de la carátula. El nombre va debajo y no encima, para que se lea igual sobre
  * una portada clara que sobre una oscura.
+ *
+ * Viene en tres tamaños (ver `lib/tilesize.ts`). Encogerla no es escalarla: a dos
+ * columnas la portada mide 169 px y hay sitio para el nombre entero y la línea de
+ * abajo, pero a cuatro son 76 px y ahí sobra todo lo que no sea la portada y el
+ * nombre. Por eso el detalle se cae por pasos en vez de reducirse: la línea de
+ * «3–6 jugadores · Puntos» desaparece, el nombre pasa a poder partirse en dos
+ * líneas en lugar de cortarse, y la chapa de «Vuestro» se queda en un punto de
+ * color con el texto solo para quien lee la pantalla en voz alta.
+ *
+ * Las medidas de cada paso están en `index.css` (`.tile`, `.tile-md`, `.tile-sm`) y
+ * no en clases sueltas aquí: son las que tienen que cuadrar entre sí.
  */
-export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
+
+const SIZE_CLASS: Record<TileSize, string> = {
+  large: '',
+  medium: 'tile-md',
+  small: 'tile-sm',
+}
+
+export function GameTile({
+  game,
+  to,
+  size = 'large',
+}: {
+  game: GameDefinition
+  to: string
+  size?: TileSize
+}) {
   const custom = isCustomGame(game)
   const cover = useCover(game)
+  const compact = size !== 'large'
 
   return (
     <Link
       to={to}
-      className="card group flex flex-col overflow-hidden transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:hard-lift active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+      className={`card tile ${SIZE_CLASS[size]} group transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:hard-lift active:translate-x-[3px] active:translate-y-[3px] active:shadow-none`}
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
-      <span className="game-rule relative block aspect-square">
+      <span
+        className={`${size === 'small' ? 'game-rule-thin' : 'game-rule'} relative block aspect-square`}
+      >
         {cover.src ? (
           <img
             src={cover.src}
@@ -34,24 +64,26 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
           />
         ) : (
           <span className="game-wash flex h-full w-full items-center justify-center">
-            <span className="text-4xl leading-none" aria-hidden="true">
+            <span className="tile-glyph" aria-hidden="true">
               {game.icon}
             </span>
           </span>
         )}
 
         {custom && (
-          <span className="overline hard-sm absolute right-1.5 top-1.5 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-accent)] px-2 py-0.5 text-xs text-[var(--color-accent-ink)]">
-            Vuestro
+          <span className="tile-badge overline hard-sm">
+            <span className={compact ? 'sr-only' : ''}>Vuestro</span>
           </span>
         )}
       </span>
 
-      <span className="game-tint block px-2.5 pb-2.5 pt-2">
-        <span className="nombre block truncate text-base leading-tight">{game.name}</span>
-        <span className="tnum mt-0.5 block text-[0.78125rem] font-semibold text-[var(--color-muted)]">
-          {game.minPlayers}–{game.maxPlayers} jugadores · {game.scoreLabel}
-        </span>
+      <span className="game-tint tile-band">
+        <span className="nombre tile-name">{game.name}</span>
+        {!compact && (
+          <span className="tnum mt-0.5 block text-[0.78125rem] font-semibold text-[var(--color-muted)]">
+            {game.minPlayers}–{game.maxPlayers} jugadores · {game.scoreLabel}
+          </span>
+        )}
       </span>
     </Link>
   )

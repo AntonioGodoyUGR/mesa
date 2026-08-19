@@ -19,7 +19,42 @@ quedó a medias y lo siguiente que toca.
 ## Estado actual
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
-  (141 tests, build OK). Comprobado 2026-08-19.
+  (146 tests, build OK). Comprobado 2026-08-19.
+- **Tamaño de las tarjetas de juego en móvil (rejilla a 2/3/4 columnas)**. Sale de una
+  consulta de Toni («¿las hago más pequeñas?, ¿pongo un selector?») que se contestó con un
+  lienzo de maquetas medido; la respuesta corta es que el problema no era el tamaño sino
+  que en Inicio había **tres rejillas iguales haciendo dos trabajos distintos**. Lo que hay
+  ahora:
+  - Las de arriba (**«Los que más jugáis»** y **«Vuestros juegos»**) son un lanzador: seis
+    juegos como mucho, se tocan a diario y se reconocen por la portada. Van **siempre a dos
+    columnas** y NO obedecen al mando. Que no se les cuelgue el `size` por comodidad.
+  - Las de abajo (**«Del catálogo»** y los **resultados de búsqueda**) son un catálogo de
+    cientos por el que se navega leyendo nombres. Ahí manda el usuario, con `GridSizePicker`
+    pegado al titular de la rejilla que cambia. Por defecto **medianas (3 columnas)**: a 390
+    px se pasa de 4 juegos por pantalla a 9.
+  - **`src/lib/tilesize.ts`** (nuevo): `TileSize = 'large' | 'medium' | 'small'`, `TILE_SIZES`,
+    `getStoredTileSize` / `setStoredTileSize` y `tileGridClass`. Guarda en `localStorage`
+    bajo `mesa.tilesize`, **igual que el tema** (`theme.ts`): es preferencia de quien mira,
+    no dato del grupo, así que **no pasa por `TableTrackerApi` ni toca la BD** — nada de SQL
+    que ejecutar. El precio asumido: no viaja del móvil al portátil.
+  - **`GameGrid.tsx`** (nuevo): la rejilla que vivía suelta dentro de `HomePage` se extrajo
+    porque se pinta tres veces y cada una con su tamaño. Acepta `children` para que la
+    tarjeta de «Crear juego» siga dentro de la rejilla de «Vuestros juegos».
+  - **`GridSizePicker.tsx`** (nuevo): mando de tres posiciones (`.seg`/`.seg-btn`/`.seg-btn-on`),
+    con iconos `rejilla-2/3/4` nuevos en `Icon.tsx` — tantas barras como columnas. Van macizos
+    y no de trazo: a 18 px un contorno de 2 px sobre una barra de 3 px se cierra sobre sí
+    mismo. Estado en `aria-pressed`, no `radiogroup`: son tres formas de ver lo mismo.
+  - **`GameTile.tsx`** acepta `size`. Encoger **no es escalar**: el detalle se cae por pasos
+    —desaparece la línea «3–6 jugadores · Puntos», el nombre pasa a partirse en dos líneas
+    en vez de cortarse (con altura reservada para que las filas cuadren), la chapa «Vuestro»
+    se queda en un punto de color con el texto en `sr-only`, y el filete `game-rule` baja de
+    5 a 3 px (`game-rule-thin`) porque sobre una portada de 76 px se comía la carátula.
+  - ⚠️ Las medidas viven **todas en `index.css`** (`.game-grid*`, `.tile*`, `.seg*`), no en
+    clases de Tailwind sueltas en el marcado: en Tailwind v4 la capa `utilities` gana a
+    `components` **pase lo que pase con la especificidad**, así que un `block` o un `px-2` en
+    el JSX anularía en silencio la regla de la capa de componentes. Por eso `GameTile` lleva
+    `tile-name` y no `tile-name block`.
+
 - **Legibilidad y «aspecto juvenil»**. Es la mezcla que eligió Toni sobre el lienzo de
   maquetas del 2026-08-19, ya implementada y en `main`. Qué hay que saber de esto:
   - **Dos tipos, y la razón por la que son dos.** `--font-display` es **Fredoka** y
@@ -146,6 +181,14 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-19** — Claude (terminal): tamaño de las tarjetas de juego en móvil. Primero un
+  lienzo de maquetas para contestar a la consulta de Toni (cuatro pantallas de 390 px a
+  distintas densidades, la tabla de medidas y el ajuste mockeado con sus costes); Toni pidió
+  implementar la recomendación **y además** el selector. Rejillas de arriba fijas a dos
+  columnas, catálogo y búsqueda con mando de 2/3/4 y por defecto 3, preferencia en
+  `localStorage` (`mesa.tilesize`) sin tocar la API ni la BD. Nuevos `lib/tilesize.ts`,
+  `GameGrid.tsx`, `GridSizePicker.tsx` e iconos `rejilla-2/3/4`; `GameTile` con `size` que
+  pierde detalle por pasos. Todo en verde (146 tests, build OK).
 - **2026-08-19** — Claude (terminal): revisión de legibilidad y «aspecto juvenil»,
   maquetada y **ya implementada**. Primero un lienzo de diez tableros (diagnóstico medido,
   antes/después de Inicio, piezas sueltas con sus medidas, la app a tres intensidades);
