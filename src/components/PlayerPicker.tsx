@@ -70,7 +70,7 @@ export function PlayerPicker({
                   demás, y el siguiente toque caería en otro jugador. */}
               <span
                 aria-hidden={!isSelected}
-                className={`tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-[11px] font-bold text-[var(--color-brand-ink)] ${
+                className={`tnum ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-brand)] text-xs font-bold text-[var(--color-brand-ink)] ${
                   isSelected ? '' : 'invisible'
                 }`}
               >

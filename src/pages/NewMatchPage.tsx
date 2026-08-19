@@ -136,7 +136,7 @@ export function NewMatchPage() {
       <header className="flex items-center gap-3">
         {step === 1 && <GameCover game={game} size={52} />}
         <div className="min-w-0">
-          <h1 className="display truncate text-xl">
+          <h1 className="nombre truncate text-xl">
             {step === 1 ? game.name : 'Puntuaciones'}
           </h1>
           <p className="text-sm text-[var(--color-muted)]">

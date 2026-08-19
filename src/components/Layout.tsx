@@ -5,12 +5,13 @@ import { useGroup } from '../context/GroupContext'
 import { isDemoMode } from '../lib/api'
 import { getStoredTheme, resolveTheme, setTheme } from '../lib/theme'
 import { Avatar } from './Avatar'
+import { Icon, type IconName } from './Icon'
 import { Logo } from './Logo'
 
 interface Tab {
   to: string
   label: string
-  icon: string
+  icon: IconName
   end: boolean
   /** Solo tiene sentido con un grupo detrás: partidas y jugadores son suyos. */
   needsGroup?: boolean
@@ -19,10 +20,10 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { to: '/', label: 'Inicio', icon: '🎲', end: true },
-  { to: '/partidas', label: 'Partidas', icon: '📋', end: false, needsGroup: true },
-  { to: '/jugadores', label: 'Jugadores', icon: '👥', end: false, needsGroup: true },
-  { to: '/grupo/nuevo', label: 'Empezar', icon: '✨', end: false, guestOnly: true },
+  { to: '/', label: 'Inicio', icon: 'dado', end: true },
+  { to: '/partidas', label: 'Partidas', icon: 'lista', end: false, needsGroup: true },
+  { to: '/jugadores', label: 'Jugadores', icon: 'jugadores', end: false, needsGroup: true },
+  { to: '/grupo/nuevo', label: 'Empezar', icon: 'chispa', end: false, guestOnly: true },
 ]
 
 function ThemeToggle() {
@@ -49,7 +50,7 @@ function DemoBanner() {
   return (
     <Link
       to="/grupo"
-      className="overline block truncate border-b-2 border-[var(--color-border)] bg-[var(--color-accent)] px-4 py-1.5 text-center text-[0.6875rem] text-[var(--color-accent-ink)]"
+      className="overline block truncate border-b-2 border-[var(--color-border)] bg-[var(--color-accent)] px-4 py-1.5 text-center text-xs text-[var(--color-accent-ink)]"
     >
       Demostración · datos solo en este navegador · <u>conectar Supabase</u>
     </Link>
@@ -97,13 +98,9 @@ export function Layout() {
                 key={tab.to}
                 to={tab.to}
                 end={tab.end}
-                className={({ isActive }) =>
-                  `overline tabbar-link ${isActive ? 'tabbar-link-on' : ''}`
-                }
+                className={({ isActive }) => `tabbar-link ${isActive ? 'tabbar-link-on' : ''}`}
               >
-                <span className="tabbar-icon" aria-hidden="true">
-                  {tab.icon}
-                </span>
+                <Icon name={tab.icon} className="tabbar-icon" />
                 {tab.label}
               </NavLink>
             ))}

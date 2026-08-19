@@ -80,10 +80,10 @@ export function PlayersPage() {
               </span>
 
               <span className="text-right">
-                <span className="tnum block text-lg font-black leading-none">
+                <span className="tnum block text-lg font-extrabold leading-none">
                   {stats.wins}
                 </span>
-                <span className="block text-[11px] text-[var(--color-muted)]">
+                <span className="block text-xs text-[var(--color-muted)]">
                   victorias
                 </span>
               </span>

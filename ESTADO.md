@@ -19,9 +19,41 @@ quedó a medias y lo siguiente que toca.
 ## Estado actual
 
 - Rama `main`. Todo en verde: `npm run lint && npm test && npm run build` pasa
-  (141 tests, build OK). Comprobado 2026-08-18.
-- **Repaso de interfaz (9 cambios, revisados uno a uno con Toni en el navegador)**. Sin
-  commitear todavía. Lo gordo es la **hoja de puntuación del revés**: `ScoreSheet.tsx`
+  (141 tests, build OK). Comprobado 2026-08-19.
+- **Legibilidad y «aspecto juvenil»**. Es la mezcla que eligió Toni sobre el lienzo de
+  maquetas del 2026-08-19, ya implementada y en `main`. Qué hay que saber de esto:
+  - **Dos tipos, y la razón por la que son dos.** `--font-display` es **Fredoka** y
+    `--font-sans` es **Nunito**, servidas desde `src/assets/fonts/*.woff2` (cuatro
+    subconjuntos, variables). Están en `src/assets/` y **no** en `public/` a propósito:
+    así Vite las reescribe con el `base` y siguen resolviendo bajo `/table-tracker/` en
+    Pages —comprobado compilando con `BASE_PATH`—; en `public/` habría que prefijar a
+    mano. Y van dentro del repo en vez de enlazadas a Google porque `workbox` ya precachea
+    los `woff2` y así la letra sobrevive sin conexión.
+  - ⚠️ **Ninguna cifra se escribe en Fredoka.** Se midió el binario: no trae `tnum` y sus
+    dígitos miden distinto (el «1» 383 unidades y el «2» 577), así que un marcador puesto
+    con ella baila al sumar. Nunito los tiene los diez a 600. Por eso `.scoreboard-total`
+    fuerza `font-family: var(--font-sans)`, y si alguien añade cifras nuevas, ahí van.
+  - **Fredoka llega a 700, no a 900.** `.display`, `.btn`, `.tab` y todo lo que era
+    `font-weight: 900` está remapeado; `font-black` en el marcado pasó a `font-extrabold`
+    (Nunito tope 800). Si vuelve a aparecer un 900, no rompe pero tampoco engorda.
+  - **Utilidades nuevas en `index.css`**: `nombre` (Fredoka 600 en caja normal, para
+    nombres propios: juego, jugador, grupo — es lo que evita «CARCASSONNE»), `game-band`
+    (color del juego al 30 %/36 %, fondo del que va ganando) y `game-rule` (el filete de
+    5 px bajo la portada de las tarjetas). El color del juego sigue sin pintarse tal cual
+    en ningún sitio.
+  - `--color-muted` de `#5e707a` a `#4a5c66` (el viejo no llegaba a 4,5:1 sobre
+    `--color-surface-2`); en oscuro de `#8898a1` a `#93a4ad`. Nada de letra por debajo de
+    12 px salvo el «✓» decorativo del avatar registrado, que vive en un disco de 14 px.
+  - `Icon.tsx` **nuevo**: los emojis 🎲📋👥✨ de la barra de secciones eran los únicos
+    dibujos que no seguían el color de la sección activa. Ahora son SVG de trazo 2 px en
+    rejilla de 24 en `currentColor`.
+  - `Logo.tsx` redondeado sin volver a trazarlo: un contorno del mismo color con
+    `stroke-linejoin="round"` redondea los catorce vértices del meeple de una vez. La
+    animación de entrada no se tocó. **`public/favicon.svg` y los tres PNG
+    (`pwa-192`, `pwa-512`, `apple-touch-icon`) están regenerados** desde el SVG nuevo con
+    `sharp`, que ya estaba en `node_modules`.
+- **Repaso de interfaz (9 cambios, revisados uno a uno con Toni en el navegador)**.
+  Lo gordo es la **hoja de puntuación del revés**: `ScoreSheet.tsx`
   ya no apila una ficha larga por jugador, sino un bloque por **concepto** con un control
   por jugador dentro (`FieldGroup` → `FieldBlock`), que es como se cuenta en la mesa
   («¿cuántos pueblos tenéis?» y vuelta a la mesa). Encima, un **marcador fijo**
@@ -51,9 +83,8 @@ quedó a medias y lo siguiente que toca.
   `covers.generated.ts` + `public/covers/*.webp`: 368/393 juegos con portada
   real (364 BGG, 1 Wikipedia, 3 manuales); 25 juegos (Go, Mindbug, KeyForge,
   Villainous, Unmatched sueltos, EXIT, etc. — ver lista en el log del script) se
-  quedan con el icono por defecto, sin ficha en BGG o sin match claro. No se ha
-  commiteado nada de esto todavía. Todo en verde (141 tests, build OK) tras la
-  descarga.
+  quedan con el icono por defecto, sin ficha en BGG o sin match claro. Todo en verde
+  (141 tests, build OK) tras la descarga.
 - **Cambiar/añadir grupo también desde «Jugadores»**: `PlayersPage.tsx` repite ahora el
   control de grupo que ya vivía solo en `GroupPage.tsx` (`/grupo`), para no obligar a saltar
   de pestaña. Debajo del `PageHeader`: chips «Cambiar de grupo» (solo si `groups.length > 1`,
@@ -115,6 +146,13 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-19** — Claude (terminal): revisión de legibilidad y «aspecto juvenil»,
+  maquetada y **ya implementada**. Primero un lienzo de diez tableros (diagnóstico medido,
+  antes/después de Inicio, piezas sueltas con sus medidas, la app a tres intensidades);
+  Toni eligió una mezcla —chasis del nivel 1, marcador entre el 1 y el 2, tipografía del
+  3— y se implementó entera en la misma sesión. Ver «Estado actual» para el detalle. Todo
+  en verde (141 tests, build OK) y comprobado en el navegador sobre la compilación de
+  producción.
 - **2026-08-18** — Claude (terminal): repaso de interfaz a partir de una revisión visual de
   la app levantada en modo demostración (`VITE_SUPABASE_*` vacíos, puerto 5174, para no
   tocar los datos reales de Toni). Nueve cambios aceptados uno a uno, el mayor la hoja de

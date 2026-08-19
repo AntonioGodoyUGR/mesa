@@ -169,8 +169,8 @@ function SheetBanner({
       <span className="sheet-banner-veil" aria-hidden="true" />
 
       <span className="relative min-w-0 px-3.5 pb-2.5">
-        <span className="display block truncate text-xl leading-tight">{game.name}</span>
-        <span className="overline block text-[0.625rem] text-[var(--color-muted)]">
+        <span className="nombre block truncate text-xl leading-tight">{game.name}</span>
+        <span className="overline block text-xs text-[var(--color-muted)]">
           {game.scoreLabel} · {game.minPlayers}–{game.maxPlayers} jugadores
         </span>
       </span>
@@ -219,19 +219,19 @@ function Scoreboard({
 
         const inside = (
           <>
-            <span className="tnum shrink-0 text-xs font-bold text-[var(--color-muted)]">
+            <span className="scoreboard-rank">
               {position + 1}
             </span>
 
             <Avatar
               name={row.name}
               avatar={row.avatar}
-              size={26}
+              size={31}
               registered={row.registered}
             />
 
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[11px] font-semibold leading-tight">
+              <span className="scoreboard-name">
                 {isWinner && (
                   <span className="mr-0.5" aria-hidden="true">
                     🏆
@@ -239,11 +239,9 @@ function Scoreboard({
                 )}
                 {row.name}
               </span>
-              <span
-                className={`tnum block text-lg font-black leading-none ${leading ? 'game-ink' : ''}`}
-              >
+              <span className={`scoreboard-total ${leading ? 'game-ink' : ''}`}>
                 {total}
-                <span className="ml-1 text-[10px] font-semibold text-[var(--color-muted)]">
+                <span className="scoreboard-unit">
                   {game.scoreLabelShort}
                   {reachedTarget && ' ✓'}
                 </span>
@@ -252,7 +250,7 @@ function Scoreboard({
           </>
         )
 
-        const dressing = `scoreboard-pill ${leading ? 'game-tint' : ''} ${
+        const dressing = `scoreboard-pill ${leading ? 'game-band' : ''} ${
           isWinner ? 'hard-sm' : ''
         }`
 
@@ -359,7 +357,7 @@ function FieldBlock({
         </span>
         <span className="text-sm font-semibold">{field.label}</span>
         {field.hint && (
-          <span className="min-w-0 truncate text-[11px] text-[var(--color-muted)]">
+          <span className="min-w-0 truncate text-xs text-[var(--color-muted)]">
             {field.hint}
           </span>
         )}

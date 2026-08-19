@@ -62,7 +62,7 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
           <ol className="flex flex-col gap-1.5">
             {rules.setup.map((step, index) => (
               <li key={step} className="flex gap-2.5 text-sm">
-                <span className="game-wash tnum mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-border)] text-[11px] font-bold">
+                <span className="game-wash tnum mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-border)] text-xs font-bold">
                   {index + 1}
                 </span>
                 <span>{step}</span>

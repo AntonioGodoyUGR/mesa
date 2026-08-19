@@ -38,7 +38,7 @@ function Dice({ tool }: { tool: DiceTool }) {
   return (
     <article className="card flex items-center gap-3 p-3">
       <div className="min-w-0 flex-1">
-        <p className="overline text-[0.6875rem] text-[var(--color-muted)]">
+        <p className="overline text-xs text-[var(--color-muted)]">
           {describeTool(tool)}
         </p>
 
@@ -54,7 +54,7 @@ function Dice({ tool }: { tool: DiceTool }) {
               {values.map((value, index) => (
                 <span
                   key={index}
-                  className="text-3xl font-black leading-none"
+                  className="text-3xl font-extrabold leading-none"
                   // Un dado de seis se pinta con su glifo, que no se lee solo.
                   aria-label={`${value}`}
                 >
@@ -134,7 +134,7 @@ function Timer({ tool }: { tool: TimerTool }) {
     <article className="card flex flex-col gap-2 p-3">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="overline text-[0.6875rem] text-[var(--color-muted)]">
+          <p className="overline text-xs text-[var(--color-muted)]">
             {describeTool(tool)}
           </p>
           <p

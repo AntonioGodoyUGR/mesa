@@ -177,7 +177,7 @@ function Looks<T extends string>({
             aria-label={`${label}: ${option.label}`}
             aria-pressed={selected === option.id}
             onClick={() => onPick(option.id)}
-            className={`flex w-16 shrink-0 flex-col items-center gap-1 rounded-lg border-2 p-1.5 text-[10px] leading-tight ${
+            className={`flex w-16 shrink-0 flex-col items-center gap-1 rounded-lg border-2 p-1.5 text-xs leading-tight ${
               selected === option.id
                 ? 'hard-sm border-[var(--color-border)] bg-[var(--color-surface-2)] font-bold'
                 : 'border-transparent text-[var(--color-muted)]'

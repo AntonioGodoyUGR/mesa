@@ -78,7 +78,7 @@ export function PlayerProfilePage() {
           registered={!!player.user_id}
         />
         <div className="min-w-0 flex-1">
-          <h1 className="display truncate text-xl">
+          <h1 className="nombre truncate text-xl">
             {player.display_name}
           </h1>
           <p className="text-sm text-[var(--color-muted)]">
@@ -144,7 +144,7 @@ export function PlayerProfilePage() {
             Habéis coincidido en {head.together} partidas.
           </p>
           <div className="mt-3 flex items-center gap-3">
-            <span className="tnum text-2xl font-black">{head.yourWins}</span>
+            <span className="tnum text-2xl font-extrabold">{head.yourWins}</span>
             <span className="text-xs text-[var(--color-muted)]">tú</span>
             <span
               className="flex h-2 flex-1 overflow-hidden rounded-full bg-[var(--color-surface-2)]"
@@ -162,7 +162,7 @@ export function PlayerProfilePage() {
             <span className="text-xs text-[var(--color-muted)]">
               {player.display_name}
             </span>
-            <span className="tnum text-2xl font-black">{head.theirWins}</span>
+            <span className="tnum text-2xl font-extrabold">{head.theirWins}</span>
           </div>
           {head.otherWins > 0 && (
             <p className="mt-2 text-xs text-[var(--color-muted)]">

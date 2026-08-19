@@ -23,7 +23,7 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
       className="card group flex flex-col overflow-hidden transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:hard-lift active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
-      <span className="relative block aspect-square border-b-2 border-[var(--color-border)]">
+      <span className="game-rule relative block aspect-square">
         {cover.src ? (
           <img
             src={cover.src}
@@ -41,15 +41,15 @@ export function GameTile({ game, to }: { game: GameDefinition; to: string }) {
         )}
 
         {custom && (
-          <span className="overline hard-sm absolute right-1.5 top-1.5 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-accent)] px-2 py-0.5 text-[9px] text-[var(--color-accent-ink)]">
+          <span className="overline hard-sm absolute right-1.5 top-1.5 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-accent)] px-2 py-0.5 text-xs text-[var(--color-accent-ink)]">
             Vuestro
           </span>
         )}
       </span>
 
-      <span className="block px-2.5 pb-2.5 pt-2">
-        <span className="display block text-[0.8125rem] leading-tight">{game.name}</span>
-        <span className="overline tnum mt-0.5 block text-[0.625rem] text-[var(--color-muted)]">
+      <span className="game-tint block px-2.5 pb-2.5 pt-2">
+        <span className="nombre block truncate text-base leading-tight">{game.name}</span>
+        <span className="tnum mt-0.5 block text-[0.78125rem] font-semibold text-[var(--color-muted)]">
           {game.minPlayers}–{game.maxPlayers} jugadores · {game.scoreLabel}
         </span>
       </span>

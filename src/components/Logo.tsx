@@ -22,43 +22,59 @@ interface LogoProps {
   className?: string
 }
 
-/** El meeple que hace de «A». Un pelo más alto que la mayúscula, como un asta. */
+/**
+ * El meeple que hace de «A». Un pelo más alto que la mayúscula, como un asta.
+ *
+ * El contorno es el truco: el mismo trazo del relleno, con las esquinas en
+ * `round`, redondea de una vez los catorce vértices de la ficha y de paso le
+ * engorda los brazos y las piernas. Así el dibujo casa con la letra —que es
+ * redonda y de palo grueso— sin volver a trazar la silueta. Por eso el
+ * `viewBox` se abre 4 unidades por lado: el trazo sobresale y si no, se corta.
+ */
 function Meeple({ className = '' }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 64 64"
-      className={`h-[0.84em] w-[0.86em] shrink-0 text-[var(--color-accent)] ${className}`}
+      viewBox="-4 -4 72 72"
+      className={`h-[0.80em] w-[0.88em] shrink-0 text-[var(--color-accent)] ${className}`}
       fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="7"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <circle cx="32" cy="12" r="11.5" />
+      <circle cx="32" cy="12" r="9" />
       <path d="M21 23H43L47 30H63V45L47 42L57 64H39L32 52L25 64H7L17 42L1 45V30H17Z" />
     </svg>
   )
 }
 
-/** El dado que separa las dos palabras, escorado como si acabara de caer. */
+/**
+ * El dado que separa las dos palabras, escorado como si acabara de caer. Las
+ * esquinas van casi de píldora (`rx` 19 de 52) para acompañar a la letra, y los
+ * puntos crecen a la vez: en un cuadrado más redondo, tres puntos pequeños se
+ * quedaban perdidos en el centro.
+ */
 function Die({ className = '' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 64 64"
-      className={`mx-[0.16em] h-[0.74em] w-[0.74em] shrink-0 -rotate-6 ${className}`}
+      className={`mx-[0.14em] h-[0.72em] w-[0.72em] shrink-0 -rotate-6 ${className}`}
       aria-hidden="true"
     >
       <rect
-        x="5"
-        y="5"
-        width="54"
-        height="54"
-        rx="11"
+        x="6"
+        y="6"
+        width="52"
+        height="52"
+        rx="19"
         fill="none"
         stroke="currentColor"
-        strokeWidth="7"
+        strokeWidth="8"
       />
       <g fill="var(--color-accent)">
-        <circle cx="19" cy="45" r="6.5" />
-        <circle cx="32" cy="32" r="6.5" />
-        <circle cx="45" cy="19" r="6.5" />
+        <circle cx="19.5" cy="44.5" r="7" />
+        <circle cx="32" cy="32" r="7" />
+        <circle cx="44.5" cy="19.5" r="7" />
       </g>
     </svg>
   )

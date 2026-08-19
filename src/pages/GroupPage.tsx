@@ -52,7 +52,7 @@ export function GroupPage() {
       <section className="card flex items-center gap-4 p-4">
         <div className="min-w-0 flex-1">
           <p className="label">Código de invitación</p>
-          <p className="mt-1 text-2xl font-black tracking-[0.25em]">{group.join_code}</p>
+          <p className="mt-1 text-2xl font-extrabold tracking-[0.25em]">{group.join_code}</p>
           <p className="mt-1 text-xs text-[var(--color-muted)]">
             Quien tenga este código puede unirse al grupo.
           </p>
@@ -123,7 +123,7 @@ export function GroupPage() {
                 )}
               </span>
               {member.role === 'admin' && (
-                <span className="rounded-full bg-[var(--color-surface-2)] px-2 py-0.5 text-[11px] text-[var(--color-muted)]">
+                <span className="rounded-full bg-[var(--color-surface-2)] px-2 py-0.5 text-xs text-[var(--color-muted)]">
                   admin
                 </span>
               )}

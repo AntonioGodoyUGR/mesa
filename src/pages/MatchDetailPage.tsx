@@ -69,7 +69,7 @@ export function MatchDetailPage() {
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="game-ink display truncate text-xl">
+          <h1 className="game-ink nombre truncate text-xl">
             {game ? (
               // Desde una partida se llega a la ficha del juego, que es donde
               // están el resto de partidas y las estadísticas.
@@ -159,10 +159,10 @@ function PlayerBreakdown({
             {entry.player.display_name}
           </Link>
           <span className="text-right">
-            <span className="game-ink tnum block text-2xl font-black leading-none">
+            <span className="game-ink tnum block text-2xl font-extrabold leading-none">
               {entry.total}
             </span>
-            <span className="block text-[11px] text-[var(--color-muted)]">
+            <span className="block text-xs text-[var(--color-muted)]">
               {game?.scoreLabelShort ?? 'pts'}
             </span>
           </span>

@@ -115,7 +115,7 @@ export function GamePage() {
         <div className="flex items-center gap-3">
           <GameCover game={game} size={88} />
           <div className="min-w-0 flex-1">
-            <h1 className="game-ink display truncate text-xl">{game.name}</h1>
+            <h1 className="game-ink nombre truncate text-xl">{game.name}</h1>
             <p className="truncate text-sm text-[var(--color-muted)]">{game.tagline}</p>
           </div>
         </div>
@@ -228,7 +228,7 @@ export function GamePage() {
               <ul className="card divide-y divide-[var(--color-border)]">
                 {table.map((row, index) => (
                   <li key={row.player.id} className="flex items-center gap-3 px-4 py-3">
-                    <span className="tnum w-5 shrink-0 text-sm font-black text-[var(--color-muted)]">
+                    <span className="tnum w-5 shrink-0 text-sm font-extrabold text-[var(--color-muted)]">
                       {index + 1}
                     </span>
                     <Link

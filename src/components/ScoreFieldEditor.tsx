@@ -182,7 +182,7 @@ export function ScoreFieldEditor({
             disabled={keyLocked}
             onChange={(event) => set('key', event.target.value)}
           />
-          <span className="text-[11px] text-[var(--color-muted)]">
+          <span className="text-xs text-[var(--color-muted)]">
             {keyLocked
               ? 'No se puede cambiar: hay partidas apuntadas con esta clave.'
               : 'Con lo que se guardan las puntuaciones. Mejor no tocarla.'}

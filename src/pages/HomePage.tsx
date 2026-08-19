@@ -132,7 +132,7 @@ export function HomePage() {
                       ＋
                     </span>
                     <span className="text-sm font-semibold">Crear juego</span>
-                    <span className="text-[11px] text-[var(--color-muted)]">
+                    <span className="text-xs text-[var(--color-muted)]">
                       Con vuestras reglas
                     </span>
                   </Link>

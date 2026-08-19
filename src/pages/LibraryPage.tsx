@@ -69,10 +69,10 @@ export function LibraryPage() {
             <span className="block text-xl leading-none" aria-hidden="true">
               {info.icon}
             </span>
-            <span className="tnum mt-1 block text-2xl font-black leading-none">
+            <span className="tnum mt-1 block text-2xl font-extrabold leading-none">
               {info.id === 'owned' ? counts.owned : counts.wishlist}
             </span>
-            <span className="mt-1 block text-[11px] text-[var(--color-muted)]">
+            <span className="mt-1 block text-xs text-[var(--color-muted)]">
               {info.title}
             </span>
           </button>

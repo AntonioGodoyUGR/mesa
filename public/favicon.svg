@@ -1,7 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Table Tracker">
-  <rect x="3" y="3" width="58" height="58" rx="12" fill="#1461d1" stroke="#071219" stroke-width="4" />
-  <g fill="#d5f2ff" transform="translate(32 34) scale(0.66) translate(-32 -32)">
-    <circle cx="32" cy="12" r="11.5" />
+  <rect x="3" y="3" width="58" height="58" rx="18" fill="#1461d1" stroke="#071219" stroke-width="4" />
+  <g
+    fill="#d5f2ff"
+    stroke="#d5f2ff"
+    stroke-width="7"
+    stroke-linejoin="round"
+    transform="translate(32 34) scale(0.6) translate(-32 -32)"
+  >
+    <circle cx="32" cy="12" r="9" />
     <path d="M21 23H43L47 30H63V45L47 42L57 64H39L32 52L25 64H7L17 42L1 45V30H17Z" />
   </g>
 </svg>
