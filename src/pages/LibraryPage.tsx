@@ -13,7 +13,8 @@ import { GameFinder } from '../components/GameFinder'
 import { LibraryToggle } from '../components/LibraryToggle'
 import { ShowMore, usePaged } from '../components/ShowMore'
 import { ErrorNote, PageHeader, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useCatalogSearch, useGamesBySlugs } from '../context/GamesContext'
+import { useGroup } from '../context/GroupContext'
 import { useLibrary } from '../context/LibraryContext'
 import { LIBRARY_STATUSES, libraryGames, libraryStatusInfo } from '../lib/library'
 import type { GameDefinition } from '../games/types'
@@ -31,18 +32,33 @@ type Tab = LibraryStatus | 'all'
  * mismo gesto, y así no hay dos maneras distintas de hacer lo mismo.
  */
 export function LibraryPage() {
-  const { games, loading: gamesLoading } = useGames()
+  const { group } = useGroup()
   const { entries, counts, statusOf, setStatus, loading, saving, error } = useLibrary()
   const [tab, setTab] = useState<Tab>('owned')
   const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
 
+  // Lo marcado son slugs sueltos: se resuelven todos en una petición, no en cuarenta.
+  const slugs = useMemo(() => entries.map((entry) => entry.game_slug), [entries])
+  const { games: marked, loading: gamesLoading } = useGamesBySlugs(slugs)
+
+  // «Todos» ya no es una lista en memoria que se rebana: es el catálogo entero, que
+  // llega por tandas del servidor. Las otras dos pestañas sí caben en la mano, así que
+  // se siguen filtrando aquí.
+  const catalogue = useCatalogSearch(filters, {
+    groupId: group?.id,
+    enabled: tab === 'all',
+  })
+
   const listed = useMemo(
-    () => (tab === 'all' ? games : libraryGames(games, entries, tab)),
-    [tab, games, entries],
+    () => (tab === 'all' ? [] : libraryGames(marked, entries, tab)),
+    [tab, marked, entries],
   )
-  const shown = useMemo(() => filterGames(listed, filters), [listed, filters])
-  // La pestaña «Todos» es el catálogo entero: se enseña por tandas.
-  const page = usePaged(shown)
+  const found = useMemo(() => filterGames(listed, filters), [listed, filters])
+  const page = usePaged(found)
+
+  const shown = tab === 'all' ? catalogue.games : page.shown
+  const empty = tab === 'all' ? catalogue.games.length === 0 : found.length === 0
+  const busy = tab === 'all' ? catalogue.loading : loading || gamesLoading
 
   const tabs: { id: Tab; label: string; count: number | null }[] = [
     { id: 'owned', label: 'En casa', count: counts.owned },
@@ -99,19 +115,21 @@ export function LibraryPage() {
         onChange={setFilters}
         placeholder="Buscar en la biblioteca…"
         results={shown.length}
-        total={listed.length}
+        total={tab === 'all' ? undefined : listed.length}
+        more={tab === 'all' && catalogue.more}
       />
 
       <ErrorNote error={error} />
+      <ErrorNote error={catalogue.error} />
 
-      {(loading || gamesLoading) && <Spinner label="Cargando tu biblioteca…" />}
+      {busy && <Spinner label="Cargando tu biblioteca…" />}
 
-      {!loading && !gamesLoading && shown.length === 0 && (
+      {!busy && empty && (
         <EmptyLibrary tab={tab} filtered={hasActiveFilters(filters)} onSeeAll={() => setTab('all')} />
       )}
 
       <ul className="flex flex-col gap-2">
-        {page.shown.map((game) => (
+        {shown.map((game) => (
           <li key={game.slug}>
             <GameRow
               game={game}
@@ -123,7 +141,15 @@ export function LibraryPage() {
         ))}
       </ul>
 
-      <ShowMore hidden={page.hidden} onClick={page.showMore} />
+      {tab === 'all' ? (
+        <ShowMore
+          more={catalogue.more}
+          loading={catalogue.loadingMore}
+          onClick={catalogue.showMore}
+        />
+      ) : (
+        <ShowMore hidden={page.hidden} onClick={page.showMore} />
+      )}
 
       <p className="text-xs text-[var(--color-muted)]">
         La biblioteca es tuya, no del grupo: te acompaña a todos los grupos en los que

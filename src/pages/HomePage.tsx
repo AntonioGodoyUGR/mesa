@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { NO_FILTERS, filterGames, hasActiveFilters, type GameFilters } from '../games/filters'
+import { NO_FILTERS, hasActiveFilters, type GameFilters } from '../games/filters'
 import { GameFinder } from '../components/GameFinder'
 import { GameGrid } from '../components/GameGrid'
 import { GridSizePicker } from '../components/GridSizePicker'
 import { MatchCard } from '../components/MatchCard'
-import { ShowMore, usePaged } from '../components/ShowMore'
-import { Spinner } from '../components/ui'
+import { ShowMore } from '../components/ShowMore'
+import { ErrorNote, Spinner } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
-import { useGames } from '../context/GamesContext'
+import { useCatalogSearch, useGames, useMatchGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 import { getStoredTileSize, setStoredTileSize, type TileSize } from '../lib/tilesize'
@@ -32,7 +32,7 @@ import type { GameDefinition } from '../games/types'
 export function HomePage() {
   const { group, loading: groupLoading } = useGroup()
   const { user, loading: authLoading } = useAuth()
-  const { games, builtin, custom } = useGames()
+  const { custom, getGame } = useGames()
   const [filters, setFilters] = useState<GameFilters>(NO_FILTERS)
   const [tileSize, setTileSize] = useState<TileSize>(getStoredTileSize)
 
@@ -45,6 +45,10 @@ export function HomePage() {
   const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data])
   const recent = matches.slice(0, 5)
 
+  // Los juegos de las partidas, resueltos de una tacada: los de la cola larga del
+  // catálogo no viajan en la app, y una tarjeta sin el nombre del juego no vale nada.
+  useMatchGames(matches)
+
   // Con más de veinte juegos la rejilla entera no es útil: arriba van los que el
   // grupo juega de verdad, y el resto queda debajo o se busca por nombre.
   const favourites = useMemo(() => {
@@ -55,22 +59,27 @@ export function HomePage() {
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
-      .map(([slug]) => games.find((game) => game.slug === slug))
+      .map(([slug]) => getGame(slug))
       .filter((game): game is GameDefinition => !!game)
-  }, [matches, games])
+  }, [matches, getGame])
 
-  // Cada juego sale una sola vez: lo que ya está arriba no se repite abajo.
-  const favouriteSlugs = new Set(favourites.map((game) => game.slug))
-  const ours = custom.filter((game) => !favouriteSlugs.has(game.slug))
-  const rest = builtin.filter((game) => !favouriteSlugs.has(game.slug))
-
-  const found = useMemo(() => filterGames(games, filters), [games, filters])
   const searching = hasActiveFilters(filters)
 
-  // El catálogo son cientos de juegos: se enseñan por tandas, tanto los resultados de
-  // una búsqueda como la rejilla de abajo.
-  const results = usePaged(found)
-  const catalogue = usePaged(rest)
+  // El catálogo ya no cabe en la app: se pide al servidor por tandas, con los mismos
+  // criterios que pinta el buscador. Sin nada puesto, lo que llega es el catálogo por
+  // orden de popularidad, que es justo la rejilla de abajo.
+  const catalogue = useCatalogSearch(filters, { groupId: group?.id })
+
+  // Cada juego sale una sola vez: lo que ya está arriba no se repite abajo. Solo
+  // mientras no se busca — buscando, lo que vale es lo que se ha pedido.
+  const favouriteSlugs = new Set(favourites.map((game) => game.slug))
+  const ourSlugs = new Set(custom.map((game) => game.slug))
+  const ours = custom.filter((game) => !favouriteSlugs.has(game.slug))
+  const rest = searching
+    ? catalogue.games
+    : catalogue.games.filter(
+        (game) => !favouriteSlugs.has(game.slug) && !ourSlugs.has(game.slug),
+      )
 
   // El tamaño elegido se queda en este navegador, como el tema: es de quien mira,
   // no del grupo, y no tiene por qué viajar a la otra pantalla.
@@ -103,19 +112,27 @@ export function HomePage() {
           filters={filters}
           onChange={setFilters}
           placeholder="Buscar entre los juegos…"
-          results={found.length}
-          total={games.length}
+          results={catalogue.games.length}
+          more={catalogue.more}
         />
 
+        <ErrorNote error={catalogue.error} />
+
         {searching ? (
-          found.length > 0 ? (
+          catalogue.loading ? (
+            <Spinner label="Buscando…" />
+          ) : rest.length > 0 ? (
             <>
               <div className="flex items-center justify-between gap-3">
                 <h2 className="display text-base">Resultados</h2>
                 <GridSizePicker value={tileSize} onChange={chooseTileSize} />
               </div>
-              <GameGrid games={results.shown} to={tileLink} size={tileSize} />
-              <ShowMore hidden={results.hidden} onClick={results.showMore} />
+              <GameGrid games={rest} to={tileLink} size={tileSize} />
+              <ShowMore
+                more={catalogue.more}
+                loading={catalogue.loadingMore}
+                onClick={catalogue.showMore}
+              />
             </>
           ) : (
             <p className="card px-4 py-6 text-center text-sm text-[var(--color-muted)]">
@@ -163,8 +180,18 @@ export function HomePage() {
               </h2>
               <GridSizePicker value={tileSize} onChange={chooseTileSize} />
             </div>
-            <GameGrid games={catalogue.shown} to={tileLink} size={tileSize} />
-            <ShowMore hidden={catalogue.hidden} onClick={catalogue.showMore} />
+            {catalogue.loading ? (
+              <Spinner label="Cargando el catálogo…" />
+            ) : (
+              <>
+                <GameGrid games={rest} to={tileLink} size={tileSize} />
+                <ShowMore
+                  more={catalogue.more}
+                  loading={catalogue.loadingMore}
+                  onClick={catalogue.showMore}
+                />
+              </>
+            )}
           </>
         )}
       </section>

@@ -24,14 +24,37 @@ export function usePaged<T>(items: T[], batch: number = BATCH) {
   }
 }
 
-/** Botón de «ver más». No pinta nada cuando ya está la lista entera. */
-export function ShowMore({ hidden, onClick }: { hidden: number; onClick: () => void }) {
-  if (hidden === 0) return null
+/**
+ * Botón de «ver más». No pinta nada cuando ya está la lista entera.
+ *
+ * Sirve para las dos formas de paginar que hay ahora. Una lista que ya está en memoria
+ * sabe cuántos quedan y lo dice (`hidden`); el catálogo, que llega por tandas desde el
+ * servidor, solo sabe si queda algo más (`more`) — y contar el total sería una consulta
+ * aparte sobre decenas de miles de filas para poner un número entre paréntesis.
+ */
+export function ShowMore({
+  hidden,
+  more,
+  loading = false,
+  onClick,
+}: {
+  hidden?: number
+  more?: boolean
+  loading?: boolean
+  onClick: () => void
+}) {
+  const pending = more ?? (hidden ?? 0) > 0
+  if (!pending) return null
 
   return (
-    <button type="button" className="btn btn-ghost w-full" onClick={onClick}>
-      Ver más juegos
-      <span className="tnum text-[var(--color-muted)]">({hidden})</span>
+    <button
+      type="button"
+      className="btn btn-ghost w-full"
+      onClick={onClick}
+      disabled={loading}
+    >
+      {loading ? 'Cargando…' : 'Ver más juegos'}
+      {!loading && !!hidden && <span className="tnum text-[var(--color-muted)]">({hidden})</span>}
     </button>
   )
 }

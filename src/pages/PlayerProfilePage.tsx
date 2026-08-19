@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -13,7 +13,7 @@ import { Avatar } from '../components/Avatar'
 import { AvatarEditor } from '../components/AvatarEditor'
 import { LibraryShelf } from '../components/LibraryShelf'
 import { EmptyState, ErrorNote, Spinner, Stat } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGames, useGamesBySlugs, useMatchGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { useLibrary } from '../context/LibraryContext'
 import { api, queryKeys } from '../lib/api'
@@ -23,8 +23,12 @@ export function PlayerProfilePage() {
   const { id } = useParams()
   const queryClient = useQueryClient()
   const { group, players, me } = useGroup()
-  const { games, getGame } = useGames()
+  const { getGame } = useGames()
   const { entries } = useLibrary()
+
+  // Los slugs de la biblioteca, resueltos de una vez: son los que pinta el estante.
+  const librarySlugs = useMemo(() => entries.map((entry) => entry.game_slug), [entries])
+  const { games: marked } = useGamesBySlugs(librarySlugs)
 
   // Mientras se compone, el muñeco vive aquí; al guardar se convierte en la cadena
   // que va a `avatar_url` y el borrador desaparece.
@@ -35,6 +39,10 @@ export function PlayerProfilePage() {
     queryFn: () => api.listMatches(group!.id),
     enabled: !!group,
   })
+
+  // Aquí arriba y no abajo: los hooks no pueden quedar detrás de un `return`.
+  const played = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data])
+  useMatchGames(played)
 
   const player = players.find((candidate) => candidate.id === id)
 
@@ -172,7 +180,7 @@ export function PlayerProfilePage() {
         </section>
       )}
 
-      {isMe && <LibraryShelf games={games} entries={entries} />}
+      {isMe && <LibraryShelf games={marked} entries={entries} />}
 
       {stats.byGame.length > 0 && (
         <section className="flex flex-col gap-2">

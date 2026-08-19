@@ -23,14 +23,17 @@ export function GameFinder({
   placeholder = 'Buscar juego…',
   results,
   total,
+  more = false,
 }: {
   filters: GameFilters
   onChange: (next: GameFilters) => void
   placeholder?: string
-  /** Cuántos juegos han pasado el filtro. */
+  /** Cuántos juegos han pasado el filtro; con el catálogo, cuántos se han traído ya. */
   results: number
-  /** Cuántos había antes de filtrar. */
-  total: number
+  /** Cuántos había antes de filtrar, cuando se sabe: el catálogo entero ya no se cuenta. */
+  total?: number
+  /** Quedan más por traer del servidor, así que `results` no es el total. */
+  more?: boolean
 }) {
   const panelId = useId()
   const active = activeFilterCount(filters)
@@ -116,9 +119,7 @@ export function GameFinder({
 
       {(active > 0 || filters.query.trim().length > 0) && (
         <p className="flex items-center gap-2 text-xs text-[var(--color-muted)]">
-          <span className="tnum">
-            {results} de {total} juegos
-          </span>
+          <span className="tnum">{foundLabel(results, total, more)}</span>
           <button
             type="button"
             className="font-semibold text-[var(--color-brand)] underline"
@@ -130,6 +131,16 @@ export function GameFinder({
       )}
     </section>
   )
+}
+
+/**
+ * «7 de 393 juegos» cuando la lista entera está a mano; «más de 24 juegos» cuando llega
+ * por tandas y todavía queda. Prometer un total que no se ha contado sería mentir.
+ */
+function foundLabel(results: number, total: number | undefined, more: boolean): string {
+  if (results === 0) return 'Ningún juego'
+  if (total !== undefined) return `${results} de ${total} juegos`
+  return more ? `Más de ${results} juegos` : `${results} juegos`
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {

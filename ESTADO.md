@@ -18,7 +18,48 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
-- **Escalar el catálogo: FASE 2 HECHA (2026-08-19), pendiente de que Toni ejecute el SQL.**
+- **FASE 3 A MEDIAS (2026-08-19). Sin commitear en `main`: vive en la rama `fase-3-interfaz`.**
+  Compila (`npx tsc -b` limpio) pero **hay 2 tests en rojo**, y son justo los esperados:
+  `App.test.tsx` y `GuestMode.test.tsx` buscan un juego de la rejilla de Inicio con
+  `getByRole` nada más pintar, y el catálogo ahora **llega de forma asíncrona** (consulta al
+  servidor + 250 ms de espera del buscador). El arreglo es `findByRole`/`await`, no un
+  cambio de comportamiento. **Es lo primero que hay que hacer mañana.**
+  Lo que ya está escrito:
+  - **`src/context/GamesContext.tsx` reescrito.** Ya no expone ningún array completo
+    (`games` y `builtin` fuera). Expone `custom` (los del grupo, que siguen siendo pocos),
+    `getGame(slug)` —resuelve en tres pasos síncronos: juegos del grupo → los que viajan en
+    la app → los que ya se trajeron del servidor (`remember`)— y `loading`. La resolución
+    tiene que seguir siendo síncrona porque una tarjeta de partida pinta el nombre de su
+    juego sin poder esperar a nadie.
+  - **Hooks nuevos, en ese mismo fichero**: `useCatalogSearch` (paginación de servidor con
+    `useInfiniteQuery`, `staleTime` de 24 h, **debounce de 250 ms** en el texto y no en los
+    chips), `useGame` (uno, solo pide si no se puede resolver ya), `useGamesBySlugs` (varios
+    en UNA petición) y `useMatchGames` (los juegos de una lista de partidas, de una tacada).
+    ⚠️ `remember` solo apunta lo que no estaba y devuelve el mismo mapa si no hay nada nuevo:
+    sin esa comparación, cada respuesta dispara un render que vuelve a apuntar lo mismo.
+  - **`HomePage`**: la rejilla del catálogo y los resultados de búsqueda son ya la MISMA
+    consulta al servidor (sin criterios, `search_catalog` devuelve el catálogo por
+    popularidad). Lo que ya sale arriba —favoritos y juegos del grupo— se descuenta de la
+    rejilla de abajo en el cliente, solo cuando no se está buscando.
+  - **`LibraryPage`**: «En casa» y «Deseados» resuelven sus slugs con `useGamesBySlugs` y se
+    siguen filtrando en memoria (son listas cortas); «Todos» es el catálogo por tandas.
+  - **`PlayerProfilePage`**: `LibraryShelf` recibe los juegos resueltos por lotes.
+  - **`ShowMore`** admite las dos paginaciones: `hidden` (lista en memoria, se sabe cuántos
+    quedan) y `more` (servidor, solo se sabe si queda algo). **`GameFinder`**: `total` pasa a
+    ser opcional y aparece «Más de N juegos» cuando quedan tandas — contar el catálogo
+    entero sería una consulta aparte sobre decenas de miles de filas para un paréntesis.
+  Lo que **falta** de la fase 3, por orden:
+  1. Arreglar los 2 tests (`findByRole`).
+  2. Pasar a `useGame` las pantallas de un solo juego: `GamePage`, `NewMatchPage`,
+     `CustomGamePage`, `MatchDetailPage`. Y `useMatchGames` en `MatchesPage` y
+     `PlayersPage`. Hoy usan `getGame` y **funcionan igual**, porque el catálogo entero
+     sigue viajando en la app; sin esto, un juego de la cola larga (fase 4 en adelante)
+     saldría sin nombre.
+  3. En `main.tsx`, **sacar las búsquedas de catálogo del `localStorage` persistido**
+     (`shouldDehydrateQuery`): son respuestas grandes y rehacibles, y pueden llenar la cuota.
+  4. `npm run lint && npm test && npm run build`, actualizar este fichero y fusionar.
+  ⚠️ Nada de esto se sube a `main` hasta que esté verde: un push a `main` despliega.
+- **Escalar el catálogo: FASE 2 HECHA (2026-08-19). Toni ya ejecutó los dos ficheros en su editor.**
   La base de datos deja de ser una copia del catálogo y pasa a ser **el original**. Lo hecho:
   - **`supabase/schema.sql`**: columnas nuevas en `public.games` (`bgg_id`, `year`,
     `sheet_id`, `min_time`, `max_time`, `difficulty`, `popularity`, `cover_url`,
