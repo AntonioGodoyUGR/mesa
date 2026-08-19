@@ -107,8 +107,8 @@ describe('coherencia de las definiciones', () => {
 
     for (const [slug, cover] of Object.entries(COVERS)) {
       expect(slugs.has(slug), `${slug} no está en GAME_LIST`).toBe(true)
-      expect(cover.file.startsWith('/'), `${slug}: la ruta debe ser relativa`).toBe(false)
-      expect(enDisco.has(cover.file), `falta public/${cover.file}`).toBe(true)
+      expect(cover.startsWith('/'), `${slug}: la ruta debe ser relativa`).toBe(false)
+      expect(enDisco.has(cover), `falta public/${cover}`).toBe(true)
     }
   })
 

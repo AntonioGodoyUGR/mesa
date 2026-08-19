@@ -15,6 +15,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { GAME_LIST } from '../src/games/registry'
+import { CATALOG_RULES } from '../src/games/catalog.rules'
 import { COVERS } from '../src/games/covers'
 import type { GameDefinition, ScoreField } from '../src/games/types'
 
@@ -93,7 +94,19 @@ function forDatabase(game: GameDefinition): GameDefinition {
   return rest
 }
 
-const GAMES = GAME_LIST.map(forDatabase)
+/**
+ * Las chuletas del catálogo amplio ya no viajan en `GameDefinition`: `catalog.ts` dejó
+ * de engancharlas para no meter sus 76 kB en el arranque de la app, y la ficha las carga
+ * con `import()` (ver `src/games/rules.ts`). Aquí sí se enganchan: este script corre en
+ * Node, donde el peso da igual, y la base de datos guarda la definición íntegra.
+ */
+function withRules(game: GameDefinition): GameDefinition {
+  if (game.rules) return game
+  const rules = CATALOG_RULES[game.slug]
+  return rules ? { ...game, rules } : game
+}
+
+const GAMES = GAME_LIST.map(forDatabase).map(withRules)
 
 const gameRows = GAMES.map(gameRow).join(',\n')
 const fieldRows = GAMES.flatMap((game) =>

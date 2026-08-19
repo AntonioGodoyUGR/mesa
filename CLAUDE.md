@@ -60,8 +60,10 @@ Un push a `main` despliega a GitHub Pages sin más pasos
 - **Añadir un juego al catálogo amplio**: una línea en `src/games/catalog.data.ts`, y
   `npm run seed:games`.
 - **Ruta nueva**: registrarla en `src/App.tsx` bajo el guardián que corresponda
-  (`RequireAuth`, `RequireGroup`), con la URL en español como las demás.
+  (`RequireAuth`, `RequireGroup`), con la URL en español como las demás, y traer la página
+  con `lazy()` como las otras: cada pantalla viaja en su propio trozo de JavaScript.
 - **Ficheros generados, no se editan a mano**: `src/games/covers.generated.ts`,
+  `scripts/covers.sources.generated.ts`,
   `scripts/external-ids.generated.ts`, `supabase/seed_games.sql`.
 
 ## Base de datos

@@ -18,6 +18,51 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **Escalar el catálogo a decenas de miles: FASE 1 HECHA (2026-08-19)**. Sale de una
+  pregunta de Toni: cómo cargar los juegos si el catálogo crece a decenas de miles y la app
+  ha de aguantar miles de usuarios a la vez. El plan aprobado está en
+  `~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md` y **decidió Toni**:
+  ~20-30k juegos por ingesta previa de BGG filtrada por votos **y además** crecimiento bajo
+  demanda; portadas **enlazadas** a la CDN de BGG (nada de pagar almacenamiento); búsqueda
+  **toda al servidor**, aceptando perder la exploración del catálogo sin conexión.
+  El diagnóstico en una línea: la app no tiene un problema de catálogo, tiene el catálogo
+  **dentro** —~308 kB de los ~350 kB de código propio eran datos de juegos.
+  De la fase 1 (adelgazar el bundle, sin tocar la BD) queda hecho:
+  - **`catalog.rules.ts` fuera del arranque.** `catalog.ts` ya **no** engancha
+    `rules` al expandir: se queda en `undefined` a propósito, incluso para los juegos que sí
+    tienen chuleta. Las resuelve **`src/games/rules.ts`** (nuevo) con un `import()` a
+    demanda, con caché y sin descargas duplicadas (`loadRules`, `ruleSheetOf`,
+    `needsRuleLoad`). Quien lo usa es `RuleSheetView`, con un hook privado `useRuleSheet`:
+    así `GamePage` y `CustomGamePage` no se enteran. Son 67 kB (23 gzip) que ya no viajan
+    en la primera visita.
+  - **Portadas partidas en dos.** `src/games/covers.generated.ts` pasó de 83 kB a 19 kB:
+    ahora es `Record<slug, string>` a secas. `source` y `sourceUrl` son **procedencia, no
+    dato de ejecución**, y se han ido a **`scripts/covers.sources.generated.ts`** (nuevo,
+    67 kB), que no importa nadie de `src/`. `npm run covers` escribe los dos.
+  - **Una ruta, un trozo de JavaScript.** `React.lazy` para las once páginas en `App.tsx`;
+    la portada (`HomePage`) se queda estática porque es donde cae todo el mundo. El
+    `<Suspense>` va en `Layout`, alrededor del `<Outlet />`, para que la cabecera y la barra
+    de secciones no parpadeen.
+  - **Medido:** carga inicial de **262 → 205 kB gzip (−22 %)**, y 36 entradas de precache
+    en vez de 18. El «~120 kB» que estimaba el plan **no era alcanzable en esta fase**: lo
+    que queda son 74 gzip de React DOM (suelo irreducible), el cliente de Supabase, y ~20
+    gzip de `catalog.data.ts` + 24 de las definiciones a mano, que no se van hasta que el
+    catálogo se sirva desde Postgres (fases 2 y 3).
+  - ⚠️ **Efecto secundario que hay que conocer:** con las rutas diferidas, React deja a la
+    vista la **pantalla anterior** mientras llega el trozo nuevo (no enseña el `Suspense`).
+    Es mejor UX, pero rompió una prueba que buscaba un encabezado justo después de navegar
+    y encontraba el de la pantalla de la que venía. Al escribir pruebas de navegación hay
+    que anclar la espera a algo que **solo** exista en la pantalla de destino.
+  - ⚠️ **`supabase/seed_games.sql` regenerado, y no era inocuo.** La bitácora del 2026-08-16
+    daba por hecho que las chuletas del catálogo «no tocan BD»; es **falso**: `seed-games.ts`
+    serializa la `GameDefinition` entera en `definition` jsonb, chuleta incluida. Como nadie
+    volvió a lanzar `npm run seed:games` desde entonces, el fichero llevaba desde agosto con
+    24 chuletas cuando el TypeScript ya tenía 74. Ahora `seed-games.ts` engancha
+    `CATALOG_RULES` por su cuenta (`withRules`) —en Node el peso da igual— y el fichero sale
+    con las 74. Comprobado que **el único cambio** son esas 50 chuletas: quitándolas de los
+    dos ficheros, son idénticos byte a byte. **Ejecutarlo en Supabase es opcional hoy**,
+    porque la app lee las reglas del TypeScript y nadie mira `definition.rules`; la fase 2
+    las mueve a una columna `games.rules` propia.
 - **Cribado de portadas con personas (2026-08-19)**. Toni pidió quitar las carátulas
   «donde aparezcan personas» y, al aclararlo, fijó el criterio: **personas REALES**
   (fotografías); si son personajes dibujados de la propia carátula del juego, se quedan.
@@ -182,10 +227,12 @@ quedó a medias y lo siguiente que toca.
 - **Chuletas de reglas en el catálogo (oleada 1)**: los juegos de `catalog.data.ts` ya
   pueden llevar `RuleSheet` sin promocionarse a `definitions/`. Viven en
   `src/games/catalog.rules.ts` (`CATALOG_RULES: Record<slug, RuleSheet>`) y `catalog.ts`
-  las engancha en `expand()` con `rules: CATALOG_RULES[slug]`; el slug que no está en el
-  mapa se queda con «Sin chuleta de reglas». Hecha la **primera oleada: 50 juegos** (los
-  más jugados). Las reglas NO tocan BD: `seed-games.ts` solo cuenta chuletas para un log,
-  no las persiste, así que no hace falta `npm run seed:games`.
+  las engancha `seed-games.ts` (antes lo hacía `catalog.ts` en `expand()`; desde la fase 1
+  del escalado ya no, para no meterlas en el arranque). El slug que no está en el mapa se
+  queda con «Sin chuleta de reglas». Hecha la **primera oleada: 50 juegos** (los más
+  jugados). ⚠️ Aquí se dijo que «las reglas NO tocan BD» y **era falso**: `seed-games.ts`
+  serializa la definición entera en `definition` jsonb, chuleta incluida. **Una chuleta
+  nueva sí pide `npm run seed:games`.**
 - **Portada de login con logo animado + invitado**: `<Logo>` acepta ahora
   `animated?: boolean` (por defecto `false`; la cabecera sigue quieta). Con `animated`,
   cada palabra converge —mitad izquierda desde la izquierda, derecha desde la derecha— y
@@ -209,14 +256,33 @@ quedó a medias y lo siguiente que toca.
       filas de `catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] Bundle JS en un solo chunk de ~759 kB (216 gzip). Se podría code-splitear con
-      `import()` dinámico. No urge.
+- [ ] **Fases 2 a 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
+      aprobado por Toni). En orden: **(2)** columnas nuevas en `public.games` (`bgg_id`,
+      `year`, `sheet_id`, `popularity`, `search_text`, `cover_url`, `cover_thumb_url`,
+      `min_time`, `max_time`, `difficulty`, `rules`), `pg_trgm` + índice GIN y la RPC
+      `search_catalog` — **hay que darle a Toni el SQL exacto para su editor**, aquí no hay
+      acceso a Supabase—, más `searchCatalog`/`getGameBySlug`/`getGamesBySlugs` en
+      `TableTrackerApi`, **implementados en `api.supabase.ts` y en `api.demo.ts`**.
+      **(3)** `GamesContext` deja de exponer el array entero, paginación de servidor en
+      `HomePage`/`LibraryPage` y debounce de 250-300 ms en el buscador (hoy no hay, porque
+      busca en memoria; mañana sería una petición por tecla). **(4)** `scripts/ingest-bgg.ts`
+      con `SUPABASE_SERVICE_ROLE_KEY` y `<thumbnail>` en `bgg-api.ts`. **(5)** Edge Function
+      `resolve-game` + tabla `catalog_misses`.
+      ⚠️ Antes de fijar el tamaño de portada en la ingesta, **comprobar con `HEAD` sobre una
+      muestra** qué variante responde 200: las URLs de BGG son Thumbor **firmadas** y la firma
+      cubre la transformación, así que cambiar `__original` por `__imagepage` puede dar 403.
 - [ ] 6 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
       o funciones exportadas junto a componentes en `AuthContext`, `GamesContext`,
       `GroupContext`, `LibraryContext`, `GameCover`, `ShowMore`. Cosmético.
 
 ## Bitácora
 
+- **2026-08-19** — Claude (terminal): fase 1 del plan de escalado del catálogo (ver «Estado
+  actual»). Chuletas del catálogo fuera del arranque con `src/games/rules.ts`, portadas
+  partidas entre el mapa que viaja y la procedencia que se queda en `scripts/`, y una ruta
+  por trozo con `React.lazy`. Carga inicial de 262 a 205 kB gzip. De paso, destapado que
+  `seed_games.sql` llevaba desde el 16 de agosto sin las 50 chuletas nuevas: regenerado.
+  Todo en verde (146 tests, build OK).
 - **2026-08-19** — Claude (terminal): las portadas viejas seguían viéndose en el móvil.
   No era el repo (los webp desplegados son ya los de BGG) sino la caché `CacheFirst` del
   service worker, que servía las fotos de Wikimedia anteriores a `12422f0`. Caché

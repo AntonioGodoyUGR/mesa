@@ -45,11 +45,12 @@ import { fetchDetails } from './lib/wikidata'
 import { infoboxImages, pageImages } from './lib/wikipedia'
 import { EXTERNAL_IDS } from './external-ids.generated'
 import { COVER_OVERRIDES } from './covers.overrides'
-import { COVERS as PREVIOUS_COVERS } from '../src/games/covers.generated'
+import { COVER_SOURCES } from './covers.sources.generated'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const coversDir = resolve(here, '..', 'public', 'covers')
 const outputPath = resolve(here, '..', 'src', 'games', 'covers.generated.ts')
+const sourcesPath = resolve(here, 'covers.sources.generated.ts')
 
 const dryRun = process.argv.includes('--dry-run')
 const force = process.argv.includes('--force')
@@ -73,14 +74,12 @@ const found = new Map<string, Found>()
  * De dónde salía cada portada en la generación anterior. Sirve para no volver a
  * descargar lo que no ha cambiado.
  *
- * Se admite también el formato viejo del fichero (`slug: url`, cuando las portadas eran
- * enlaces a Wikipedia y no se descargaba nada) para que la primera generación con el
- * formato nuevo no tenga que rehacerlo todo.
+ * Sale de `covers.sources.generated.ts` y no del mapa que usa la app: allí solo queda la
+ * ruta del fichero, porque la procedencia no pinta nada en el navegador y sus URLs pesan
+ * más que todo lo demás junto.
  */
 const previous = new Map<string, string>(
-  Object.entries(PREVIOUS_COVERS as Record<string, string | { sourceUrl: string }>).map(
-    ([slug, cover]) => [slug, typeof cover === 'string' ? cover : cover.sourceUrl],
-  ),
+  Object.entries(COVER_SOURCES).map(([slug, origin]) => [slug, origin.url]),
 )
 
 function pending(): typeof games {
@@ -380,13 +379,8 @@ function quote(value: string): string {
   return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 }
 
-const entries = [...covers.entries()]
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(
-    ([slug, cover]) =>
-      `  '${slug}': { file: '${cover.file}', source: '${cover.source}',` +
-      ` sourceUrl: ${quote(cover.url)} },`,
-  )
+const stamp = new Date().toISOString().slice(0, 10)
+const entries = [...covers.entries()].sort(([a], [b]) => a.localeCompare(b))
 
 const file = `/**
  * GENERADO AUTOMÁTICAMENTE POR \`npm run covers\` — NO EDITAR A MANO.
@@ -399,26 +393,47 @@ const file = `/**
  *
  * Los juegos que no salen aquí no tienen portada conocida y se pintan con su icono.
  *
- * \`sourceUrl\` es de dónde se sacó la imagen. Las carátulas son de sus editoriales; se
- * guardan a ${SIZE} px con fines de identificación (ver la nota del README).
+ * Aquí solo está la ruta, y a propósito: este mapa viaja en el bundle y lo paga cada
+ * visita. De dónde salió cada imagen es procedencia, no dato de ejecución, y se guarda
+ * aparte en \`scripts/covers.sources.generated.ts\`. Las carátulas son de sus
+ * editoriales; se guardan a ${SIZE} px con fines de identificación (ver la nota del README).
  *
- * Última actualización: ${new Date().toISOString().slice(0, 10)}
+ * Última actualización: ${stamp}
  * Con portada: ${covers.size} de ${games.length}
  */
-export interface Cover {
-  /** Ruta relativa a la base del sitio: \`covers/azul.webp\`. */
-  file: string
-  source: ${(['manual', 'bgg', 'wikidata', 'wikipedia'] as const).map((source) => `'${source}'`).join(' | ')}
-  sourceUrl: string
+export const COVERS: Record<string, string> = {
+${entries.map(([slug, cover]) => `  '${slug}': '${cover.file}',`).join('\n')}
+}
+`
+
+const sources = `/**
+ * GENERADO AUTOMÁTICAMENTE POR \`npm run covers\` — NO EDITAR A MANO.
+ *
+ * De dónde salió la portada de cada juego. Vive en \`scripts/\` y no lo importa nadie de
+ * \`src/\` a propósito: es procedencia, no dato de ejecución, y si viajara en el bundle
+ * serían decenas de kB de URLs que ningún navegador llega a mirar. Lo que la app necesita
+ * —la ruta del fichero— está en \`src/games/covers.generated.ts\`.
+ *
+ * \`npm run covers\` lo lee para no volver a descargar lo que no ha cambiado, y lo
+ * reescribe al terminar.
+ *
+ * Última actualización: ${stamp}
+ */
+export type CoverSource = ${(['manual', 'bgg', 'wikidata', 'wikipedia'] as const).map((source) => `'${source}'`).join(' | ')}
+
+export interface CoverOrigin {
+  source: CoverSource
+  url: string
 }
 
-export const COVERS: Record<string, Cover> = {
-${entries.join('\n')}
+export const COVER_SOURCES: Record<string, CoverOrigin> = {
+${entries.map(([slug, cover]) => `  '${slug}': { source: '${cover.source}', url: ${quote(cover.url)} },`).join('\n')}
 }
 `
 
 if (!dryRun) {
   writeFileSync(outputPath, file, 'utf8')
+  writeFileSync(sourcesPath, sources, 'utf8')
 }
 
 console.log('\n─────────────────────────────────────────────')
@@ -435,5 +450,5 @@ if (missing.length > 0) {
 }
 
 if (!dryRun) {
-  console.log(`\n✓ src/games/covers.generated.ts — ${covers.size}/${games.length} con portada`)
+  console.log(`\n✓ src/games/covers.generated.ts + scripts/covers.sources.generated.ts — ${covers.size}/${games.length} con portada`)
 }

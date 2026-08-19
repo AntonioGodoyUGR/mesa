@@ -147,9 +147,14 @@ describe('App', () => {
 
     fireEvent.click(await screen.findByRole('link', { name: 'Tu ficha y tu avatar' }))
 
+    // Cada página llega en su propio trozo de JavaScript (`React.lazy` en `App.tsx`), y
+    // mientras llega, React deja a la vista la pantalla anterior. Si esa era /biblioteca,
+    // su título también es «Tu biblioteca»: hay que esperar a algo que solo esté aquí.
+    await screen.findByRole('heading', { name: 'Sus partidas' })
+
     // La demo trae Catán comprado y Wingspan deseado, cada uno en su estante.
     const shelf = within(
-      (await screen.findByRole('heading', { name: 'Tu biblioteca' })).closest('section')!,
+      screen.getByRole('heading', { name: 'Tu biblioteca' }).closest('section')!,
     )
     expect(shelf.getByText('Catán')).toBeVisible()
     expect(shelf.getByText('Wingspan')).toBeVisible()

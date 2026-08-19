@@ -13,7 +13,6 @@
 import { COVERS } from './covers.generated'
 
 export { COVERS } from './covers.generated'
-export type { Cover } from './covers.generated'
 
 /**
  * BASE_URL siempre acaba en barra ('/' o '/table-tracker/'), y el fichero nunca empieza por una.
@@ -25,5 +24,5 @@ const base = import.meta.env?.BASE_URL ?? '/'
 /** URL de la portada del juego, o `undefined` si no tiene (se pinta su icono). */
 export function coverUrl(slug: string): string | undefined {
   const cover = COVERS[slug]
-  return cover ? `${base}${cover.file}` : undefined
+  return cover ? `${base}${cover}` : undefined
 }

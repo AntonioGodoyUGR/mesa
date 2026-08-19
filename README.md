@@ -41,7 +41,8 @@ src/games/          El motor: la definición de cada juego y los cálculos
   curated.ts          La lista de esos juegos
   catalog.data.ts     El catálogo amplio: un juego por línea
   catalog.ts          Convierte esas líneas en GameDefinition completas
-  covers.generated.ts Portadas del catálogo (npm run covers) — no se edita a mano
+  covers.generated.ts Ruta de la portada de cada juego (npm run covers) — no se edita a mano
+  rules.ts            Carga las chuletas del catálogo con import() al abrir una ficha
   registry.ts         Junta las dos capas + computeTotal, rankPlayers, validateScores…
   custom.ts           Juegos del grupo: slugs c-, plantilla y validación
 src/lib/            Datos y estadísticas
@@ -268,5 +269,6 @@ enlaza la página del editor.
 Las imágenes de `public/covers/` son **propiedad de sus editoriales**. Se guardan recortadas a
 512 px y se usan únicamente para identificar cada juego dentro de una aplicación sin ánimo de
 lucro. La procedencia de cada una —fuente y URL original— queda anotada en
-`src/games/covers.generated.ts`, que genera `npm run covers`. Si eres el titular de alguna y
-prefieres que no aparezca, abre una incidencia y se retira.
+`scripts/covers.sources.generated.ts`, que genera `npm run covers` junto al mapa de rutas que
+usa la app. Si eres el titular de alguna y prefieres que no aparezca, abre una incidencia y se
+retira.

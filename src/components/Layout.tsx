@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useGroup } from '../context/GroupContext'
@@ -7,6 +7,7 @@ import { getStoredTheme, resolveTheme, setTheme } from '../lib/theme'
 import { Avatar } from './Avatar'
 import { Icon, type IconName } from './Icon'
 import { Logo } from './Logo'
+import { Spinner } from './ui'
 
 interface Tab {
   to: string
@@ -131,7 +132,9 @@ export function Layout() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-4 md:pb-10">
-        <Outlet />
+        <Suspense fallback={<Spinner />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )
