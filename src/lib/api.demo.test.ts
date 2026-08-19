@@ -42,3 +42,87 @@ describe('demoApi.getGameStats', () => {
     expect(stats.lastPlayedAt).toBeNull()
   })
 })
+
+/**
+ * `searchCatalog` y compañía son la contrapartida en memoria de `search_catalog`, la
+ * función de Postgres sobre la que busca la app cuando hay Supabase detrás. Aquí solo
+ * se puede probar la de mentira; lo que se comprueba es el contrato que las dos
+ * cumplen, porque la interfaz no distingue cuál tiene delante.
+ */
+describe('demoApi.searchCatalog', () => {
+  it('sin nada puesto devuelve la primera tanda del catálogo', async () => {
+    const games = await demoApi.searchCatalog({})
+
+    // Una tanda son 24, y los escritos a mano van primero.
+    expect(games).toHaveLength(24)
+    expect(games[0].slug).toBe('monopoly')
+  })
+
+  it('busca sin tildes y sin mayúsculas, como hará Postgres', async () => {
+    const games = await demoApi.searchCatalog({ query: 'CATAN' })
+
+    expect(games.map((game) => game.slug)).toContain('catan')
+  })
+
+  it('los filtros se cruzan igual que en la pantalla', async () => {
+    // Camel Up dura 20–30 min y admite de 3 a 8; Patchwork es corto pero solo para dos.
+    const games = await demoApi.searchCatalog({ durations: ['short'], players: 3 })
+    const slugs = games.map((game) => game.slug)
+
+    expect(slugs).toContain('camel-up')
+    expect(slugs).not.toContain('patchwork')
+  })
+
+  it('pagina por tandas y no repite juegos entre una y la siguiente', async () => {
+    const first = await demoApi.searchCatalog({ limit: 10 })
+    const second = await demoApi.searchCatalog({ limit: 10, offset: 10 })
+
+    expect(first).toHaveLength(10)
+    expect(second).toHaveLength(10)
+    const repetidos = first.filter((game) =>
+      second.some((other) => other.slug === game.slug),
+    )
+    expect(repetidos).toEqual([])
+  })
+
+  it('con slugs concretos manda la lista y el resto de criterios sobra', async () => {
+    const games = await demoApi.searchCatalog({
+      slugs: ['catan', 'wingspan'],
+      // Ninguno de los dos es corto: si el filtro contara, no saldría ninguno.
+      durations: ['short'],
+    })
+
+    expect(games.map((game) => game.slug).sort()).toEqual(['catan', 'wingspan'])
+  })
+})
+
+describe('demoApi.getGameBySlug', () => {
+  it('un juego escrito a mano llega con su chuleta', async () => {
+    const game = await demoApi.getGameBySlug('catan')
+
+    expect(game?.name).toBe('Catán')
+    expect(game?.rules?.setup?.length).toBeGreaterThan(0)
+  })
+
+  it('un juego del catálogo amplio también, aunque su chuleta viva aparte', async () => {
+    // En la app las chuletas del catálogo llegan con `import()`; quien pide un juego
+    // por su slug no tiene que saberlo.
+    const game = await demoApi.getGameBySlug('pandemic')
+
+    expect(game?.name).toBe('Pandemic')
+    expect(game?.rules?.turn?.length).toBeGreaterThan(0)
+  })
+
+  it('un slug que no existe devuelve null, no revienta', async () => {
+    expect(await demoApi.getGameBySlug('no-existe')).toBeNull()
+  })
+})
+
+describe('demoApi.getGamesBySlugs', () => {
+  it('resuelve varios de una vez y no pide nada con la lista vacía', async () => {
+    const games = await demoApi.getGamesBySlugs(['wingspan', 'azul'])
+
+    expect(games.map((game) => game.slug).sort()).toEqual(['azul', 'wingspan'])
+    expect(await demoApi.getGamesBySlugs([])).toEqual([])
+  })
+})

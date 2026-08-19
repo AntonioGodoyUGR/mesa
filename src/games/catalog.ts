@@ -16,7 +16,7 @@
  * la definición escrita a mano.
  */
 import { CATALOG_ROWS, type CatalogRow, type SheetId } from './catalog.data'
-import type { GameDefinition, GameTheme, ScoreField } from './types'
+import type { GameDefinition, GameDifficulty, GameTheme, ScoreField } from './types'
 
 /**
  * Las cuatro formas de apuntar el resultado de una partida.
@@ -192,9 +192,54 @@ function paletteFor(slug: string): GameTheme {
   return PALETTES[hash % PALETTES.length]
 }
 
-function expand(row: CatalogRow): GameDefinition {
-  const [slug, name, icon, tagline, minPlayers, maxPlayers, minTime, maxTime, difficulty, sheetId] =
-    row
+/**
+ * Una fila del catálogo tal y como la sirve `search_catalog` en Postgres.
+ *
+ * Es la misma información que una línea de `catalog.data.ts`, solo que llegada por red
+ * y en `snake_case`, como todo lo que viene de la base de datos. No trae la hoja de
+ * puntuación ni la chuleta: trae `sheet_id`, que es el nombre de una de las cinco
+ * hojas de aquí arriba. Con eso basta para reconstruir el juego entero sin bajárselo,
+ * y por eso una fila son ~150 B en vez de ~1,2 kB.
+ */
+export interface CatalogGameRow {
+  slug: string
+  name: string
+  icon: string
+  tagline: string | null
+  theme: GameTheme | null
+  min_players: number
+  max_players: number
+  min_time: number | null
+  max_time: number | null
+  difficulty: GameDifficulty | null
+  sheet_id: SheetId | null
+  image_url: string | null
+  cover_thumb_url: string | null
+  group_id: string | null
+  /** Solo los juegos de grupo la traen: no tienen hoja genérica que los reconstruya. */
+  definition: GameDefinition | null
+}
+
+/**
+ * Monta la `GameDefinition` a partir de los datos sueltos de un juego de catálogo.
+ *
+ * Lo comparten las dos puertas de entrada del catálogo amplio —la línea de
+ * `catalog.data.ts` y la fila de Postgres—, que traen exactamente lo mismo por
+ * caminos distintos. La regla de qué hoja y qué color le tocan a un juego vive aquí,
+ * en un solo sitio, y así los dos caminos no pueden divergir.
+ */
+function build(
+  slug: string,
+  name: string,
+  icon: string,
+  tagline: string,
+  theme: GameTheme,
+  minPlayers: number,
+  maxPlayers: number,
+  playTime: GameDefinition['playTime'],
+  difficulty: GameDifficulty | undefined,
+  sheetId: SheetId,
+): GameDefinition {
   const sheet = SHEETS[sheetId]
 
   return {
@@ -202,10 +247,10 @@ function expand(row: CatalogRow): GameDefinition {
     name,
     icon,
     tagline,
-    theme: paletteFor(slug),
+    theme,
     minPlayers,
     maxPlayers,
-    playTime: { min: minTime, max: maxTime },
+    playTime,
     difficulty,
     scoreLabel: sheet.scoreLabel,
     scoreLabelShort: sheet.scoreLabelShort,
@@ -214,6 +259,61 @@ function expand(row: CatalogRow): GameDefinition {
     // Las hojas se comparten entre juegos: se copian los campos para que nadie pueda
     // mutar la de todo el catálogo sin querer.
     fields: sheet.fields.map((field) => ({ ...field })),
+  }
+}
+
+function expand(row: CatalogRow): GameDefinition {
+  const [slug, name, icon, tagline, minPlayers, maxPlayers, minTime, maxTime, difficulty, sheetId] =
+    row
+  return build(
+    slug,
+    name,
+    icon,
+    tagline,
+    paletteFor(slug),
+    minPlayers,
+    maxPlayers,
+    { min: minTime, max: maxTime },
+    difficulty,
+    sheetId,
+  )
+}
+
+/**
+ * Lo mismo, pero desde una fila de la base de datos.
+ *
+ * Un juego de grupo llega con su definición entera y se devuelve tal cual: no usa
+ * ninguna de las cinco hojas, así que no hay nada que reconstruir. Un juego que
+ * llegue sin hoja y sin definición —una fila a medio sembrar— cae en `points`, que
+ * es «apunta los puntos y gana el que más tenga»: lo peor que puede pasar es que la
+ * hoja sea más sosa de lo que le tocaba, no que la ficha se rompa.
+ */
+export function expandCatalogRow(row: CatalogGameRow): GameDefinition {
+  if (row.definition) {
+    return {
+      ...row.definition,
+      slug: row.slug,
+      groupId: row.group_id ?? undefined,
+      imageUrl: row.image_url ?? row.definition.imageUrl,
+    }
+  }
+
+  return {
+    ...build(
+      row.slug,
+      row.name,
+      row.icon,
+      row.tagline ?? '',
+      row.theme ?? paletteFor(row.slug),
+      row.min_players,
+      row.max_players,
+      row.min_time !== null && row.max_time !== null
+        ? { min: row.min_time, max: row.max_time }
+        : undefined,
+      row.difficulty ?? undefined,
+      row.sheet_id ?? 'points',
+    ),
+    imageUrl: row.image_url ?? row.cover_thumb_url ?? undefined,
   }
 }
 

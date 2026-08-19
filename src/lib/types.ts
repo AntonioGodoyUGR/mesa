@@ -1,4 +1,5 @@
-import type { GameDefinition, ScoreValues } from '../games/types'
+import type { DurationBucket } from '../games/filters'
+import type { GameDefinition, GameDifficulty, ScoreValues } from '../games/types'
 
 export interface Profile {
   id: string
@@ -124,4 +125,27 @@ export interface LibraryEntry {
   game_slug: string
   status: LibraryStatus
   created_at: string
+}
+
+/**
+ * Qué se le pide al catálogo del servidor.
+ *
+ * Son los mismos criterios que `GameFilters` (`src/games/filters.ts`), que es lo que
+ * compone el buscador en pantalla, más la paginación y el grupo activo. Se separan
+ * porque `GameFilters` es estado de la interfaz —lo que hay marcado en los chips— y
+ * esto es una consulta: viaja por red y forma parte de la clave de caché.
+ *
+ * Con `slugs` puesto se ignora todo lo demás: es la vía para resolver de golpe los
+ * juegos de una biblioteca o de un historial de partidas, sin una petición por juego.
+ */
+export interface CatalogQuery {
+  query?: string
+  durations?: DurationBucket[]
+  difficulties?: GameDifficulty[]
+  players?: number | null
+  /** El grupo activo, para que sus juegos propios salgan junto al catálogo. */
+  groupId?: string | null
+  slugs?: string[]
+  limit?: number
+  offset?: number
 }

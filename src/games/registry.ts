@@ -1,9 +1,10 @@
 import type { GameDefinition, ScoreField, ScoreValues } from './types'
 import { CURATED_GAMES } from './curated'
-import { CATALOG_GAMES } from './catalog'
+import { CATALOG_GAMES, expandCatalogRow, type CatalogGameRow } from './catalog'
 import { coverUrl } from './covers'
 
 export { CURATED_GAMES } from './curated'
+export type { CatalogGameRow } from './catalog'
 
 const CURATED_SLUGS = new Set(CURATED_GAMES.map((game) => game.slug))
 
@@ -59,8 +60,32 @@ export function requireGame(slug: string): GameDefinition {
   return game
 }
 
-/** Sin tildes ni mayúsculas: buscar «azul» tiene que encontrar «Azul». */
-function searchable(text: string): string {
+/**
+ * Un juego que ha llegado del servidor, listo para pintarse.
+ *
+ * Es el punto de encuentro de las dos capas del catálogo. Si el juego ya viaja en el
+ * bundle manda esa copia: trae su portada descargada, su hoja escrita a mano y su
+ * chuleta, que es más de lo que cabe en una fila de lista. Si no —la cola larga, que
+ * es casi todo el catálogo cuando este llega a decenas de miles—, se reconstruye a
+ * partir de la fila con `expandCatalogRow`.
+ *
+ * Así el servidor puede mandar filas de 150 B sin que la interfaz note la diferencia:
+ * de aquí sale siempre una `GameDefinition` completa, venga de donde venga.
+ */
+export function catalogGame(row: CatalogGameRow): GameDefinition {
+  const builtin = row.group_id === null ? GAMES[row.slug] : undefined
+  return builtin ?? withCover(expandCatalogRow(row))
+}
+
+/**
+ * Sin tildes ni mayúsculas: buscar «azul» tiene que encontrar «Azul».
+ *
+ * Se exporta porque la misma regla está escrita en Postgres (`public.searchable`, en
+ * `supabase/schema.sql`), que es quien normaliza la columna `search_text` sobre la que
+ * busca el servidor. Si cambia una, cambia la otra: si dejaran de coincidir, un juego
+ * se encontraría en modo demostración y no en producción, o al revés.
+ */
+export function searchable(text: string): string {
   return text
     .normalize('NFD')
     .replace(/[^\p{Letter}\p{Number}\s]/gu, '')

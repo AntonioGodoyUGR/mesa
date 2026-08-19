@@ -129,6 +129,116 @@ alter table public.games add constraint games_custom_slug_prefix
 create index if not exists games_group_idx on public.games (group_id);
 
 -- -----------------------------------------------------------------------------
+-- El catálogo, listable sin bajarse la definición entera
+--
+-- Durante los primeros cientos de juegos esta tabla fue una COPIA: el catálogo
+-- viajaba dentro del bundle de JavaScript y aquí solo estaba para que
+-- `matches.game_slug` tuviera a qué apuntar. Con el catálogo creciendo a decenas
+-- de miles, la copia pasa a ser el original y la app busca aquí.
+--
+-- Estas columnas existen para poder LISTAR sin tocar `definition`, que es el 90 %
+-- del peso de la fila. Con ellas una fila de catálogo son ~150 B en vez de ~1,2 kB.
+--
+-- `sheet_id` es la pieza que lo hace posible: dice cuál de las cinco hojas
+-- genéricas usa el juego («se cuentan puntos», «gana quien menos suma»…). Esas
+-- cinco hojas son código, no datos, y ya viajan en el bundle, así que el cliente
+-- reconstruye la definición completa a partir de la fila ligera —lo hace
+-- `catalogGame()` en `src/games/registry.ts`—. Los juegos escritos a mano en
+-- `definitions/` no usan hoja genérica y llevan `sheet_id` a null: esos siguen
+-- viajando enteros en el bundle, son los 24 que hacen que la app arranque sin red.
+--
+-- `rules` tiene columna propia porque la chuleta son ~2,8 kB que solo hacen falta
+-- al abrir la ficha de un juego, nunca al listar. Hoy la chuleta está además dentro
+-- de `definition`, que sigue siendo la copia íntegra de la definición TypeScript;
+-- la columna es la que leerá la ingesta de BGG, que traerá reglas de juegos para los
+-- que no hay definición escrita. Al leer manda la columna y `definition` es el
+-- respaldo (ver `getGameBySlug` en `src/lib/api.supabase.ts`).
+-- -----------------------------------------------------------------------------
+alter table public.games add column if not exists bgg_id int;
+alter table public.games add column if not exists year int;
+alter table public.games add column if not exists sheet_id text;
+alter table public.games add column if not exists min_time int;
+alter table public.games add column if not exists max_time int;
+alter table public.games add column if not exists difficulty text;
+-- Cuánto se juega en el mundo real: es el orden por defecto del catálogo. La
+-- llena la ingesta de BGG a partir del número de votos; hasta entonces vale 0 y
+-- manda `sort_order`, que es el orden de siempre.
+alter table public.games add column if not exists popularity int not null default 0;
+-- Portada grande (ficha) y pequeña (rejilla). Pueden apuntar fuera: el catálogo
+-- amplio enlaza la imagen de BGG en vez de almacenarla. `image_url` se queda para
+-- las portadas propias (`public/covers/` y las que sube un grupo).
+alter table public.games add column if not exists cover_url text;
+alter table public.games add column if not exists cover_thumb_url text;
+alter table public.games add column if not exists rules jsonb;
+-- Nombre y lema ya normalizados —sin tildes, sin signos, en minúscula—, que es
+-- sobre lo que busca `search_catalog`. Lo escribe quien inserta: el seed y la
+-- ingesta con `searchable()` de TypeScript, `save_custom_game` con la gemela de
+-- aquí abajo. Ver la nota de esa función.
+alter table public.games add column if not exists search_text text not null default '';
+
+alter table public.games drop constraint if exists games_sheet_id_valid;
+alter table public.games add constraint games_sheet_id_valid
+  check (sheet_id is null or sheet_id in ('points', 'lowest', 'coop', 'teams', 'win'));
+
+alter table public.games drop constraint if exists games_difficulty_valid;
+alter table public.games add constraint games_difficulty_valid
+  check (difficulty is null or difficulty in ('easy', 'medium', 'hard'));
+
+-- -----------------------------------------------------------------------------
+-- Normalizar para buscar
+--
+-- Gemela de `searchable()` en `src/games/registry.ts`, y por el mismo motivo que
+-- `compute_match_total`: la regla vive en los dos sitios porque en los dos hace
+-- falta. En TypeScript la usa el modo demostración y la usa el seed al generar
+-- `search_text`; aquí la usa `save_custom_game`, que corre en el servidor y no
+-- puede llamar a la de TypeScript. **Si cambia una, cambia la otra.**
+--
+-- Descomponer a NFD separa la tilde de su letra, y quitar todo lo que no sea
+-- letra, número o espacio se lleva por delante la tilde suelta: «Catán» → «catan».
+-- Así no hace falta la extensión `unaccent`.
+--
+-- No se usa en ningún índice ni columna generada a propósito: si lo estuviera,
+-- reemplazarla dejaría los datos calculados con la versión vieja sin avisar.
+-- -----------------------------------------------------------------------------
+create or replace function public.searchable(p_text text)
+returns text
+language sql immutable strict as $$
+  select lower(regexp_replace(normalize(p_text, NFD), '[^[:alnum:][:space:]]', '', 'g'));
+$$;
+
+-- Trigramas: es lo que convierte un `like '%cata%'` de barrido completo en una
+-- consulta con índice. Sin esto, buscar sobre decenas de miles de filas recorre
+-- la tabla entera en cada tecla.
+create extension if not exists pg_trgm;
+
+create index if not exists games_search_trgm
+  on public.games using gin (search_text gin_trgm_ops);
+
+-- El orden por defecto del catálogo, sin búsqueda de por medio: lo más jugado
+-- primero. Parcial sobre el catálogo oficial, que es el que se pagina.
+create index if not exists games_catalog_order_idx
+  on public.games (popularity desc, sort_order)
+  where group_id is null;
+
+-- Rellena las columnas nuevas de las filas que ya estaban, leyéndolas de la
+-- `definition` que sí las traía. Al catálogo oficial lo pisará el seed de todos
+-- modos —y es el único que puede poner `sheet_id`—, pero a los juegos que haya
+-- creado un grupo no los toca nadie más: sin esto se quedarían con `search_text`
+-- vacío y no aparecerían nunca al buscar. Solo actúa donde falta el dato, así
+-- que volver a ejecutar este fichero no deshace nada.
+update public.games set
+  min_time = coalesce(min_time, nullif(definition -> 'playTime' ->> 'min', '')::int),
+  max_time = coalesce(max_time, nullif(definition -> 'playTime' ->> 'max', '')::int),
+  difficulty = coalesce(difficulty, nullif(definition ->> 'difficulty', '')),
+  rules = coalesce(rules, definition -> 'rules'),
+  cover_url = coalesce(cover_url, image_url),
+  search_text = case
+    when search_text = ''
+      then public.searchable(name || ' ' || coalesce(tagline, ''))
+    else search_text
+  end;
+
+-- -----------------------------------------------------------------------------
 -- Biblioteca personal: qué juegos ha comprado cada uno y cuáles desea.
 --
 -- Cuelga de la CUENTA y no del grupo a propósito: la caja está en tu estantería
@@ -575,7 +685,8 @@ begin
   insert into public.games (
     slug, name, icon, tagline, theme, min_players, max_players,
     score_label, score_label_short, total_mode, winner_rule, target_score,
-    sort_order, definition, group_id, created_by, image_url
+    sort_order, definition, group_id, created_by, image_url,
+    min_time, max_time, difficulty, rules, search_text
   ) values (
     v_slug,
     v_name,
@@ -593,7 +704,15 @@ begin
     p_definition,
     p_group_id,
     auth.uid(),
-    nullif(p_definition ->> 'imageUrl', '')
+    nullif(p_definition ->> 'imageUrl', ''),
+    -- Las columnas de lista: sin ellas el juego de un grupo no saldría al filtrar
+    -- por duración ni por dificultad en `search_catalog`. `sheet_id` se queda a
+    -- null porque un juego propio no usa hoja genérica: viaja con su definición.
+    nullif(p_definition -> 'playTime' ->> 'min', '')::int,
+    nullif(p_definition -> 'playTime' ->> 'max', '')::int,
+    nullif(p_definition ->> 'difficulty', ''),
+    p_definition -> 'rules',
+    public.searchable(v_name || ' ' || coalesce(p_definition ->> 'tagline', ''))
   )
   on conflict (slug) do update set
     name = excluded.name,
@@ -609,6 +728,11 @@ begin
     target_score = excluded.target_score,
     definition = excluded.definition,
     image_url = excluded.image_url,
+    min_time = excluded.min_time,
+    max_time = excluded.max_time,
+    difficulty = excluded.difficulty,
+    rules = excluded.rules,
+    search_text = excluded.search_text,
     updated_at = now();
 
   insert into public.game_score_fields (
@@ -748,6 +872,106 @@ $$;
 
 -- Sin esto un visitante sin cuenta no podría abrir la ficha de un juego.
 grant execute on function public.game_global_stats(text) to anon, authenticated;
+
+-- -----------------------------------------------------------------------------
+-- Buscar en el catálogo, del lado del servidor
+--
+-- Hasta ahora el buscador filtraba un array en memoria (`filterGames` en
+-- `src/games/filters.ts`), que es lo correcto con cuatrocientos juegos dentro del
+-- bundle y deja de serlo con decenas de miles. Esta función es la contrapartida
+-- de aquella, criterio por criterio, y se prueba que coinciden en el modo
+-- demostración: el mismo buscador, los mismos filtros, los mismos resultados.
+--
+-- Devuelve SOLO columnas de lista. Nunca `definition` de un juego del catálogo
+-- —el cliente la reconstruye con `sheet_id`— ni `rules`, que se pide aparte al
+-- abrir la ficha. La excepción es el juego de un grupo: ese no tiene hoja
+-- genérica que lo reconstruya, así que viaja entero. Son unas decenas por grupo.
+--
+-- `security invoker` a propósito: la política `games_select` ya recorta lo que
+-- puede ver cada uno —el catálogo oficial lo lee hasta quien no tiene cuenta— y
+-- así no hay que replicar esa regla aquí.
+--
+-- El filtro es `like '%…%'`, exactamente el `includes` que hacía el buscador de
+-- TypeScript; el índice de trigramas lo resuelve sin recorrer la tabla. La
+-- ordenación sí usa `similarity`, para que «cata» ponga «Catán» por delante de
+-- «Escape from the Aztec Catacombs».
+-- -----------------------------------------------------------------------------
+create or replace function public.search_catalog(
+  p_query text default '',
+  p_limit int default 24,
+  p_offset int default 0,
+  p_players int default null,
+  -- Tramos de duración: 'short' | 'medium' | 'long'. Suman entre sí (se piden con «o»).
+  p_durations text[] default null,
+  p_difficulties text[] default null,
+  -- El grupo activo, para que sus juegos propios salgan junto al catálogo.
+  p_group_id uuid default null,
+  -- Slugs concretos, para resolver de golpe los juegos de una biblioteca o de un
+  -- historial de partidas. Con esto puesto, el resto de filtros se ignora.
+  p_slugs text[] default null
+)
+returns table (
+  slug text,
+  name text,
+  icon text,
+  tagline text,
+  theme jsonb,
+  min_players int,
+  max_players int,
+  min_time int,
+  max_time int,
+  difficulty text,
+  sheet_id text,
+  image_url text,
+  cover_thumb_url text,
+  group_id uuid,
+  definition jsonb
+)
+language sql stable set search_path = public as $$
+  with needle as (
+    select case when p_slugs is null then public.searchable(coalesce(p_query, '')) else '' end as q
+  )
+  select
+    g.slug, g.name, g.icon, g.tagline, g.theme,
+    g.min_players, g.max_players, g.min_time, g.max_time,
+    g.difficulty, g.sheet_id, g.image_url, g.cover_thumb_url, g.group_id,
+    case when g.group_id is null then null else g.definition end
+  from public.games g, needle n
+  where (g.group_id is null or g.group_id = p_group_id)
+    and (p_slugs is null or g.slug = any (p_slugs))
+    and (n.q = '' or g.search_text like '%' || n.q || '%')
+    and (p_players is null or p_players between g.min_players and g.max_players)
+    -- Un juego sin dificultad o sin duración declaradas desaparece en cuanto se
+    -- filtra por ese dato: no se puede afirmar que dure media hora si nadie lo ha
+    -- dicho. Es lo mismo que hace `filterGames`.
+    and (
+      p_difficulties is null or cardinality(p_difficulties) = 0
+      or g.difficulty = any (p_difficulties)
+    )
+    and (
+      p_durations is null or cardinality(p_durations) = 0
+      or (
+        g.min_time is not null and g.max_time is not null and (
+          ('short' = any (p_durations) and g.min_time <= 30)
+          or ('medium' = any (p_durations) and g.max_time > 30 and g.min_time <= 60)
+          or ('long' = any (p_durations) and g.max_time > 60)
+        )
+      )
+    )
+  order by
+    case when n.q = '' then 0 else similarity(g.search_text, n.q) end desc,
+    g.popularity desc,
+    g.sort_order,
+    g.name
+  -- El tope lo pone el servidor: una petición no puede pedirse el catálogo entero.
+  limit greatest(1, least(coalesce(p_limit, 24), 200))
+  offset greatest(0, coalesce(p_offset, 0));
+$$;
+
+-- Consultar el catálogo es público, igual que la ficha de un juego.
+grant execute on function public.search_catalog(
+  text, int, int, int, text[], text[], uuid, text[]
+) to anon, authenticated;
 
 -- =============================================================================
 -- Row Level Security — todo se recorta por pertenencia al grupo

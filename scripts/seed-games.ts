@@ -14,10 +14,25 @@
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { GAME_LIST } from '../src/games/registry'
+import { GAME_LIST, searchable } from '../src/games/registry'
 import { CATALOG_RULES } from '../src/games/catalog.rules'
+import { CATALOG_ROWS } from '../src/games/catalog.data'
 import { COVERS } from '../src/games/covers'
+import type { SheetId } from '../src/games/catalog.data'
 import type { GameDefinition, ScoreField } from '../src/games/types'
+
+/**
+ * Qué hoja genérica usa cada juego del catálogo amplio.
+ *
+ * `catalog.ts` la consume al expandir y luego la tira: a la app no le hace falta,
+ * porque el juego ya viaja expandido. A la base de datos sí, y mucho: `sheet_id` es
+ * lo que permite servir una fila de ~150 B en vez de la definición entera, porque el
+ * cliente reconstruye el resto con la hoja que ya tiene en el bundle. Los juegos
+ * escritos a mano no salen aquí: su hoja es suya y no se parece a ninguna otra.
+ */
+const SHEET_BY_SLUG = new Map<string, SheetId>(
+  CATALOG_ROWS.map((row) => [row[0], row[9]]),
+)
 
 const here = dirname(fileURLToPath(import.meta.url))
 const outputPath = resolve(here, '..', 'supabase', 'seed_games.sql')
@@ -58,6 +73,16 @@ function gameRow(game: GameDefinition, index: number): string {
     num(game.targetScore),
     num(index),
     json(game),
+    // Las columnas de lista: con ellas el catálogo se puede buscar y paginar en
+    // Postgres sin leer `definition`, que es el 90 % del peso de la fila.
+    text(SHEET_BY_SLUG.get(game.slug)),
+    num(game.playTime?.min),
+    num(game.playTime?.max),
+    text(game.difficulty),
+    game.rules ? json(game.rules) : 'null',
+    // La misma normalización que hará el buscador. La escribe TypeScript porque es
+    // aquí donde vive la regla; Postgres tiene su gemela para lo que inserta él.
+    text(searchable(`${game.name} ${game.tagline}`)),
   ].join(', ')})`
 }
 
@@ -124,7 +149,8 @@ const sql = `-- ================================================================
 insert into public.games (
   slug, name, icon, tagline, image_url, theme, min_players, max_players,
   score_label, score_label_short, total_mode, winner_rule, target_score,
-  sort_order, definition
+  sort_order, definition,
+  sheet_id, min_time, max_time, difficulty, rules, search_text
 ) values
 ${gameRows}
 on conflict (slug) do update set
@@ -142,6 +168,12 @@ on conflict (slug) do update set
   target_score = excluded.target_score,
   sort_order = excluded.sort_order,
   definition = excluded.definition,
+  sheet_id = excluded.sheet_id,
+  min_time = excluded.min_time,
+  max_time = excluded.max_time,
+  difficulty = excluded.difficulty,
+  rules = excluded.rules,
+  search_text = excluded.search_text,
   updated_at = now();
 
 insert into public.game_score_fields (

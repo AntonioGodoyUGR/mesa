@@ -1,4 +1,12 @@
-import { computeTotal, emptyScores, getGame, requireGame } from '../games/registry'
+import {
+  BUILTIN_GAMES,
+  computeTotal,
+  emptyScores,
+  getGame,
+  requireGame,
+} from '../games/registry'
+import { CATALOG_PAGE, filterGames } from '../games/filters'
+import { loadRules } from '../games/rules'
 import { customSlug } from '../games/custom'
 import type { GameDefinition, ScoreValues } from '../games/types'
 import type { TableTrackerApi } from './api'
@@ -395,6 +403,48 @@ export const demoApi: TableTrackerApi = {
 
   async listGames(groupId) {
     return delay(db().customGames.filter((game) => game.groupId === groupId))
+  },
+
+  async searchCatalog(query) {
+    // La contrapartida en memoria de `search_catalog`. Filtra con `filterGames`, que
+    // es exactamente lo que hacía el buscador cuando el catálogo entero vivía dentro
+    // de la app: los mismos criterios que ahora escribe Postgres, escritos una vez.
+    const pool = [
+      ...BUILTIN_GAMES,
+      ...(query.groupId ? db().customGames.filter((g) => g.groupId === query.groupId) : []),
+    ]
+
+    // Con slugs puestos manda la lista y el resto de criterios sobra, igual que allí.
+    const found = query.slugs
+      ? pool.filter((game) => query.slugs!.includes(game.slug))
+      : filterGames(pool, {
+          query: query.query ?? '',
+          durations: query.durations ?? [],
+          difficulties: query.difficulties ?? [],
+          players: query.players ?? null,
+        })
+
+    const offset = query.offset ?? 0
+    return delay(found.slice(offset, offset + (query.limit ?? CATALOG_PAGE)))
+  },
+
+  async getGameBySlug(slug) {
+    const custom = db().customGames.find((game) => game.slug === slug)
+    if (custom) return delay(custom)
+
+    const builtin = getGame(slug)
+    if (!builtin) return delay(null)
+
+    // En Supabase la chuleta es una columna de la fila; aquí está en `catalog.rules`,
+    // que se carga a demanda. En los dos casos, quien pide un juego por su slug lo
+    // recibe con reglas: es la pantalla donde se leen.
+    const rules = builtin.rules ?? (await loadRules())[slug]
+    return delay(rules ? { ...builtin, rules } : builtin)
+  },
+
+  async getGamesBySlugs(slugs) {
+    if (slugs.length === 0) return []
+    return demoApi.searchCatalog({ slugs, limit: slugs.length })
   },
 
   async saveCustomGame(input) {

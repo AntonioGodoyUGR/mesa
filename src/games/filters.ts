@@ -45,6 +45,15 @@ export interface GameFilters {
   players: number | null
 }
 
+/**
+ * Cuántos juegos trae cada tanda del catálogo.
+ *
+ * Es el mismo número que enseña `usePaged` en pantalla, y ahora también lo que se le
+ * pide al servidor: una tanda son 24 filas de ~150 B, unos 4 kB. Vive aquí y no en el
+ * componente porque a partir de ahora lo usan los dos lados, el que pinta y el que pide.
+ */
+export const CATALOG_PAGE = 24
+
 export const NO_FILTERS: GameFilters = {
   query: '',
   durations: [],

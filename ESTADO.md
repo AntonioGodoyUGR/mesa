@@ -18,6 +18,51 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **Escalar el catálogo: FASE 2 HECHA (2026-08-19), pendiente de que Toni ejecute el SQL.**
+  La base de datos deja de ser una copia del catálogo y pasa a ser **el original**. Lo hecho:
+  - **`supabase/schema.sql`**: columnas nuevas en `public.games` (`bgg_id`, `year`,
+    `sheet_id`, `min_time`, `max_time`, `difficulty`, `popularity`, `cover_url`,
+    `cover_thumb_url`, `rules`, `search_text`), sus dos `check`, la extensión `pg_trgm`, el
+    índice GIN `games_search_trgm` sobre `search_text` y `games_catalog_order_idx` para el
+    orden por popularidad. Todo `if not exists`: el fichero **sigue siendo idempotente** y se
+    puede volver a lanzar entero.
+  - **`public.searchable(text)` en SQL es gemela de la de `registry.ts`** (sin tildes, sin
+    signos, minúsculas). Misma situación que `compute_match_total`: la regla está a propósito
+    en los dos sitios y **si cambia una, cambia la otra**. No se usa en ningún índice ni
+    columna generada, para que `create or replace` no se quede bloqueado por dependencias.
+  - **RPC `search_catalog`**: `stable`, `security invoker` (la policy `games_select` ya deja
+    leer a `anon` lo que tenga `group_id is null`), concedida a `anon` y `authenticated`.
+    Filtra con `like '%…%'` sobre `search_text` —exactamente el mismo `includes` de antes,
+    para que buscar dé lo mismo en servidor y en demostración— y usa `similarity()` **solo
+    para ordenar**. Acepta los mismos criterios que la pantalla (texto, jugadores, tramos de
+    duración, dificultad) más `p_group_id` y `p_slugs`, y devuelve `definition` **solo** para
+    los juegos de grupo: los del catálogo se reconstruyen en el cliente.
+  - **`catalogGame(row)` (`registry.ts`) es la costura.** Una fila de ~150 B vuelve a ser un
+    `GameDefinition` completo porque las 5 hojas genéricas y las 16 paletas son **código** y
+    ya viajan en el bundle (`expandCatalogRow` en `catalog.ts`). Si el juego está entre los
+    que viajan en la app, manda el del bundle. Ningún componente se entera de dónde salió.
+  - **`TableTrackerApi` con tres métodos nuevos** —`searchCatalog`, `getGameBySlug`,
+    `getGamesBySlugs`— **implementados en las dos** (`api.supabase.ts` habla con la RPC;
+    `api.demo.ts` filtra en memoria con `filterGames` sobre `BUILTIN_GAMES` + los juegos del
+    grupo, y resuelve la chuleta con `loadRules()`). Claves nuevas en `queryKeys`: `catalog`
+    (la consulta **es** la clave, para que miles de personas buscando lo mismo compartan
+    respuesta), `game` y `gamesBySlugs` (con los slugs ordenados). `CatalogQuery` vive en
+    `lib/types.ts`; `CATALOG_PAGE = 24` en `games/filters.ts` y no en `ShowMore.tsx`, porque
+    ahí lo importaría `api.supabase.ts` y se cerraría un ciclo de módulos real.
+  - **`save_custom_game` también rellena** `min_time`, `max_time`, `difficulty`, `rules` y
+    `search_text`: sin eso, un juego creado por un grupo se guardaba pero no aparecía al
+    buscar. Y `schema.sql` trae un **relleno idempotente** que arregla las filas que ya
+    existan.
+  - **`npm run seed:games` regenerado** (560 → 723 kB): siembra las seis columnas nuevas.
+    ⚠️ **`sheet_id` no se puede deducir de `definition`**, así que volver a pasar el seed no
+    es opcional si se quiere que el catálogo amplio se reconstruya bien desde la BD.
+  - ⚠️ **Lo que TIENE que ejecutar Toni en su SQL Editor, en este orden:** `supabase/schema.sql`
+    entero y después `supabase/seed_games.sql` entero. Hasta entonces la app sigue funcionando
+    igual, porque la fase 3 (que es la que empieza a *leer* de ahí) aún no está.
+    Para comprobar que el índice entra: `explain analyze select * from search_catalog('cata', 24, 0);`
+    no debe hacer `seq scan` — medido con la tabla ya poblada, no con 393 filas.
+  - Nada de esto cambia todavía ninguna pantalla: la interfaz sigue leyendo del bundle hasta
+    la fase 3.
 - **Escalar el catálogo a decenas de miles: FASE 1 HECHA (2026-08-19)**. Sale de una
   pregunta de Toni: cómo cargar los juegos si el catálogo crece a decenas de miles y la app
   ha de aguantar miles de usuarios a la vez. El plan aprobado está en
@@ -256,13 +301,8 @@ quedó a medias y lo siguiente que toca.
       filas de `catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Fases 2 a 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
-      aprobado por Toni). En orden: **(2)** columnas nuevas en `public.games` (`bgg_id`,
-      `year`, `sheet_id`, `popularity`, `search_text`, `cover_url`, `cover_thumb_url`,
-      `min_time`, `max_time`, `difficulty`, `rules`), `pg_trgm` + índice GIN y la RPC
-      `search_catalog` — **hay que darle a Toni el SQL exacto para su editor**, aquí no hay
-      acceso a Supabase—, más `searchCatalog`/`getGameBySlug`/`getGamesBySlugs` en
-      `TableTrackerApi`, **implementados en `api.supabase.ts` y en `api.demo.ts`**.
+- [ ] **Fases 3 a 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
+      aprobado por Toni; las fases 1 y 2 están hechas). En orden:
       **(3)** `GamesContext` deja de exponer el array entero, paginación de servidor en
       `HomePage`/`LibraryPage` y debounce de 250-300 ms en el buscador (hoy no hay, porque
       busca en memoria; mañana sería una petición por tecla). **(4)** `scripts/ingest-bgg.ts`
@@ -277,6 +317,14 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-19** — Claude (terminal): fase 2 del plan de escalado (ver «Estado actual»).
+  Columnas nuevas en `public.games`, `pg_trgm` + índice GIN, `searchable()` gemela en SQL y
+  la RPC `search_catalog`; `catalogGame`/`expandCatalogRow` para volver a montar un juego
+  entero desde una fila de 150 B; `searchCatalog`/`getGameBySlug`/`getGamesBySlugs` en las
+  **dos** implementaciones de la API, con sus claves de consulta; `save_custom_game` y el
+  seed puestos al día. **Falta que Toni ejecute `schema.sql` y `seed_games.sql`** en su
+  editor: aquí no hay acceso a Supabase. Ninguna pantalla cambia todavía. Todo en verde
+  (161 tests, build OK).
 - **2026-08-19** — Claude (terminal): fase 1 del plan de escalado del catálogo (ver «Estado
   actual»). Chuletas del catálogo fuera del arranque con `src/games/rules.ts`, portadas
   partidas entre el mapa que viaja y la procedencia que se queda en `scripts/`, y una ruta

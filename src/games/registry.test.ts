@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import {
   applyUniqueField,
+  catalogGame,
   computeTotal,
   CURATED_GAMES,
   emptyScores,
   GAME_LIST,
   rankPlayers,
   requireGame,
+  searchable,
   validateScores,
 } from './registry'
+import type { CatalogGameRow } from './registry'
 import { CATALOG_GAMES } from './catalog'
 import { COVERS, coverUrl } from './covers'
 import type { ScoreValues } from './types'
@@ -376,5 +379,90 @@ describe('applyUniqueField', () => {
     ]
     const next = applyUniqueField(catan, scores, 'longest_road', 0, false)
     expect(next.map((s) => s.longest_road)).toEqual([false, false])
+  })
+})
+
+/**
+ * `catalogGame` es la costura entre el catálogo que viaja en el bundle y el que
+ * sirve Postgres. Lo que se prueba aquí es que una fila ligera —150 B, sin hoja de
+ * puntuación ni chuleta— vuelve a ser un juego completo, porque de eso depende que
+ * ningún componente tenga que enterarse de dónde salió el juego que está pintando.
+ */
+describe('catalogGame', () => {
+  // Un juego de la cola larga: existe en Postgres y no viaja en el bundle, que es
+  // justo el caso que esta función tiene que resolver.
+  const row: CatalogGameRow = {
+    slug: 'valle-de-los-mapaches',
+    name: 'El valle de los mapaches',
+    icon: '🦝',
+    tagline: 'Cinco mapaches y un contenedor de basura',
+    theme: { primary: '#1a7f4d' },
+    min_players: 2,
+    max_players: 5,
+    min_time: 100,
+    max_time: 150,
+    difficulty: 'hard',
+    sheet_id: 'points',
+    image_url: null,
+    cover_thumb_url: 'https://cf.geekdo-images.com/ejemplo.jpg',
+    group_id: null,
+    definition: null,
+  }
+
+  it('reconstruye la hoja de puntuación a partir de `sheet_id`', () => {
+    const game = catalogGame(row)
+
+    expect(game.name).toBe('El valle de los mapaches')
+    expect(game.playTime).toEqual({ min: 100, max: 150 })
+    expect(game.difficulty).toBe('hard')
+    // La hoja «points» viaja en el bundle: es código, no dato.
+    expect(game.totalMode).toBe('explicit')
+    expect(game.winnerRule).toBe('highest')
+    expect(game.fields.map((field) => field.key)).toEqual(['points'])
+    // Sin portada propia, vale la que enlaza el servidor.
+    expect(game.imageUrl).toBe('https://cf.geekdo-images.com/ejemplo.jpg')
+  })
+
+  it('un juego que ya viaja en la app manda sobre la fila', () => {
+    // Catán tiene hoja escrita a mano; la fila remota no puede empeorarla.
+    const game = catalogGame({ ...row, slug: 'catan', sheet_id: 'points' })
+
+    expect(game).toBe(requireGame('catan'))
+    expect(game.fields.length).toBeGreaterThan(1)
+  })
+
+  it('un juego de grupo llega con su definición entera', () => {
+    const definition = { ...requireGame('azul'), slug: 'c-el-de-los-jueves' }
+    const game = catalogGame({
+      ...row,
+      slug: 'c-el-de-los-jueves',
+      group_id: 'grupo-1',
+      sheet_id: null,
+      definition,
+    })
+
+    expect(game.groupId).toBe('grupo-1')
+    expect(game.fields).toEqual(definition.fields)
+  })
+
+  it('una fila sin hoja ni definición no rompe la ficha', () => {
+    // Puede pasar con una fila a medio sembrar: cae en «apunta los puntos».
+    const game = catalogGame({ ...row, sheet_id: null })
+
+    expect(game.fields.map((field) => field.key)).toEqual(['points'])
+  })
+
+  it('sin duración declarada no se inventa una', () => {
+    const game = catalogGame({ ...row, min_time: null, max_time: null })
+
+    expect(game.playTime).toBeUndefined()
+  })
+})
+
+describe('searchable', () => {
+  it('quita tildes, signos y mayúsculas, como su gemela de Postgres', () => {
+    expect(searchable('Catán')).toBe('catan')
+    expect(searchable('7 Wonders: Duel')).toBe('7 wonders duel')
+    expect(searchable('¡Ñam!')).toBe('nam')
   })
 })

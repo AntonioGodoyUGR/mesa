@@ -1,6 +1,10 @@
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { toDefinition } from '../games/custom'
+import { catalogGame } from '../games/registry'
+import { CATALOG_PAGE } from '../games/filters'
+import type { CatalogGameRow } from '../games/registry'
+import type { GameDefinition } from '../games/types'
 import type { TableTrackerApi } from './api'
 import type {
   Group,
@@ -192,6 +196,46 @@ export const supabaseApi: TableTrackerApi = {
       .order('name')
     if (error) fail('No se han podido cargar los juegos del grupo', error)
     return (data ?? []).map(toDefinition)
+  },
+
+  async searchCatalog(query) {
+    // Los filtros vacíos van como null y no como array vacío: es lo que la función
+    // entiende por «este criterio no se ha puesto».
+    const { data, error } = await supabase.rpc('search_catalog', {
+      p_query: query.query?.trim() ?? '',
+      p_limit: query.limit ?? CATALOG_PAGE,
+      p_offset: query.offset ?? 0,
+      p_players: query.players ?? null,
+      p_durations: query.durations?.length ? query.durations : null,
+      p_difficulties: query.difficulties?.length ? query.difficulties : null,
+      p_group_id: query.groupId ?? null,
+      p_slugs: query.slugs?.length ? query.slugs : null,
+    })
+    if (error) fail('No se ha podido buscar en el catálogo', error)
+    return ((data ?? []) as CatalogGameRow[]).map(catalogGame)
+  },
+
+  async getGameBySlug(slug) {
+    // Aquí sí viaja la definición entera: es una fila sola y es la pantalla donde se
+    // leen las reglas. `rules` tiene columna propia desde que el catálogo creció;
+    // las filas viejas la llevan todavía dentro de `definition`, así que vale la que
+    // haya.
+    const { data, error } = await supabase
+      .from('games')
+      .select('slug, image_url, group_id, created_by, definition, rules')
+      .eq('slug', slug)
+      .maybeSingle()
+    if (error) fail('No se ha podido cargar el juego', error)
+    if (!data) return null
+
+    const game = toDefinition(data)
+    const rules = (data.rules as GameDefinition['rules']) ?? game.rules
+    return rules ? { ...game, rules } : game
+  },
+
+  async getGamesBySlugs(slugs) {
+    if (slugs.length === 0) return []
+    return supabaseApi.searchCatalog({ slugs, limit: slugs.length })
   },
 
   async saveCustomGame(input) {
