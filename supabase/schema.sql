@@ -958,8 +958,23 @@ language sql stable set search_path = public as $$
         )
       )
     )
+  -- No se ordena por `similarity()`, y conviene saber por qué: compara el texto
+  -- ENTERO, que aquí es nombre + lema, así que castiga a los nombres largos. Con
+  -- "cata", «catan economico negociacion» puntuaba por debajo de «catatac» y Catan
+  -- —el juego más votado de BoardGameGeek— no salía ni entre los tres primeros.
+  --
+  -- Lo que la gente espera al teclear es que empiece por lo que ha escrito, y entre
+  -- los que empiezan igual, el que más se juega. Empezar una palabra cualquiera vale
+  -- lo mismo que empezar la frase: quien busca "tokyo" quiere King of Tokyo, no
+  -- Tokyo Highway. `similarity()` nunca filtró nada —eso lo hace el `like`—, así que
+  -- quitarla de aquí no pierde ni un resultado, solo los coloca mejor.
   order by
-    case when n.q = '' then 0 else similarity(g.search_text, n.q) end desc,
+    case
+      when n.q = '' then 0
+      when g.search_text = n.q then 0
+      when g.search_text like n.q || '%' or g.search_text like '% ' || n.q || '%' then 1
+      else 2
+    end,
     g.popularity desc,
     g.sort_order,
     g.name

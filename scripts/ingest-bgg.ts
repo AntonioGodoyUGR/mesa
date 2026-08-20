@@ -124,6 +124,10 @@ function loadProgress(): Progress {
 }
 
 function saveProgress(progress: Progress): void {
+  // Un ensayo no escribe nada, así que tampoco puede dar nada por hecho: si guardara el
+  // avance, la pasada de verdad se saltaría justo los juegos que se usaron para probar
+  // —los más populares— y nadie lo notaría hasta buscarlos y no encontrarlos.
+  if (options.dryRun) return
   mkdirSync(DATA_DIR, { recursive: true })
   writeFileSync(progressPath, JSON.stringify(progress), 'utf8')
 }

@@ -104,6 +104,24 @@ describe('filterGames', () => {
     expect(filterGames(catalogo, filters({ players: 7 }))).not.toContain(catan)
   })
 
+  // Lo mismo que hace el `order by` de `search_catalog`: delante lo que empieza por lo
+  // escrito, aunque en la lista viniera detrás. Sin esto, buscar «tokyo» sacaría antes
+  // un juego que lo lleva metido dentro de otra palabra que el que se llama así.
+  it('delante lo que empieza por lo escrito, aunque venga después en la lista', () => {
+    const como = (slug: string, name: string): GameDefinition => ({
+      ...requireGame('uno'),
+      slug,
+      name,
+      tagline: 'Cartas',
+    })
+    const lista = [como('c-neotokyo', 'Neotokyo'), como('c-king', 'King of Tokyo')]
+
+    expect(names(filterGames(lista, filters({ query: 'tokyo' })))).toEqual([
+      'King of Tokyo',
+      'Neotokyo',
+    ])
+  })
+
   it('combina texto y filtros', () => {
     const found = filterGames(
       catalogo,

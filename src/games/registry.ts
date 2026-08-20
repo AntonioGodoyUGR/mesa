@@ -89,13 +89,29 @@ export function searchable(text: string): string {
 /**
  * Filtro por nombre o lema para los buscadores de la home y de las reglas.
  * Con una consulta vacía devuelve la lista tal cual.
+ *
+ * El orden es el mismo que el del `order by` de `search_catalog`, y por el mismo motivo
+ * que `compute_match_total`: la regla vive en los dos sitios porque en los dos hace
+ * falta. Delante lo que empieza por lo escrito —empezar una palabra cualquiera cuenta,
+ * que quien busca «tokyo» quiere King of Tokyo y no Tokyo Highway— y detrás lo que
+ * solo lo lleva dentro. Entre iguales manda el orden que traía la lista. **Si cambia
+ * una, cambia la otra.**
  */
 export function searchGames(games: GameDefinition[], query: string): GameDefinition[] {
   const needle = searchable(query).trim()
   if (!needle) return games
-  return games.filter((game) =>
-    searchable(`${game.name} ${game.tagline}`).includes(needle),
-  )
+
+  const rank = (game: GameDefinition): number => {
+    const text = searchable(`${game.name} ${game.tagline}`)
+    if (!text.includes(needle)) return -1
+    return text.startsWith(needle) || text.includes(` ${needle}`) ? 0 : 1
+  }
+
+  return games
+    .map((game, index) => ({ game, index, rank: rank(game) }))
+    .filter((entry) => entry.rank >= 0)
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((entry) => entry.game)
 }
 
 // ---------------------------------------------------------------------------
