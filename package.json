@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "seed:games": "tsx scripts/seed-games.ts",
     "ingest:bgg": "tsx scripts/ingest-bgg.ts",
+    "bundle:function": "tsx scripts/bundle-function.ts",
     "ids": "tsx scripts/bgg-ids.ts",
     "covers": "tsx scripts/fetch-covers.ts",
     "icons": "node scripts/generate-icons.mjs"

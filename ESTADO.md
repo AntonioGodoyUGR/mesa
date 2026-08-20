@@ -22,10 +22,8 @@ quedó a medias y lo siguiente que toca.
   buscador devuelve menos de tres juegos y hay al menos tres letras escritas, la app le
   pregunta a BoardGameGeek por lo que falta, lo escribe en el catálogo y lo pinta. Es el
   último trozo del plan de escalado: las cinco fases están completas.
-  - ⚠️ **PENDIENTE DE TONI, y son dos cosas:** ejecutar `scripts/data/resolve_game.sql` en
-    el SQL Editor **y** desplegar la Edge Function con la CLI de Supabase (las órdenes
-    exactas, en la cabecera de `supabase/functions/resolve-game/index.ts` y en el propio
-    SQL). Sin eso el código está inerte y la app se comporta exactamente igual que hoy.
+  - **SQL ejecutado por Toni el 2026-08-20** (`search_catalog.sql` y `resolve_game.sql`).
+    ⚠️ **Queda desplegar la función**, sin la cual esto sigue inerte: ver «Pendiente».
   - **Qué hay nuevo.** `supabase/functions/resolve-game/` (la función), `catalog_misses` +
     `claim_catalog_lookup` + `resolve_catalog_games` en `supabase/schema.sql`, `resolveGame`
     en las **dos** implementaciones de la API, `needsBggLookup` en `filters.ts` y el enganche
@@ -54,10 +52,8 @@ quedó a medias y lo siguiente que toca.
   había, `public.games` tiene **17.972 juegos de catálogo, 17.944 con carátula de BGG y
   ninguno sin `search_text`**. Los escritos a mano conservan su ficha entera: Catan sigue
   con su icono, su hoja y su chuleta, y de BGG solo se le añadieron año, votos y portadas.
-  - ⚠️ **PENDIENTE DE TONI: ejecutar `scripts/data/search_catalog.sql` en el SQL Editor.**
-    Es `search_catalog` con el `order by` nuevo (abajo). Hasta que se ejecute, buscar
-    «cata» en producción **no devuelve Catan**. No borra ni migra nada: es un
-    `create or replace` de la función.
+  - **`search_catalog` con el `order by` nuevo, ejecutado por Toni el 2026-08-20.** Antes,
+    buscar «cata» en producción no devolvía Catan; ahora sí.
   - **Por qué cambia el orden.** Ordenar por `similarity()` compara el texto ENTERO
     —nombre + lema—, así que castiga los nombres largos: «catan economico negociacion»
     puntuaba por debajo de «catatac». Ahora manda que **empiece por lo escrito** y, entre
@@ -455,17 +451,21 @@ quedó a medias y lo siguiente que toca.
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Toni: poner en marcha el crecimiento bajo demanda** (el código ya está, ver «Estado
-      actual»). Son dos pasos y ninguno se puede hacer desde el terminal:
-      1. Ejecutar `scripts/data/resolve_game.sql` en el SQL Editor.
-      2. Desplegar la función, que **no** sale con el push a GitHub Pages:
-         `supabase login` → `supabase link --project-ref <ref>` →
-         `supabase secrets set BGG_API_TOKEN=…` → `supabase functions deploy resolve-game`.
+- [ ] **Toni: desplegar la Edge Function `resolve-game`.** El SQL ya está ejecutado
+      (`search_catalog` y `resolve_game`, 2026-08-20); falta solo la función, que **no**
+      sale con el push a GitHub Pages. Dos caminos:
+      - **Desde el panel, sin instalar nada:** `npm run bundle:function` genera
+        `scripts/data/resolve-game.bundle.ts` (un solo fichero, ~18 kB, porque el editor
+        del panel no admite varios). Edge Functions → «Deploy a new function» → «Via
+        Editor», nombre `resolve-game`, pegar y desplegar. **Antes**, el secreto
+        `BGG_API_TOKEN` en Edge Functions → Secrets.
+      - **Con la CLI:** `supabase link` → `supabase secrets set BGG_API_TOKEN=…` →
+        `supabase functions deploy resolve-game`. Sube los tres ficheros de verdad, sin
+        empaquetar.
+      Si se toca el original hay que **volver a generar y volver a pegar** el empaquetado:
+      el panel no se entera de lo que pase en el repositorio.
       Mientras tanto no se rompe nada: sin función desplegada, buscar un juego que no está
       da lo mismo que hoy («ningún juego cumple lo que buscas»).
-- [ ] **Toni: ejecutar `scripts/data/search_catalog.sql`** en el SQL Editor de Supabase.
-      Mientras no se haga, el catálogo de 17.972 juegos está dentro pero se busca mal:
-      «cata» no devuelve Catan (ver «Estado actual»).
 - [ ] 10 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
       o funciones exportadas junto a componentes en `AuthContext`, `GamesContext`,
       `GroupContext`, `LibraryContext`, `GameCover`, `ShowMore`. Cosmético.

@@ -185,7 +185,10 @@ Deno.serve(async (request: Request): Promise<Response> => {
     })
     return json({ games: rows })
   } catch (error) {
-    console.error('resolve-game', (error as Error).message)
-    return json({ error: (error as Error).message }, 502)
+    // `instanceof` y no `as Error`: el fichero de un solo trozo que se pega en el
+    // panel de Supabase sale sin tipos, y ahí `as Error` no protegería de nada.
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('resolve-game', message)
+    return json({ error: message }, 502)
   }
 })
