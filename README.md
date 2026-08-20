@@ -38,11 +38,10 @@ suficiente para recorrer la app entera.
 src/games/          El motor: la definición de cada juego y los cálculos
   types.ts            GameDefinition, ScoreField, RuleSheet
   definitions/        Un fichero por juego escrito a mano — la fuente de verdad
-  curated.ts          La lista de esos juegos
-  catalog.data.ts     El catálogo amplio: un juego por línea
-  catalog.ts          Convierte esas líneas en GameDefinition completas
+  curated.ts          La lista de esos juegos: los 24 que viajan en la app
+  catalog.ts          Las cinco hojas genéricas y las paletas: convierte una fila del
+                      servidor (~150 B) en una GameDefinition completa
   covers.generated.ts Ruta de la portada de cada juego (npm run covers) — no se edita a mano
-  rules.ts            Carga las chuletas del catálogo con import() al abrir una ficha
   registry.ts         Junta las dos capas + computeTotal, rankPlayers, validateScores…
   custom.ts           Juegos del grupo: slugs c-, plantilla y validación
 src/lib/            Datos y estadísticas
@@ -56,7 +55,12 @@ src/context/        Sesión, grupo activo, catálogo de juegos y biblioteca pers
 src/components/     Piezas reutilizables, todas guiadas por GameDefinition
 src/pages/          Una pantalla por ruta
 supabase/           schema.sql, storage.sql y el seed generado
-scripts/            Generadores (seed de juegos, iconos PNG)
+scripts/            Generadores y semilla del catálogo (no viajan en la app)
+  catalog.data.ts     El catálogo amplio: un juego por línea
+  catalog.rules.ts    Sus chuletas de reglas, aparte porque pesan ~2,8 kB cada una
+  lib/game-rows.ts    Cómo se convierte un juego en filas de Postgres
+  seed-games.ts       Escribe supabase/seed_games.sql (npm run seed:games)
+  ingest-bgg.ts       Siembra el catálogo desde BoardGameGeek (npm run ingest:bgg)
 ```
 
 ### La idea: todo parametrizado
@@ -85,19 +89,23 @@ en los que se juegan de verdad, pero no escala a cientos de títulos. Así que h
 
 - **Escritos a mano** (`definitions/`): campos con los conceptos del juego —pueblos, ciudades,
   camino más largo— y chuleta de reglas para consultar en la mesa.
-- **Catálogo amplio** (`catalog.data.ts`): una línea por juego —nombre, icono, lema, jugadores,
-  duración, dificultad y cuál de las cinco hojas genéricas usa (puntos, quien menos suma,
-  cooperativo, por equipos o solo ganador)—. Sin chuleta: la pantalla de reglas dice «Sin
-  chuleta de reglas» en vez de inventarse un resumen.
+- **Catálogo amplio**: una línea por juego —nombre, icono, lema, jugadores, duración,
+  dificultad y cuál de las cinco hojas genéricas usa (puntos, quien menos suma, cooperativo,
+  por equipos o solo ganador)—. Vive **en Postgres**, no en el bundle: son decenas de miles
+  de juegos y se buscan en el servidor. Su semilla está en `scripts/catalog.data.ts`.
 
+Solo los escritos a mano viajan dentro de la app; son los que la hacen funcionar sin red.
 Un juego del catálogo se comporta igual que uno escrito a mano en todo lo demás: buscador,
 biblioteca, partidas y estadísticas. **Ascenderlo** es escribir su fichero en `definitions/`
-y borrar su fila del catálogo; si estuviera en los dos sitios, manda el escrito a mano.
+y borrar su fila de la semilla; si estuviera en los dos sitios, manda el escrito a mano.
 
-Las portadas del catálogo las busca `npm run covers` en Wikipedia y las deja en
-`covers.generated.ts`. El juego que no tiene portada fiable se queda con su emoji: vale más
-un icono que la caja de otro juego (la API de BoardGameGeek dejó de ser pública y responde
-`401` sin credenciales; RAWG, IGDB, GiantBomb, MobyGames y TheGamesDB son de videojuegos).
+Las portadas van en dos capas, y por la misma razón que el catálogo. Las de los juegos más
+vistos están descargadas en `public/covers/` (`npm run covers`, que las busca en Wikipedia y
+en BoardGameGeek): se sirven desde el propio dominio, están precacheadas y funcionan sin
+conexión. Las de la cola larga se **enlazan** al CDN de BoardGameGeek —`cover_thumb_url` en
+la fila, que trae la ingesta—, porque descargar decenas de miles de imágenes serían gigas en
+el repo. El juego que no tiene ninguna se queda con su emoji: vale más un icono que la caja
+de otro juego.
 
 ### Juegos propios
 
@@ -242,7 +250,8 @@ sobre claro, con texto blanco encima y aclarados sobre oscuro.
 | `npm run preview` | Sirve el build (para probar la PWA de verdad) |
 | `npm test` | Tests del motor de juegos |
 | `npm run lint` | oxlint |
-| `npm run seed:games` | Regenera `supabase/seed_games.sql` desde las definiciones |
+| `npm run seed:games` | Regenera `supabase/seed_games.sql` desde las definiciones y la semilla |
+| `npm run ingest:bgg` | Siembra el catálogo amplio desde BGG a Supabase (`-- --dry-run`, `-- --min-votes=100`) |
 | `npm run ids` | Resuelve `slug → id de BGG / Wikidata` en `scripts/external-ids.generated.ts` |
 | `npm run covers` | Descarga las portadas a `public/covers/` (`-- --dry-run`, `-- --force`) |
 | `npm run icons` | Regenera los iconos PNG de la PWA |

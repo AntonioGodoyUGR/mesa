@@ -1,22 +1,46 @@
 /**
- * Catálogo amplio: los cientos de juegos que se pueden apuntar sin chuleta propia.
+ * El motor del catálogo amplio: las cinco hojas de puntuación genéricas y las paletas.
  *
  * Los juegos de `definitions/` están escritos a mano uno a uno: traen su hoja de
  * puntuación con los conceptos del juego («pueblos», «ciudades», «camino más largo»)
- * y su chuleta de reglas. Eso no escala a cuatrocientos títulos, y tampoco haría
+ * y su chuleta de reglas. Eso no escala a decenas de miles de títulos, y tampoco haría
  * falta: para la mayoría, lo que se quiere apuntar es quién ganó y con cuántos puntos.
  *
- * Así que aquí cada juego se declara en una línea —nombre, jugadores, duración,
- * dificultad y qué se apunta al acabar— y este fichero la convierte en una
+ * Así que un juego del catálogo se describe con muy poco —nombre, jugadores, duración,
+ * dificultad y cuál de las cinco hojas usa— y este fichero lo convierte en una
  * `GameDefinition` completa. Un juego del catálogo se comporta igual que uno escrito
  * a mano en todo lo demás: sale en el buscador, en la biblioteca y en las estadísticas.
  *
- * Si un juego de aquí se merece su hoja detallada, se le escribe su fichero en
- * `definitions/` y se borra su fila de `catalog.data.ts`: el registro da prioridad a
- * la definición escrita a mano.
+ * Esto es código, no datos: pesa lo mismo con 400 juegos que con 40.000, y por eso es
+ * lo único que viaja en el bundle. Las filas están en Postgres y llegan por
+ * `search_catalog`; su semilla se escribe en `scripts/catalog.data.ts`.
+ *
+ * Si un juego del catálogo se merece su hoja detallada, se le escribe su fichero en
+ * `definitions/` y se borra su fila de la semilla: el registro da prioridad a la
+ * definición escrita a mano.
  */
-import { CATALOG_ROWS, type CatalogRow, type SheetId } from './catalog.data'
 import type { GameDefinition, GameDifficulty, GameTheme, ScoreField } from './types'
+
+/** Cuál de las cinco hojas de aquí abajo usa un juego del catálogo. */
+export type SheetId = 'points' | 'lowest' | 'coop' | 'teams' | 'win'
+
+/**
+ * Una fila de la semilla (`scripts/catalog.data.ts`), en tupla para que quepa en una
+ * línea. El tipo vive aquí, con la función que la expande, y no con los datos: es el
+ * formato que entiende el motor, y los datos son solo un fichero que lo cumple.
+ */
+export type CatalogRow = readonly [
+  slug: string,
+  name: string,
+  icon: string,
+  tagline: string,
+  minPlayers: number,
+  maxPlayers: number,
+  minTime: number,
+  maxTime: number,
+  difficulty: GameDifficulty,
+  sheet: SheetId,
+]
 
 /**
  * Las cuatro formas de apuntar el resultado de una partida.
@@ -262,7 +286,16 @@ function build(
   }
 }
 
-function expand(row: CatalogRow): GameDefinition {
+/**
+ * Una fila de la semilla, expandida a juego completo.
+ *
+ * Solo la usan los scripts —el seed y la ingesta de BGG—, que son los que meten esas
+ * filas en Postgres. La app nunca ve una `CatalogRow`: recibe filas de la base de datos
+ * y las expande con `expandCatalogRow`, aquí al lado. Las dos puertas comparten `build`
+ * a propósito: si divergieran, un mismo juego se comportaría distinto según por dónde
+ * hubiera entrado.
+ */
+export function expandCatalogSeedRow(row: CatalogRow): GameDefinition {
   const [slug, name, icon, tagline, minPlayers, maxPlayers, minTime, maxTime, difficulty, sheetId] =
     row
   return build(
@@ -316,13 +349,3 @@ export function expandCatalogRow(row: CatalogGameRow): GameDefinition {
     imageUrl: row.image_url ?? row.cover_thumb_url ?? undefined,
   }
 }
-
-/**
- * El catálogo entero, ya expandido.
- *
- * Aquí `rules` se queda en `undefined` a propósito, incluso para los juegos que sí
- * tienen chuleta escrita. `catalog.rules.ts` pesa más que este fichero entero y solo
- * hace falta al abrir la ficha de un juego: engancharla al expandir la metería en el
- * arranque de la app. La resuelve `rules.ts` con un `import()` a demanda.
- */
-export const CATALOG_GAMES: GameDefinition[] = CATALOG_ROWS.map(expand)

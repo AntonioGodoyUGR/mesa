@@ -2,6 +2,7 @@ import type { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { toDefinition } from '../games/custom'
 import { catalogGame } from '../games/registry'
+import { coverUrl } from '../games/covers'
 import { CATALOG_PAGE } from '../games/filters'
 import type { CatalogGameRow } from '../games/registry'
 import type { GameDefinition } from '../games/types'
@@ -222,7 +223,9 @@ export const supabaseApi: TableTrackerApi = {
     // haya.
     const { data, error } = await supabase
       .from('games')
-      .select('slug, image_url, group_id, created_by, definition, rules')
+      .select(
+        'slug, image_url, group_id, created_by, definition, rules, cover_url, cover_thumb_url',
+      )
       .eq('slug', slug)
       .maybeSingle()
     if (error) fail('No se ha podido cargar el juego', error)
@@ -230,7 +233,14 @@ export const supabaseApi: TableTrackerApi = {
 
     const game = toDefinition(data)
     const rules = (data.rules as GameDefinition['rules']) ?? game.rules
-    return rules ? { ...game, rules } : game
+    // La portada, por orden: la descargada —se sirve desde el propio dominio, está
+    // precacheada y funciona sin conexión—, la que subió el grupo y por último la de
+    // BGG. De las dos de BGG manda la grande: esta llamada es la de la ficha, donde la
+    // miniatura de 200 px se vería borrosa. La cola larga solo tiene esa.
+    const cover =
+      coverUrl(slug) ?? game.imageUrl ?? data.cover_url ?? data.cover_thumb_url ?? undefined
+    const withCover = cover ? { ...game, imageUrl: cover } : game
+    return rules ? { ...withCover, rules } : withCover
   },
 
   async getGamesBySlugs(slugs) {

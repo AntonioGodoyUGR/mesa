@@ -108,6 +108,14 @@ export class BggDump {
     return this.byId.get(id)
   }
 
+  /**
+   * Todas las fichas del volcado. Lo usa la ingesta, que no busca un juego concreto
+   * sino que recorre el catálogo entero para quedarse con los más votados.
+   */
+  all(): DumpEntry[] {
+    return [...this.byId.values()]
+  }
+
   /** Las filas que comparten algún token poco común con el nombre dado. */
   private neighbours(name: string): DumpEntry[] {
     const ids = new Set<number>()

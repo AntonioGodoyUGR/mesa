@@ -1,38 +1,26 @@
 /**
- * Genera `supabase/seed_games.sql` a partir del catálogo de la app: los juegos
- * escritos a mano en `src/games/definitions/` y las filas del catálogo amplio
- * (`src/games/catalog.data.ts`), que es exactamente lo que hay en `GAME_LIST`.
+ * Genera `supabase/seed_games.sql` con el catálogo que describe el proyecto: los juegos
+ * escritos a mano en `src/games/definitions/` y las filas de la semilla amplia
+ * (`scripts/catalog.data.ts`).
  *
- * Es lo que mantiene una sola fuente de verdad: las reglas de puntuación se
- * escriben una vez en TypeScript y de ahí bajan a la base de datos, que las
- * necesita para recalcular totales en `save_match()`.
+ * Es lo que arranca un proyecto de Supabase desde cero, y lo que mantiene una sola
+ * fuente de verdad: las reglas de puntuación se escriben una vez en TypeScript y de ahí
+ * bajan a la base de datos, que las necesita para recalcular totales en `save_match()`.
  *
  *   npm run seed:games
  *
  * Después, pega el fichero generado en el SQL Editor de Supabase.
+ *
+ * Ojo con el tamaño: esto vale para los cientos de juegos que trae el repo y no para el
+ * catálogo entero. Decenas de miles de juegos son decenas de MB de SQL, que ningún
+ * editor traga; ese camino es `npm run ingest:bgg`, que escribe por red. Los dos montan
+ * la fila con `lib/game-rows.ts`, así que salen idénticas.
  */
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { GAME_LIST, searchable } from '../src/games/registry'
-import { CATALOG_RULES } from '../src/games/catalog.rules'
-import { CATALOG_ROWS } from '../src/games/catalog.data'
+import { fieldRows, gameRow, seedGames, type Row } from './lib/game-rows'
 import { COVERS } from '../src/games/covers'
-import type { SheetId } from '../src/games/catalog.data'
-import type { GameDefinition, ScoreField } from '../src/games/types'
-
-/**
- * Qué hoja genérica usa cada juego del catálogo amplio.
- *
- * `catalog.ts` la consume al expandir y luego la tira: a la app no le hace falta,
- * porque el juego ya viaja expandido. A la base de datos sí, y mucho: `sheet_id` es
- * lo que permite servir una fila de ~150 B en vez de la definición entera, porque el
- * cliente reconstruye el resto con la hoja que ya tiene en el bundle. Los juegos
- * escritos a mano no salen aquí: su hoja es suya y no se parece a ninguna otra.
- */
-const SHEET_BY_SLUG = new Map<string, SheetId>(
-  CATALOG_ROWS.map((row) => [row[0], row[9]]),
-)
 
 const here = dirname(fileURLToPath(import.meta.url))
 const outputPath = resolve(here, '..', 'supabase', 'seed_games.sql')
@@ -43,159 +31,89 @@ function text(value: string | undefined | null): string {
   return `'${value.replace(/'/g, "''")}'`
 }
 
-function num(value: number | undefined | null): string {
-  return value === undefined || value === null ? 'null' : String(value)
-}
-
-function bool(value: boolean | undefined): string {
-  return value ? 'true' : 'false'
-}
-
-/** Literal jsonb, escapado para SQL. */
-function json(value: unknown): string {
+/**
+ * Un valor de fila, escrito como literal SQL. El tipo de la columna se deduce del de
+ * JavaScript: lo que llega como objeto es jsonb, que son `theme`, `definition` y
+ * `rules`.
+ */
+function literal(value: Row[string]): string {
+  if (value === null) return 'null'
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'boolean') return value ? 'true' : 'false'
+  if (typeof value === 'string') return text(value)
   return `${text(JSON.stringify(value))}::jsonb`
 }
 
-function gameRow(game: GameDefinition, index: number): string {
-  return `  (${[
-    text(game.slug),
-    text(game.name),
-    text(game.icon),
-    text(game.tagline),
-    text(game.imageUrl),
-    json(game.theme),
-    num(game.minPlayers),
-    num(game.maxPlayers),
-    text(game.scoreLabel),
-    text(game.scoreLabelShort),
-    text(game.totalMode),
-    text(game.winnerRule),
-    num(game.targetScore),
-    num(index),
-    json(game),
-    // Las columnas de lista: con ellas el catálogo se puede buscar y paginar en
-    // Postgres sin leer `definition`, que es el 90 % del peso de la fila.
-    text(SHEET_BY_SLUG.get(game.slug)),
-    num(game.playTime?.min),
-    num(game.playTime?.max),
-    text(game.difficulty),
-    game.rules ? json(game.rules) : 'null',
-    // La misma normalización que hará el buscador. La escribe TypeScript porque es
-    // aquí donde vive la regla; Postgres tiene su gemela para lo que inserta él.
-    text(searchable(`${game.name} ${game.tagline}`)),
-  ].join(', ')})`
+/** Los nombres de columna, repartidos en líneas que quepan en la pantalla. */
+function columnList(columns: string[]): string {
+  const lines: string[] = []
+  for (const column of columns) {
+    const last = lines[lines.length - 1]
+    if (last && `${last} ${column},`.length <= 88) lines[lines.length - 1] = `${last} ${column},`
+    else lines.push(`  ${column},`)
+  }
+  return lines.join('\n').replace(/,$/, '')
 }
 
-function fieldRow(game: GameDefinition, field: ScoreField, index: number): string {
-  return `  (${[
-    text(game.slug),
-    text(field.key),
-    text(field.label),
-    text(field.short),
-    text(field.icon),
-    text(field.type),
-    num(field.points),
-    bool(field.isTotal),
-    text(field.group),
-    num(field.min),
-    num(field.max),
-    bool(field.uniquePerMatch),
-    bool(field.showInSummary),
-    text(field.hint),
-    num(index),
-  ].join(', ')})`
+/** `(a, b, c)`, en el orden de las columnas. */
+function values(row: Row): string {
+  return `  (${Object.values(row).map(literal).join(', ')})`
 }
 
 /**
- * Las portadas integradas viven en `public/covers/` y su ruta depende de dónde esté
- * publicada la app: en la raíz (Vercel) o bajo `/table-tracker/` (GitHub Pages). Guardarla en la
- * base de datos ataría las filas a un despliegue concreto, así que se quita: la app ya
- * resuelve la portada por su cuenta desde `covers.generated.ts`, que viaja en el bundle.
- * En `games.image_url` solo acaban URLs absolutas, que son las de los juegos del grupo.
+ * Lo que la semilla NO pisa si la fila ya existe.
+ *
+ * Son las columnas que llena `npm run ingest:bgg` y la semilla no sabe: el año, los
+ * votos y las portadas de BoardGameGeek. Sin esto, volver a sembrar después de una
+ * ingesta —que es lo normal al añadir un juego escrito a mano— dejaría el catálogo
+ * entero con `popularity` a cero y sin carátulas.
  */
-function forDatabase(game: GameDefinition): GameDefinition {
-  if (!COVERS[game.slug]) return game
-  const { imageUrl: _local, ...rest } = game
-  return rest
+const KEEP_IF_SET: Record<string, string> = {
+  bgg_id: 'coalesce(excluded.bgg_id, public.games.bgg_id)',
+  year: 'coalesce(excluded.year, public.games.year)',
+  cover_url: 'coalesce(excluded.cover_url, public.games.cover_url)',
+  cover_thumb_url: 'coalesce(excluded.cover_thumb_url, public.games.cover_thumb_url)',
+  // `popularity` es `not null`, así que no hay null que detectar: se queda el mayor.
+  popularity: 'greatest(excluded.popularity, public.games.popularity)',
 }
 
-/**
- * Las chuletas del catálogo amplio ya no viajan en `GameDefinition`: `catalog.ts` dejó
- * de engancharlas para no meter sus 76 kB en el arranque de la app, y la ficha las carga
- * con `import()` (ver `src/games/rules.ts`). Aquí sí se enganchan: este script corre en
- * Node, donde el peso da igual, y la base de datos guarda la definición íntegra.
- */
-function withRules(game: GameDefinition): GameDefinition {
-  if (game.rules) return game
-  const rules = CATALOG_RULES[game.slug]
-  return rules ? { ...game, rules } : game
+/** `columna = excluded.columna` para todo menos la clave primaria. */
+function upsertSet(columns: string[], keys: string[]): string {
+  return columns
+    .filter((column) => !keys.includes(column))
+    .map((column) => `  ${column} = ${KEEP_IF_SET[column] ?? `excluded.${column}`}`)
+    .join(',\n')
 }
 
-const GAMES = GAME_LIST.map(forDatabase).map(withRules)
+const SEED = seedGames()
+const GAMES = SEED.map((seed, index) => gameRow(seed, index))
+const FIELDS = SEED.flatMap((seed) => fieldRows(seed.game))
 
-const gameRows = GAMES.map(gameRow).join(',\n')
-const fieldRows = GAMES.flatMap((game) =>
-  game.fields.map((field, index) => fieldRow(game, field, index)),
-).join(',\n')
+const gameColumns = Object.keys(GAMES[0])
+const fieldColumns = Object.keys(FIELDS[0])
 
-const slugList = GAMES.map((game) => text(game.slug)).join(', ')
+const slugList = GAMES.map((row) => text(row.slug as string)).join(', ')
 
 const sql = `-- =============================================================================
 -- GENERADO AUTOMÁTICAMENTE POR \`npm run seed:games\` — NO EDITAR A MANO.
--- Fuente: src/games/definitions/ y src/games/catalog.data.ts
+-- Fuente: src/games/definitions/ y scripts/catalog.data.ts
 -- Juegos: ${GAMES.length}
 -- =============================================================================
 
 insert into public.games (
-  slug, name, icon, tagline, image_url, theme, min_players, max_players,
-  score_label, score_label_short, total_mode, winner_rule, target_score,
-  sort_order, definition,
-  sheet_id, min_time, max_time, difficulty, rules, search_text
+${columnList(gameColumns)}
 ) values
-${gameRows}
+${GAMES.map(values).join(',\n')}
 on conflict (slug) do update set
-  name = excluded.name,
-  icon = excluded.icon,
-  tagline = excluded.tagline,
-  image_url = excluded.image_url,
-  theme = excluded.theme,
-  min_players = excluded.min_players,
-  max_players = excluded.max_players,
-  score_label = excluded.score_label,
-  score_label_short = excluded.score_label_short,
-  total_mode = excluded.total_mode,
-  winner_rule = excluded.winner_rule,
-  target_score = excluded.target_score,
-  sort_order = excluded.sort_order,
-  definition = excluded.definition,
-  sheet_id = excluded.sheet_id,
-  min_time = excluded.min_time,
-  max_time = excluded.max_time,
-  difficulty = excluded.difficulty,
-  rules = excluded.rules,
-  search_text = excluded.search_text,
+${upsertSet(gameColumns, ['slug'])},
   updated_at = now();
 
 insert into public.game_score_fields (
-  game_slug, field_key, label, short, icon, field_type, points, is_total,
-  field_group, min_value, max_value, unique_per_match, show_in_summary,
-  hint, sort_order
+${columnList(fieldColumns)}
 ) values
-${fieldRows}
+${FIELDS.map(values).join(',\n')}
 on conflict (game_slug, field_key) do update set
-  label = excluded.label,
-  short = excluded.short,
-  icon = excluded.icon,
-  field_type = excluded.field_type,
-  points = excluded.points,
-  is_total = excluded.is_total,
-  field_group = excluded.field_group,
-  min_value = excluded.min_value,
-  max_value = excluded.max_value,
-  unique_per_match = excluded.unique_per_match,
-  show_in_summary = excluded.show_in_summary,
-  hint = excluded.hint,
-  sort_order = excluded.sort_order;
+${upsertSet(fieldColumns, ['game_slug', 'field_key'])};
 
 -- Retira los campos que ya no existen en la definición TypeScript.
 -- Las partidas antiguas conservan su jsonb intacto: solo dejan de mostrarse.
@@ -203,9 +121,7 @@ delete from public.game_score_fields f
 where f.game_slug in (${slugList})
   and not exists (
     select 1 from (values
-${GAMES.flatMap((game) =>
-  game.fields.map((field) => `      (${text(game.slug)}, ${text(field.key)})`),
-).join(',\n')}
+${FIELDS.map((row) => `      (${text(row.game_slug as string)}, ${text(row.field_key as string)})`).join(',\n')}
     ) as keep(slug, field_key)
     where keep.slug = f.game_slug and keep.field_key = f.field_key
   );
@@ -214,11 +130,8 @@ ${GAMES.flatMap((game) =>
 mkdirSync(dirname(outputPath), { recursive: true })
 writeFileSync(outputPath, sql, 'utf8')
 
-const fieldCount = GAMES.reduce((total, game) => total + game.fields.length, 0)
-console.log(
-  `✓ supabase/seed_games.sql — ${GAMES.length} juegos, ${fieldCount} campos de puntuación`,
-)
+console.log(`✓ supabase/seed_games.sql — ${GAMES.length} juegos, ${FIELDS.length} campos de puntuación`)
 // Listarlos todos serían cientos de líneas: se enseña cuántos hay de cada tipo.
-const conChuleta = GAMES.filter((game) => game.rules).length
+const conChuleta = GAMES.filter((row) => row.rules).length
 const conPortada = Object.keys(COVERS).length
 console.log(`  ${conChuleta} con chuleta de reglas, ${conPortada} con portada`)

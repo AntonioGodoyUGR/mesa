@@ -104,13 +104,12 @@ describe('demoApi.getGameBySlug', () => {
     expect(game?.rules?.setup?.length).toBeGreaterThan(0)
   })
 
-  it('un juego del catálogo amplio también, aunque su chuleta viva aparte', async () => {
-    // En la app las chuletas del catálogo llegan con `import()`; quien pide un juego
-    // por su slug no tiene que saberlo.
-    const game = await demoApi.getGameBySlug('pandemic')
-
-    expect(game?.name).toBe('Pandemic')
-    expect(game?.rules?.turn?.length).toBeGreaterThan(0)
+  // El catálogo amplio ya no viaja en la app: vive en Postgres y llega por
+  // `search_catalog`. En modo demostración —que es lo que hay sin credenciales y sin
+  // red— solo existen los 24 escritos a mano y los que se invente el grupo, así que un
+  // juego de la cola larga no está. Es la contrapartida aceptada de buscar en servidor.
+  it('un juego que solo vive en el catálogo remoto no está', async () => {
+    expect(await demoApi.getGameBySlug('pandemic')).toBeNull()
   })
 
   it('un slug que no existe devuelve null, no revienta', async () => {

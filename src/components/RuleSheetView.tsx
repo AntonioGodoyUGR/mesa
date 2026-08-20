@@ -1,7 +1,5 @@
 import type { CSSProperties } from 'react'
-import { useEffect, useState } from 'react'
 import { difficultyIcon, difficultyLabel, formatPlayTime } from '../games/filters'
-import { loadRules, needsRuleLoad, ruleSheetOf } from '../games/rules'
 import type { GameDefinition } from '../games/types'
 
 /**
@@ -14,13 +12,20 @@ import type { GameDefinition } from '../games/types'
  * Nota: no incluimos ni redistribuimos el reglamento oficial (tiene copyright);
  * esto es un resumen propio y, si acaso, un enlace a la web del editor.
  *
- * De dónde salen las reglas lo resuelve `games/rules.ts`, no la pantalla: las de un
- * juego escrito a mano vienen en su propia definición, y las del catálogo amplio se
- * cargan a demanda para no meterlas en el arranque de la app. Por eso hay un momento
- * de espera, y por eso no se pinta «no tiene chuleta» mientras dura: sería mentira.
+ * La chuleta llega dentro del juego, y de dónde sale el juego no es asunto de esta
+ * pantalla: los de `definitions/` la traen en su propia definición y los del catálogo
+ * amplio, en la columna `rules` de su fila. Lo que sí importa aquí es `loading`: son
+ * ~2,8 kB que solo se piden al abrir la ficha, y mientras llegan no se puede pintar
+ * «no tiene chuleta», porque sería mentira.
  */
-export function RuleSheetView({ game }: { game: GameDefinition }) {
-  const { rules, loading } = useRuleSheet(game)
+export function RuleSheetView({
+  game,
+  loading = false,
+}: {
+  game: GameDefinition
+  loading?: boolean
+}) {
+  const rules = game.rules ?? {}
 
   const hasContent =
     !!rules.setup?.length ||
@@ -143,40 +148,6 @@ export function RuleSheetView({ game }: { game: GameDefinition }) {
       )}
     </article>
   )
-}
-
-/**
- * La chuleta del juego, esperando al `import()` de `catalog.rules.ts` si hace falta.
- *
- * Empieza por lo que se pueda resolver sin esperar, así el juego que trae la suya
- * —los de `definitions/` y los de grupo— se pinta en el primer render, sin parpadeo.
- * `loading` existe para no decir «no tiene chuleta» mientras se está cargando.
- */
-function useRuleSheet(game: GameDefinition) {
-  const [rules, setRules] = useState(() => ruleSheetOf(game))
-  const [loading, setLoading] = useState(() => needsRuleLoad(game))
-
-  useEffect(() => {
-    setRules(ruleSheetOf(game))
-
-    if (!needsRuleLoad(game)) {
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    let alive = true
-    loadRules().then(() => {
-      if (!alive) return
-      setRules(ruleSheetOf(game))
-      setLoading(false)
-    })
-    return () => {
-      alive = false
-    }
-  }, [game])
-
-  return { rules: rules ?? {}, loading }
 }
 
 function Chip({ icon, text }: { icon: string; text: string }) {

@@ -12,7 +12,6 @@ import {
   validateScores,
 } from './registry'
 import type { CatalogGameRow } from './registry'
-import { CATALOG_GAMES } from './catalog'
 import { COVERS, coverUrl } from './covers'
 import type { ScoreValues } from './types'
 
@@ -52,10 +51,10 @@ describe('coherencia de las definiciones', () => {
     }
   })
 
-  // `rules` es opcional en el tipo: no la traen los juegos que crea un usuario. Los del
-  // catálogo amplio PUEDEN llevarla —los más jugados la tienen en `catalog.rules.ts`— o
-  // quedarse sin ella y enseñar «Sin chuleta de reglas». Los escritos a mano en
-  // `definitions/` sí están obligados a llevar la chuleta entera: es lo que los distingue.
+  // `rules` es opcional en el tipo: no la traen los juegos que crea un usuario, y los del
+  // catálogo amplio la tienen en Postgres o no la tienen. Los escritos a mano en
+  // `definitions/` sí están obligados a llevar la chuleta entera, y además dentro del
+  // bundle: son los que funcionan sin red.
   it('la chuleta de reglas está completa en todos los juegos escritos a mano', () => {
     for (const game of CURATED_GAMES) {
       const rules = game.rules
@@ -94,11 +93,11 @@ describe('coherencia de las definiciones', () => {
   })
 
   // `covers.generated.ts` lo escribe un script y se commitea junto a los .webp. Las dos
-  // formas de que se desincronice son que sobreviva la entrada de un juego que ya no
-  // existe, y que se commitee el fichero generado sin las imágenes: ninguna de las dos
-  // rompe la compilación, solo dejan un hueco en la interfaz.
-  it('cada portada generada apunta a un juego real y a un fichero que existe', () => {
-    const slugs = new Set(GAME_LIST.map((game) => game.slug))
+  // forma de que se desincronice es que se commitee sin las imágenes, que no rompe la
+  // compilación: solo deja un hueco en la interfaz. Que cada portada corresponda a un
+  // juego que existe se comprueba en `scripts/seed.test.ts`, que es donde están los 393
+  // juegos de la semilla; aquí solo viajan los 24 escritos a mano.
+  it('cada portada generada apunta a un fichero que existe', () => {
     // Se listan con `import.meta.glob` en vez de leer el disco con `node:fs` porque este
     // fichero compila con el tsconfig de la app, que no trae los tipos de Node. Sin
     // `eager` no se importa ninguna imagen: solo interesan las claves.
@@ -109,7 +108,6 @@ describe('coherencia de las definiciones', () => {
     )
 
     for (const [slug, cover] of Object.entries(COVERS)) {
-      expect(slugs.has(slug), `${slug} no está en GAME_LIST`).toBe(true)
       expect(cover.startsWith('/'), `${slug}: la ruta debe ser relativa`).toBe(false)
       expect(enDisco.has(cover), `falta public/${cover}`).toBe(true)
     }
@@ -119,59 +117,6 @@ describe('coherencia de las definiciones', () => {
     for (const game of GAME_LIST) {
       expect(game.slug.startsWith('c-'), `${game.slug} pisa el prefijo c-`).toBe(false)
     }
-  })
-})
-
-describe('catálogo amplio', () => {
-  const curatedSlugs = new Set(CURATED_GAMES.map((game) => game.slug))
-
-  it('está entero dentro de la lista de juegos integrados', () => {
-    const slugs = new Set(GAME_LIST.map((game) => game.slug))
-    for (const game of CATALOG_GAMES) {
-      expect(slugs.has(game.slug), `${game.slug} no llegó a GAME_LIST`).toBe(true)
-    }
-    expect(GAME_LIST.length).toBe(CURATED_GAMES.length + CATALOG_GAMES.length)
-  })
-
-  // Si un juego del catálogo repitiera el slug de uno escrito a mano, el registro se
-  // quedaría con el escrito a mano y la fila del catálogo desaparecería sin avisar.
-  // Cuando eso pase, lo correcto es borrar la fila de `catalog.data.ts`.
-  it('ninguna fila pisa el slug de un juego escrito a mano', () => {
-    const pisados = CATALOG_GAMES.filter((game) => curatedSlugs.has(game.slug))
-    expect(pisados.map((game) => game.slug)).toEqual([])
-  })
-
-  it('cada juego trae nombre, icono y lema', () => {
-    for (const game of CATALOG_GAMES) {
-      expect(game.name.trim(), game.slug).not.toBe('')
-      expect(game.icon.trim(), game.slug).not.toBe('')
-      expect(game.tagline.trim(), game.slug).not.toBe('')
-      expect(game.slug, `${game.name}: slug con mayúsculas o símbolos`).toMatch(
-        /^[a-z0-9]+(-[a-z0-9]+)*$/,
-      )
-    }
-  })
-
-  it('los rangos de jugadores son posibles', () => {
-    for (const game of CATALOG_GAMES) {
-      expect(game.minPlayers, game.slug).toBeGreaterThan(0)
-      expect(game.maxPlayers, game.slug).toBeGreaterThanOrEqual(game.minPlayers)
-    }
-  })
-
-  it('todos declaran una hoja de puntuación utilizable', () => {
-    for (const game of CATALOG_GAMES) {
-      expect(game.fields.length, `${game.slug} sin campos`).toBeGreaterThan(0)
-      expect(game.scoreLabel.trim(), game.slug).not.toBe('')
-    }
-  })
-
-  // Cada juego copia los campos de su hoja: si los compartieran, tocar el mínimo de uno
-  // se lo cambiaría a los otros trescientos que usan la misma hoja.
-  it('dos juegos con la misma hoja no comparten el objeto de los campos', () => {
-    const conPuntos = CATALOG_GAMES.filter((game) => game.fields[0]?.key === 'points')
-    expect(conPuntos.length).toBeGreaterThan(1)
-    expect(conPuntos[0].fields[0]).not.toBe(conPuntos[1].fields[0])
   })
 })
 

@@ -1,32 +1,26 @@
 import type { GameDefinition, ScoreField, ScoreValues } from './types'
 import { CURATED_GAMES } from './curated'
-import { CATALOG_GAMES, expandCatalogRow, type CatalogGameRow } from './catalog'
+import { expandCatalogRow, type CatalogGameRow } from './catalog'
 import { coverUrl } from './covers'
 
 export { CURATED_GAMES } from './curated'
 export type { CatalogGameRow } from './catalog'
 
-const CURATED_SLUGS = new Set(CURATED_GAMES.map((game) => game.slug))
-
 /**
- * Catálogo de juegos que vienen con la app, en dos capas:
+ * Los juegos que viajan dentro de la app: los 24 escritos a mano en `definitions/`,
+ * con su hoja de puntuación propia y su chuleta de reglas.
  *
- * - `CURATED_GAMES`: los escritos a mano en `definitions/`, con su hoja de puntuación
- *   propia y su chuleta de reglas. Van primero: son los que se juegan a diario.
- * - `CATALOG_GAMES`: los cientos de títulos declarados en una línea en `catalog.data.ts`,
- *   con hoja genérica y sin chuleta.
+ * No están todos los que son, y es a propósito. El catálogo amplio —cientos de títulos
+ * hoy, decenas de miles cuando acabe la ingesta de BGG— vive en Postgres y llega por
+ * `search_catalog`: meterlo aquí serían megabytes de JavaScript en cada visita para que
+ * cada cual mire cuatro juegos. Estos 24 son el arranque en frío: lo que hace que la app
+ * funcione entera sin red y lo que usa el modo demostración.
  *
- * Si un juego está en las dos, manda la definición escrita a mano: escribir su fichero
- * en `definitions/` es la forma de ascender un juego del catálogo.
- *
- * Los juegos que crean los usuarios NO están aquí: viven en la base de datos y se resuelven
- * en tiempo de ejecución (ver `context/GamesContext`). Su slug empieza por `c-`, prefijo que
- * ningún juego integrado puede usar.
+ * Los juegos que crean los usuarios tampoco están aquí: viven en la base de datos y se
+ * resuelven en tiempo de ejecución (ver `context/GamesContext`). Su slug empieza por
+ * `c-`, prefijo que ningún juego integrado puede usar.
  */
-export const BUILTIN_GAMES: GameDefinition[] = [
-  ...CURATED_GAMES,
-  ...CATALOG_GAMES.filter((game) => !CURATED_SLUGS.has(game.slug)),
-].map(withCover)
+export const BUILTIN_GAMES: GameDefinition[] = CURATED_GAMES.map(withCover)
 
 /**
  * Le pone al juego la portada descargada, si la tiene.

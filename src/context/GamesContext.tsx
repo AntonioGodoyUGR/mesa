@@ -188,18 +188,29 @@ export function useCatalogSearch(
   }
 }
 
-/** Un juego con todo lo suyo. Solo pregunta al servidor si no se puede resolver ya. */
+/**
+ * Un juego con todo lo suyo, incluida la chuleta de reglas.
+ *
+ * Se pregunta al servidor salvo que el juego ya esté entero, que es lo que pasa con los
+ * 24 que viajan en la app y con los que se inventa el grupo. Una fila del catálogo, en
+ * cambio, llega sin chuleta: son ~2,8 kB que no pintan nada en una rejilla de tarjetas y
+ * que solo hacen falta en la ficha, así que se piden aquí. Mientras llegan se devuelve
+ * la copia que ya había, y por eso abrir un juego recién buscado no espera a nadie.
+ */
 export function useGame(slug: string | undefined): {
   game: GameDefinition | undefined
   loading: boolean
+  /** Hay un juego que pintar, pero todavía le falta lo que no cabe en una fila. */
+  completing: boolean
 } {
   const { getGame, remember, loading } = useGames()
   const local = getGame(slug)
+  const complete = !!local && (!!local.rules || !!local.groupId)
 
   const query = useQuery({
     queryKey: queryKeys.game(slug ?? ''),
     queryFn: () => api.getGameBySlug(slug!),
-    enabled: !!slug && !local && !loading,
+    enabled: !!slug && !complete && !loading,
     staleTime: CATALOG_STALE,
   })
 
@@ -208,8 +219,9 @@ export function useGame(slug: string | undefined): {
   }, [query.data, remember])
 
   return {
-    game: local ?? query.data ?? undefined,
-    loading: loading || query.isLoading,
+    game: query.data ?? local,
+    loading: loading || (!local && query.isLoading),
+    completing: !!local && query.isLoading,
   }
 }
 

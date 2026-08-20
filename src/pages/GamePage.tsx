@@ -51,7 +51,7 @@ export function GamePage() {
   const { getGame } = useGames()
   // Por `useGame` y no por `getGame`: un juego de la cola larga del catálogo no viaja
   // dentro de la app, y esta pantalla se puede abrir por enlace directo.
-  const { game, loading } = useGame(slug)
+  const { game, loading, completing } = useGame(slug)
   const { group, players, me } = useGroup()
   const { user } = useAuth()
   const { statusOf, setStatus, saving } = useLibrary()
@@ -170,7 +170,7 @@ export function GamePage() {
             </section>
           )}
 
-          <RuleSheetView game={game} />
+          <RuleSheetView game={game} loading={completing} />
 
           {/* Los accesorios del juego son de lo poco que se puede usar sin haber
               jugado nada, así que van junto a las reglas. */}

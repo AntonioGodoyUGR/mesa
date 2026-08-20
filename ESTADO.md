@@ -18,6 +18,54 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **Escalar el catálogo: FASE 4 HECHA (2026-08-20).** El catálogo sale del bundle y entra
+  la ingesta masiva. Ya no hay ningún dato de juego en la app salvo los 24 escritos a mano.
+  - **`catalog.data.ts` y `catalog.rules.ts` se mudan a `scripts/`.** Dejan de ser dato de
+    ejecución y pasan a ser **semilla**: los leen `npm run seed:games` y `npm run ingest:bgg`,
+    y de ahí bajan a Postgres, que es de donde los busca la app. `src/games/rules.ts` borrado
+    —ya no hay nada que cargar con `import()`, la chuleta viene en `games.rules`— y
+    `RuleSheetView` la lee de `game.rules` con un `loading` que le pasa `useGame`.
+    `BUILTIN_GAMES` = `CURATED_GAMES`: 24 juegos, y el resto del catálogo por red.
+  - **`scripts/ingest-bgg.ts` (nuevo)**: `--min-votes=100 --limit=30000 --dry-run --restart`.
+    Lee el volcado CSV de BGG (`scripts/data/`, en `.gitignore`), se queda con los más
+    votados, pide sus fichas a la XML API en lotes de 20 con la pausa de 2 s de siempre y
+    hace `upsert` a Supabase en tandas de 500 con la clave de servicio. **Reanudable**:
+    apunta por dónde iba en `scripts/data/ingest-bgg.progress.json`. Un juego que ya está
+    escrito a mano **no se pisa**: se le añaden solo `bgg_id`, `year`, `popularity` y las
+    dos portadas. Coste estimado: ~50 min para 30.000 fichas.
+  - **La traducción BGG → catálogo vive aparte, en `scripts/lib/bgg-games.ts`**, porque es lo
+    único de la ingesta que se puede comprobar sin red (regla 3 del `CLAUDE.md`): categorías
+    a lema en español, icono, peso a dificultad, mecánicas a hoja, y el slug. Ojo con el
+    slug: `games_custom_slug_prefix` prohíbe que un juego de catálogo empiece por `c-`, así
+    que «C&C: Ancients» sale como `bgg-c-c-ancients`. Testeado en `bgg-games.test.ts`.
+  - **Las dos siembras comparten `scripts/lib/game-rows.ts`**: escriben la MISMA fila, una
+    en SQL y otra por red. Y `seed-games.ts` ya **no pisa** lo que trajo la ingesta
+    (`KEEP_IF_SET`: `coalesce` en las portadas y el año, `greatest` en la popularidad), que
+    si no, volver a sembrar tras añadir un juego a mano dejaba el catálogo sin carátulas.
+  - **Portadas sin forjar nada.** `bgg-api.ts` lee ahora `<thumbnail>` además de `<image>`,
+    que son las dos URLs que **da BGG**: la grande para la ficha, la miniatura para la
+    rejilla. Nada de inventarse una variante de Thumbor —van firmadas—, y la ingesta hace
+    `HEAD` sobre una muestra de 20 antes de escribir nada: si falla más de la mitad, se
+    planta. `getGameBySlug` ya trae `cover_url`/`cover_thumb_url`, así que un juego de la
+    cola larga abierto por enlace directo sale con su caja y no con el emoji.
+  - **Tests movidos de sitio, no borrados.** Las invariantes del catálogo amplio salen de
+    `registry.test.ts` (que ya solo ve 24 juegos) y entran en **`scripts/seed.test.ts`**,
+    del lado que las escribe: slugs únicos, nada que pise un juego a mano, lema y rangos
+    posibles, campos no compartidos por referencia, columnas `not null` llenas y cada
+    portada apuntando a un juego que existe. 189 tests en verde.
+  - **Medido:** primera visita en **190 kB gzip** (era 205 tras la fase 1 y 261 al empezar).
+    Comprobado que en `dist/` no aparece ni una fila del catálogo (`grep "Pandemic Legacy"`
+    → nada).
+  - ⚠️ **No hace falta ejecutar nada en Supabase**: las columnas que usa la ingesta ya
+    entraron con la fase 2. Lo que sí necesita Toni para **lanzarla**: `BGG_API_TOKEN`,
+    `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` en `.env` (ver `.env.example`) y el CSV del
+    volcado oficial (gratis, pide cuenta) de `boardgamegeek.com/data_dumps/bg_ranks` en
+    `scripts/data/`. Sin el CSV el script se planta y explica de dónde bajarlo: la XML API
+    no tiene forma de listar «todos los juegos», solo de preguntar por ID.
+  - ⚠️ **En modo demostración el catálogo amplio ya no existe.** Sin credenciales solo hay
+    24 juegos. Es la contrapartida que Toni aceptó al elegir búsqueda toda en servidor, y
+    está escrita en el test (`api.demo.test.ts`: `getGameBySlug('pandemic')` → `null`).
+
 - **Escalar el catálogo: FASE 3 HECHA (2026-08-20).** La interfaz ya lee el catálogo de
   Postgres: el array completo de juegos **ya no existe** en ninguna parte del cliente.
   - **`src/context/GamesContext.tsx` reescrito.** Fuera `games` y `builtin`. Expone `custom`
@@ -338,24 +386,31 @@ quedó a medias y lo siguiente que toca.
 ## Pendiente / ideas (sin prioridad asignada)
 
 - [ ] **Chuletas del catálogo, oleadas siguientes**: quedan sin chuleta el resto de las
-      filas de `catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
+      filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Fases 4 y 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
-      aprobado por Toni; las fases 1, 2 y 3 están hechas). En orden:
-      **(4)** `scripts/ingest-bgg.ts` con `SUPABASE_SERVICE_ROLE_KEY` y `<thumbnail>` en
-      `bgg-api.ts`. **(5)** Edge Function `resolve-game` + tabla `catalog_misses`.
-      Con la fase 4 llega el momento de **sacar `catalog.data.ts` del bundle**: ya solo sirve
-      de arranque en frío y de reserva del modo demostración.
-      ⚠️ Antes de fijar el tamaño de portada en la ingesta, **comprobar con `HEAD` sobre una
-      muestra** qué variante responde 200: las URLs de BGG son Thumbor **firmadas** y la firma
-      cubre la transformación, así que cambiar `__original` por `__imagepage` puede dar 403.
-- [ ] 6 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
+- [ ] **Fase 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
+      aprobado por Toni; las fases 1, 2, 3 y 4 están hechas): **crecimiento bajo demanda**.
+      Edge Function `resolve-game` —cuando `search_catalog` devuelve poco, consulta BGG con
+      el token del servidor, inserta las filas y las devuelve— y tabla `catalog_misses` para
+      no repetir búsquedas fallidas, con límite por IP.
+      ⚠️ **Invariante que no se puede romper:** `matches.game_slug` es FK a `games.slug`, así
+      que la función tiene que **insertar antes de devolver**; si no, se puede pintar un juego
+      con el que luego no se puede guardar una partida.
+- [ ] **Lanzar la ingesta de verdad**. El script está hecho y probado en seco, pero nadie ha
+      corrido las ~50 min contra el Supabase real: falta el CSV del volcado y la clave de
+      servicio (ver «Estado actual»). Hasta entonces el catálogo en producción son los 393
+      juegos de la semilla.
+- [ ] 10 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
       o funciones exportadas junto a componentes en `AuthContext`, `GamesContext`,
       `GroupContext`, `LibraryContext`, `GameCover`, `ShowMore`. Cosmético.
 
 ## Bitácora
 
+- **2026-08-20** — Claude (terminal): fase 4 del plan de escalado (ver «Estado actual»). El
+  catálogo sale del bundle —`catalog.data.ts` y `catalog.rules.ts` se mudan a `scripts/`, y
+  en la app solo quedan los 24 escritos a mano— y entra `npm run ingest:bgg`, que siembra
+  Postgres desde BoardGameGeek. Primera visita en 190 kB gzip. 189 tests en verde.
 - **2026-08-20** — Claude (terminal): fase 3 del plan de escalado (ver «Estado actual»). La
   interfaz deja de tener el catálogo dentro: `GamesContext` resuelve por slug, el catálogo
   llega por tandas desde `search_catalog` con 250 ms de espera y 24 h de caché, y las

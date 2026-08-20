@@ -1,12 +1,14 @@
 /**
- * La lista de juegos integrados, vista desde los scripts.
+ * La lista de juegos que trae el proyecto, vista desde los scripts.
  *
- * Se arma desde `catalog.data.ts` y `curated.ts` en vez de desde `registry.ts`
- * a propósito: `registry.ts` arrastra `catalog.ts`, y ese importa
- * `covers.generated.ts`, que es justo el fichero que estos scripts escriben.
- * Importarlo desde aquí ataría la generación al resultado de la vez anterior.
+ * Se arma desde la semilla del catálogo y desde `curated.ts` en vez de desde
+ * `registry.ts` a propósito, y por dos motivos. Uno: `registry.ts` importa
+ * `covers.generated.ts`, que es justo el fichero que estos scripts escriben, y tirar de
+ * él ataría la generación al resultado de la vez anterior. Dos: desde que el catálogo
+ * amplio vive en Postgres, `registry.ts` solo conoce los 24 escritos a mano, y estos
+ * scripts trabajan con los cientos de la semilla.
  */
-import { CATALOG_ROWS } from '../../src/games/catalog.data'
+import { CATALOG_ROWS } from '../catalog.data'
 import { CURATED_GAMES } from '../../src/games/curated'
 
 export interface GameEntry {
@@ -20,8 +22,8 @@ const curated: GameEntry[] = CURATED_GAMES.map(({ slug, name }) => ({ slug, name
 const curatedSlugs = new Set(curated.map((game) => game.slug))
 
 /**
- * Los 393 juegos que trae la app, curados primero, sin repetir slug.
- * Mismo criterio que `BUILTIN_GAMES` en `registry.ts`.
+ * Los juegos que el proyecto describe él mismo, curados primero y sin repetir slug:
+ * los 24 escritos a mano más las filas de la semilla del catálogo.
  */
 export const BUILTIN_ENTRIES: GameEntry[] = [
   ...curated,

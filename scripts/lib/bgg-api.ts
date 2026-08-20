@@ -10,29 +10,20 @@
  * Wikidata, que no piden credenciales.
  *
  * BGG pide ir despacio (~1 petición cada 2 s) y responde `202` mientras prepara la
- * respuesta, así que hay que reintentar en vez de darlo por vacío.
+ * respuesta, así que hay que reintentar en vez de darlo por vacío. Ese ritmo es también
+ * la razón de que esto viva solo en `scripts/`: 0,5 peticiones por segundo es el techo
+ * del token entero, no de cada usuario, así que la app nunca habla con BGG.
  */
-import { readFileSync, existsSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readEnv } from './env'
 
-const here = dirname(fileURLToPath(import.meta.url))
 const BASE = 'https://boardgamegeek.com/xmlapi2'
 const USER_AGENT = 'TableTracker/1.0 (https://github.com/; contacto en el repo)'
 /** BGG recomienda un máximo de una petición cada dos segundos. */
 export const BGG_PAUSE_MS = 2000
 
-/** Lee `BGG_API_TOKEN` del entorno o del `.env` del proyecto, sin dependencias. */
+/** Lee `BGG_API_TOKEN` del entorno o del `.env` del proyecto. */
 export function readToken(): string | undefined {
-  if (process.env.BGG_API_TOKEN) return process.env.BGG_API_TOKEN.trim()
-
-  const envPath = resolve(here, '..', '..', '.env')
-  if (!existsSync(envPath)) return undefined
-  for (const line of readFileSync(envPath, 'utf8').split(/\r?\n/)) {
-    const match = /^\s*BGG_API_TOKEN\s*=\s*(.*)$/.exec(line)
-    if (match) return match[1].trim().replace(/^["']|["']$/g, '')
-  }
-  return undefined
+  return readEnv('BGG_API_TOKEN')
 }
 
 async function get(path: string, token: string): Promise<string> {
@@ -72,6 +63,24 @@ function decode(text: string): string {
     .replace(/&amp;/g, '&')
 }
 
+/** `<etiqueta value="…"/>`, como número. Devuelve `undefined` si no está o es 0. */
+function numberOf(block: string, tag: string): number | undefined {
+  const found = new RegExp(`<${tag}[^>]*/>`).exec(block)?.[0]
+  const value = found ? Number.parseFloat(attr(found, 'value') ?? '') : NaN
+  return Number.isFinite(value) && value > 0 ? value : undefined
+}
+
+/** Los valores de `<link type="…" value="…"/>`: mecánicas, categorías, familias. */
+function linksOf(block: string, type: string): string[] {
+  const values: string[] = []
+  for (const tag of block.match(/<link[^>]*\/>/g) ?? []) {
+    if (attr(tag, 'type') !== type) continue
+    const value = attr(tag, 'value')
+    if (value) values.push(decode(value))
+  }
+  return values
+}
+
 /** `/search`: juegos y expansiones cuyo nombre encaja con la consulta. */
 export async function search(
   query: string,
@@ -98,26 +107,78 @@ export async function search(
   return hits
 }
 
+/**
+ * La ficha de un juego en BGG.
+ *
+ * Lo de arriba lo lee cualquiera que llame; lo de `stats` en adelante solo llega si se
+ * pide `stats: true`, que es lo que hace la ingesta. `fetch-covers.ts` no lo pide: solo
+ * quiere la carátula, y con `stats=1` la respuesta de 20 juegos se multiplica por tres
+ * para tirar el resto.
+ */
 export interface BggThing {
   id: number
   name?: string
+  /** `boardgame`, `boardgameexpansion`… La ingesta descarta lo que no sea un juego. */
+  type?: string
+  /** La carátula original, de hasta ~1500 px. */
   image?: string
+  /** La miniatura de ~200 px que sirve el propio CDN de BGG. */
+  thumbnail?: string
+  year?: number
+  minPlayers?: number
+  maxPlayers?: number
+  minTime?: number
+  maxTime?: number
+  /** La dificultad que vota la gente, de 1 a 5. */
+  weight?: number
+  /** Cuánta gente la ha votado: es la medida de popularidad que usa la ingesta. */
+  votes?: number
+  mechanics?: string[]
+  categories?: string[]
 }
 
-/** `/thing`: la ficha de hasta 20 juegos por petición, con su carátula. */
-export async function things(ids: number[], token: string): Promise<BggThing[]> {
-  const xml = await get(`thing?id=${ids.join(',')}`, token)
+/**
+ * `/thing`: la ficha de hasta 20 juegos por petición.
+ *
+ * Con `stats` viene además `<statistics>`, de donde salen el peso y los votos. No se
+ * pide siempre porque engorda mucho la respuesta y casi nadie lo necesita.
+ */
+export async function things(
+  ids: number[],
+  token: string,
+  options: { stats?: boolean } = {},
+): Promise<BggThing[]> {
+  const query = options.stats ? `thing?id=${ids.join(',')}&stats=1` : `thing?id=${ids.join(',')}`
+  const xml = await get(query, token)
 
   const items: BggThing[] = []
   for (const block of xml.split('<item ').slice(1)) {
     const id = Number.parseInt(attr(block, 'id') ?? '', 10)
     if (!Number.isFinite(id)) continue
     const nameTag = /<name[^>]*type="primary"[^>]*\/>/.exec(block)?.[0]
-    items.push({
+
+    const thing: BggThing = {
       id,
       name: nameTag ? decode(attr(nameTag, 'value') ?? '') : undefined,
+      type: attr(block, 'type'),
       image: /<image>([^<]+)<\/image>/.exec(block)?.[1]?.trim(),
-    })
+      thumbnail: /<thumbnail>([^<]+)<\/thumbnail>/.exec(block)?.[1]?.trim(),
+    }
+
+    if (options.stats) {
+      thing.year = numberOf(block, 'yearpublished')
+      thing.minPlayers = numberOf(block, 'minplayers')
+      thing.maxPlayers = numberOf(block, 'maxplayers')
+      // `playingtime` es el único que traen todas las fichas antiguas: vale de respaldo.
+      thing.minTime = numberOf(block, 'minplaytime') ?? numberOf(block, 'playingtime')
+      thing.maxTime = numberOf(block, 'maxplaytime') ?? numberOf(block, 'playingtime')
+      thing.weight = numberOf(block, 'averageweight')
+      thing.votes = numberOf(block, 'usersrated') ?? 0
+      thing.mechanics = linksOf(block, 'boardgamemechanic')
+      thing.categories = linksOf(block, 'boardgamecategory')
+    }
+
+    items.push(thing)
   }
   return items
 }

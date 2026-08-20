@@ -1,6 +1,13 @@
 /**
- * El catálogo, una línea por juego. Lo lee `catalog.ts`, que lo convierte en
- * `GameDefinition`s completas.
+ * El catálogo amplio, una línea por juego. Es la SEMILLA de la base de datos, no
+ * un dato de ejecución: lo leen `npm run seed:games` y `npm run ingest:bgg`, y de
+ * ahí baja a Postgres, que es de donde lo busca la app.
+ *
+ * Vive en `scripts/` justo por eso. Estuvo dentro de `src/games/` mientras el
+ * catálogo entero viajaba en el bundle; con el catálogo creciendo a decenas de
+ * miles de juegos, meterlo en el JavaScript que descarga cada visita dejó de tener
+ * sentido. Lo que sigue viajando en la app son los 24 de `definitions/`, que es lo
+ * que la hace funcionar sin red.
  *
  * Columnas:
  *   slug · nombre · icono · lema · jugadores (min, max) · minutos (min, max) · dificultad · hoja
@@ -16,26 +23,16 @@
  * dificultad es cuánto cuesta ponerse a jugar, no cuánto cuesta ganar.
  *
  * Los juegos con hoja de puntuación DETALLADA (con los conceptos propios del juego) van
- * en `definitions/`, no aquí. Una chuleta de reglas por sí sola no basta para promocionar
- * un juego: los más jugados del catálogo la llevan sin salir de aquí, escrita aparte en
- * `catalog.rules.ts`. Si un juego está en los dos sitios, manda `definitions/`.
+ * en `src/games/definitions/`, no aquí. Una chuleta de reglas por sí sola no basta para
+ * promocionar un juego: los más jugados del catálogo la llevan sin salir de aquí,
+ * escrita aparte en `catalog.rules.ts`. Si un juego está en los dos sitios, manda
+ * `definitions/`.
+ *
+ * La regla de qué hoja y qué color le tocan a cada fila no está aquí, sino en
+ * `expandCatalogSeedRow` (`src/games/catalog.ts`): es la misma que reconstruye un
+ * juego que llega del servidor, y no puede haber dos.
  */
-import type { GameDifficulty } from './types'
-
-export type SheetId = 'points' | 'lowest' | 'coop' | 'teams' | 'win'
-
-export type CatalogRow = readonly [
-  slug: string,
-  name: string,
-  icon: string,
-  tagline: string,
-  minPlayers: number,
-  maxPlayers: number,
-  minTime: number,
-  maxTime: number,
-  difficulty: GameDifficulty,
-  sheet: SheetId,
-]
+import type { CatalogRow } from '../src/games/catalog'
 
 export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------

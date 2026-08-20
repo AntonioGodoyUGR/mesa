@@ -56,9 +56,11 @@ Un push a `main` despliega a GitHub Pages sin más pasos
 
 - **Añadir un juego con hoja propia**: fichero nuevo en `src/games/definitions/<slug>.ts`,
   importarlo y añadirlo a `CURATED_GAMES` (`src/games/curated.ts`), borrar su fila de
-  `catalog.data.ts` si la tenía, y `npm run seed:games`.
-- **Añadir un juego al catálogo amplio**: una línea en `src/games/catalog.data.ts`, y
-  `npm run seed:games`.
+  `scripts/catalog.data.ts` si la tenía, y `npm run seed:games`.
+- **Añadir un juego al catálogo amplio**: una línea en `scripts/catalog.data.ts`, y
+  `npm run seed:games`. Ese fichero es la **semilla**, no un dato de ejecución: el
+  catálogo se busca en Postgres, no en el bundle. El catálogo de verdad —decenas de
+  miles— lo escribe `npm run ingest:bgg`, que habla con BoardGameGeek y con Supabase.
 - **Ruta nueva**: registrarla en `src/App.tsx` bajo el guardián que corresponda
   (`RequireAuth`, `RequireGroup`), con la URL en español como las demás, y traer la página
   con `lazy()` como las otras: cada pantalla viaja en su propio trozo de JavaScript.

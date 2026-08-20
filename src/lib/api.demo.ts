@@ -6,7 +6,6 @@ import {
   requireGame,
 } from '../games/registry'
 import { CATALOG_PAGE, filterGames } from '../games/filters'
-import { loadRules } from '../games/rules'
 import { customSlug } from '../games/custom'
 import type { GameDefinition, ScoreValues } from '../games/types'
 import type { TableTrackerApi } from './api'
@@ -432,14 +431,11 @@ export const demoApi: TableTrackerApi = {
     const custom = db().customGames.find((game) => game.slug === slug)
     if (custom) return delay(custom)
 
-    const builtin = getGame(slug)
-    if (!builtin) return delay(null)
-
-    // En Supabase la chuleta es una columna de la fila; aquí está en `catalog.rules`,
-    // que se carga a demanda. En los dos casos, quien pide un juego por su slug lo
-    // recibe con reglas: es la pantalla donde se leen.
-    const rules = builtin.rules ?? (await loadRules())[slug]
-    return delay(rules ? { ...builtin, rules } : builtin)
+    // Los 24 que viajan en la app traen su chuleta dentro de la definición, así que
+    // aquí no hay nada que completar. En Supabase la chuleta es una columna de la
+    // fila y la trae esta misma llamada: en los dos casos, quien pide un juego por su
+    // slug lo recibe con reglas, que es lo que espera la ficha.
+    return delay(getGame(slug) ?? null)
   },
 
   async getGamesBySlugs(slugs) {

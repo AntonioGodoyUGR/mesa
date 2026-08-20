@@ -5,16 +5,19 @@
  * hasta ahora la pantalla enseñaba «Sin chuleta de reglas» para todos. Pero los más
  * jugados sí merecen su resumen, y no compensa promocionarlos a `definitions/` solo por
  * eso —seguirían siendo juegos de una hoja genérica—. Así que las reglas viven aquí,
- * separadas de la fila del catálogo: un mapa `slug` → `RuleSheet` que `catalog.ts`
- * engancha al expandir. Si un slug no está en el mapa, el juego se queda sin chuleta y
- * se comporta como antes.
+ * separadas de la fila del catálogo: un mapa `slug` → `RuleSheet`.
+ *
+ * Es semilla, como `catalog.data.ts`, y por el mismo motivo: son ~2,8 kB por juego que
+ * solo hacen falta al abrir UNA ficha. Van a la columna `games.rules` de Postgres y la
+ * app las pide con el juego (`getGameBySlug`); no viajan en el bundle. Si un slug no
+ * está en el mapa, el juego se queda sin chuleta y se comporta como antes.
  *
  * Se rellena por oleadas, empezando por los títulos más jugados. Precisión ante todo:
  * son las reglas de la caja base (sin expansiones), y donde no hay certeza se deja el
  * apartado fuera antes que inventarlo. El PDF oficial no se empaqueta —es material con
  * copyright—: por eso cada juego enlaza a la web del editor en `officialLink`.
  */
-import type { RuleSheet } from './types'
+import type { RuleSheet } from '../src/games/types'
 
 export const CATALOG_RULES: Record<string, RuleSheet> = {
   // ---------------------------------------------------------------------------
