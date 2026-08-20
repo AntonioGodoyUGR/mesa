@@ -22,8 +22,15 @@ quedó a medias y lo siguiente que toca.
   buscador devuelve menos de tres juegos y hay al menos tres letras escritas, la app le
   pregunta a BoardGameGeek por lo que falta, lo escribe en el catálogo y lo pinta. Es el
   último trozo del plan de escalado: las cinco fases están completas.
-  - **SQL ejecutado por Toni el 2026-08-20** (`search_catalog.sql` y `resolve_game.sql`).
-    ⚠️ **Queda desplegar la función**, sin la cual esto sigue inerte: ver «Pendiente».
+  - **EN PRODUCCIÓN desde el 2026-08-20**: Toni ejecutó los dos SQL (`search_catalog.sql`
+    y `resolve_game.sql`) y desplegó la función desde el panel de Supabase.
+  - ⚠️ **La función desplegada es una COPIA empaquetada, no el código del repo.** Se
+    desplegó desde el panel (Edge Functions → Via Editor), cuyo editor es de un solo
+    fichero, así que lo pegado es la salida de `npm run bundle:function`
+    (`scripts/data/resolve-game.bundle.ts`). **Quien toque
+    `supabase/functions/resolve-game/index.ts` o `_shared/` tiene que volver a generar el
+    empaquetado y volver a pegarlo**, o el cambio se queda en el repositorio y no llega a
+    producción. El panel tampoco guarda historial de esas ediciones.
   - **Qué hay nuevo.** `supabase/functions/resolve-game/` (la función), `catalog_misses` +
     `claim_catalog_lookup` + `resolve_catalog_games` en `supabase/schema.sql`, `resolveGame`
     en las **dos** implementaciones de la API, `needsBggLookup` en `filters.ts` y el enganche
@@ -451,27 +458,15 @@ quedó a medias y lo siguiente que toca.
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Toni: desplegar la Edge Function `resolve-game`.** El SQL ya está ejecutado
-      (`search_catalog` y `resolve_game`, 2026-08-20); falta solo la función, que **no**
-      sale con el push a GitHub Pages. Dos caminos:
-      - **Desde el panel, sin instalar nada:** `npm run bundle:function` genera
-        `scripts/data/resolve-game.bundle.ts` (un solo fichero, ~18 kB, porque el editor
-        del panel no admite varios). Edge Functions → «Deploy a new function» → «Via
-        Editor», nombre `resolve-game`, pegar y desplegar. **Antes**, el secreto
-        `BGG_API_TOKEN` en Edge Functions → Secrets.
-      - **Con la CLI:** `supabase link` → `supabase secrets set BGG_API_TOKEN=…` →
-        `supabase functions deploy resolve-game`. Sube los tres ficheros de verdad, sin
-        empaquetar.
-      Si se toca el original hay que **volver a generar y volver a pegar** el empaquetado:
-      el panel no se entera de lo que pase en el repositorio.
-      Mientras tanto no se rompe nada: sin función desplegada, buscar un juego que no está
-      da lo mismo que hoy («ningún juego cumple lo que buscas»).
 - [ ] 10 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
       o funciones exportadas junto a componentes en `AuthContext`, `GamesContext`,
       `GroupContext`, `LibraryContext`, `GameCover`, `ShowMore`. Cosmético.
 
 ## Bitácora
 
+- **2026-08-20** — Toni: los dos SQL ejecutados y `resolve-game` desplegada desde el panel
+  de Supabase. El crecimiento bajo demanda está vivo en producción. Ojo con lo de arriba:
+  lo desplegado es el empaquetado de un fichero, no el código del repo.
 - **2026-08-20** — Claude (terminal): **fase 5, y con ella el plan de escalado entero**.
   Crecimiento bajo demanda: Edge Function `resolve-game`, `catalog_misses` y sus dos
   funciones de Postgres, `resolveGame` en las dos APIs y el enganche en `useCatalogSearch`.
