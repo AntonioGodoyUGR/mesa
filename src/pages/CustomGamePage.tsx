@@ -42,7 +42,7 @@ import { ScoreFieldEditor } from '../components/ScoreFieldEditor'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { RuleSheetView } from '../components/RuleSheetView'
 import { ErrorNote, PageHeader, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGame } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 import { resizeToWebp } from '../lib/image'
@@ -99,9 +99,8 @@ export function CustomGamePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { group } = useGroup()
-  const { getGame, loading } = useGames()
+  const { game: existing, loading } = useGame(slug)
 
-  const existing = slug ? getGame(slug) : undefined
   const [draft, setDraft] = useState<GameDefinition | null>(null)
   const [rulesForm, setRulesForm] = useState<RulesForm | null>(null)
   const [imageError, setImageError] = useState<string | null>(null)

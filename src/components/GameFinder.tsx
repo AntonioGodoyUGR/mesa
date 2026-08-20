@@ -139,8 +139,12 @@ export function GameFinder({
  */
 function foundLabel(results: number, total: number | undefined, more: boolean): string {
   if (results === 0) return 'Ningún juego'
-  if (total !== undefined) return `${results} de ${total} juegos`
-  return more ? `Más de ${results} juegos` : `${results} juegos`
+  // «1 juego» y no «1 juegos»: buscar el nombre de uno concreto es lo más común que
+  // se hace aquí, así que el caso raro sale a diario. Concuerda con el número que
+  // acompaña al sustantivo, que en «N de M» es el segundo.
+  const juegos = (count: number) => (count === 1 ? 'juego' : 'juegos')
+  if (total !== undefined) return `${results} de ${total} ${juegos(total)}`
+  return more ? `Más de ${results} ${juegos(results)}` : `${results} ${juegos(results)}`
 }
 
 function Group({ label, children }: { label: string; children: ReactNode }) {

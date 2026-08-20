@@ -38,8 +38,9 @@ describe('sin sesión', () => {
     expect(await screen.findByRole('heading', { name: 'Juegos' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Todos los juegos' })).toBeVisible()
 
-    // Sin grupo no hay marcador que abrir: la rejilla lleva a la ficha.
-    const catan = screen.getByRole('link', { name: /Catán/ })
+    // Sin grupo no hay marcador que abrir: la rejilla lleva a la ficha. El catálogo
+    // ya no viaja en la app: llega del servidor, así que hay que esperarlo.
+    const catan = await screen.findByRole('link', { name: /Catán/ })
     expect(catan).toHaveAttribute('href', '/juegos/catan')
 
     // Y no se ofrece crear un juego, que es cosa de un grupo.

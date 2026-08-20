@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { MatchCard } from '../components/MatchCard'
 import { EmptyState, ErrorNote, PageHeader, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGames, useMatchGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 
@@ -19,6 +19,8 @@ export function MatchesPage() {
   })
 
   const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data])
+  useMatchGames(matches) // los juegos de todas ellas, en una sola petición
+
   const shown = filter ? matches.filter((match) => match.game_slug === filter) : matches
 
   // Un chip por juego que el grupo haya jugado de verdad, ordenados por frecuencia:

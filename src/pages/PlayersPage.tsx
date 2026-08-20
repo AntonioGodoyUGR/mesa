@@ -1,9 +1,10 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { computeLeaderboard, formatPercent } from '../lib/stats'
 import { Avatar } from '../components/Avatar'
 import { ErrorNote, PageHeader, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGames, useMatchGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 
@@ -19,7 +20,11 @@ export function PlayersPage() {
     enabled: !!group,
   })
 
-  const board = computeLeaderboard(matchesQuery.data ?? [], players, getGame)
+  // La clasificación resuelve el juego de cada partida, así que se piden todos juntos.
+  const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data])
+  useMatchGames(matches)
+
+  const board = computeLeaderboard(matches, players, getGame)
 
   return (
     <div className="flex flex-col gap-4">

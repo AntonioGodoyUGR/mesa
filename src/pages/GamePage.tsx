@@ -9,7 +9,7 @@ import { MatchCard } from '../components/MatchCard'
 import { RuleSheetView } from '../components/RuleSheetView'
 import { EmptyState, ErrorNote, Spinner, Stat } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
-import { useGames } from '../context/GamesContext'
+import { useGame, useGames } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { useLibrary } from '../context/LibraryContext'
 import { difficultyIcon, difficultyLabel, formatPlayTime } from '../games/filters'
@@ -48,8 +48,10 @@ function isTabId(value: string | null): value is TabId {
  */
 export function GamePage() {
   const { slug } = useParams()
-  const { getGame, loading } = useGames()
-  const game = getGame(slug)
+  const { getGame } = useGames()
+  // Por `useGame` y no por `getGame`: un juego de la cola larga del catálogo no viaja
+  // dentro de la app, y esta pantalla se puede abrir por enlace directo.
+  const { game, loading } = useGame(slug)
   const { group, players, me } = useGroup()
   const { user } = useAuth()
   const { statusOf, setStatus, saving } = useLibrary()

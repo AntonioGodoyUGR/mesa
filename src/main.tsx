@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import App from './App'
@@ -40,7 +40,19 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, maxAge: WEEK }}
+      persistOptions={{
+        persister,
+        maxAge: WEEK,
+        dehydrateOptions: {
+          // El catálogo no se guarda en disco. Cada búsqueda es una clave distinta
+          // con sus fichas dentro, y `localStorage` son 5 MB para toda la app: unas
+          // cuantas búsquedas lo llenarían y se perdería lo que de verdad hace falta
+          // sin cobertura —partidas, biblioteca, fichas ya vistas—, que sí se guarda.
+          // Volver a pedir el catálogo es una consulta; recuperar lo otro, imposible.
+          shouldDehydrateQuery: (query) =>
+            defaultShouldDehydrateQuery(query) && query.queryKey[0] !== 'catalog',
+        },
+      }}
     >
       <App />
     </PersistQueryClientProvider>

@@ -6,7 +6,7 @@ import { formatDate } from '../lib/stats'
 import { GameCover } from '../components/GameCover'
 import { Avatar } from '../components/Avatar'
 import { EmptyState, ErrorNote, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGame } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 import type { GameDefinition } from '../games/types'
@@ -17,7 +17,6 @@ export function MatchDetailPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { group } = useGroup()
-  const { getGame } = useGames()
 
   const matchesQuery = useQuery({
     queryKey: queryKeys.matches(group?.id ?? ''),
@@ -33,9 +32,13 @@ export function MatchDetailPage() {
     },
   })
 
+  // La partida se busca aquí arriba porque de ella sale el slug del juego, y los
+  // hooks no pueden quedar detrás de un `return`.
+  const match = matchesQuery.data?.find((candidate) => candidate.id === id)
+  const { game } = useGame(match?.game_slug)
+
   if (matchesQuery.isLoading) return <Spinner />
 
-  const match = matchesQuery.data?.find((candidate) => candidate.id === id)
   if (!match) {
     return (
       <EmptyState
@@ -51,7 +54,6 @@ export function MatchDetailPage() {
     )
   }
 
-  const game = getGame(match.game_slug)
   const entries = [...match.match_players].sort((a, b) => a.rank - b.rank)
 
   return (

@@ -8,7 +8,7 @@ import { GameTools } from '../components/GameTools'
 import { PlayerPicker } from '../components/PlayerPicker'
 import { ScoreSheet, type ScoreRow } from '../components/ScoreSheet'
 import { ErrorNote, Spinner } from '../components/ui'
-import { useGames } from '../context/GamesContext'
+import { useGame } from '../context/GamesContext'
 import { useGroup } from '../context/GroupContext'
 import { api, queryKeys } from '../lib/api'
 
@@ -25,8 +25,8 @@ export function NewMatchPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { group, players } = useGroup()
-  const { getGame, loading } = useGames()
-  const game = getGame(slug)
+  // Se puede llegar aquí por enlace directo a un juego que no viaja dentro de la app.
+  const { game, loading } = useGame(slug)
 
   const [step, setStep] = useState<1 | 2>(1)
   const [selected, setSelected] = useState<string[]>([])

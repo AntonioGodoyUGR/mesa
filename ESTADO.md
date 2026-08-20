@@ -18,47 +18,46 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
-- **FASE 3 A MEDIAS (2026-08-19). Sin commitear en `main`: vive en la rama `fase-3-interfaz`.**
-  Compila (`npx tsc -b` limpio) pero **hay 2 tests en rojo**, y son justo los esperados:
-  `App.test.tsx` y `GuestMode.test.tsx` buscan un juego de la rejilla de Inicio con
-  `getByRole` nada más pintar, y el catálogo ahora **llega de forma asíncrona** (consulta al
-  servidor + 250 ms de espera del buscador). El arreglo es `findByRole`/`await`, no un
-  cambio de comportamiento. **Es lo primero que hay que hacer mañana.**
-  Lo que ya está escrito:
-  - **`src/context/GamesContext.tsx` reescrito.** Ya no expone ningún array completo
-    (`games` y `builtin` fuera). Expone `custom` (los del grupo, que siguen siendo pocos),
-    `getGame(slug)` —resuelve en tres pasos síncronos: juegos del grupo → los que viajan en
-    la app → los que ya se trajeron del servidor (`remember`)— y `loading`. La resolución
-    tiene que seguir siendo síncrona porque una tarjeta de partida pinta el nombre de su
-    juego sin poder esperar a nadie.
+- **Escalar el catálogo: FASE 3 HECHA (2026-08-20).** La interfaz ya lee el catálogo de
+  Postgres: el array completo de juegos **ya no existe** en ninguna parte del cliente.
+  - **`src/context/GamesContext.tsx` reescrito.** Fuera `games` y `builtin`. Expone `custom`
+    (los del grupo, que siguen siendo pocos), `getGame(slug)` —resuelve en tres pasos
+    **síncronos**: juegos del grupo → los que viajan en la app → los que ya se trajeron del
+    servidor (`remember`)— y `loading`. Tiene que seguir siendo síncrono porque una tarjeta
+    de partida pinta el nombre de su juego sin poder esperar a nadie.
   - **Hooks nuevos, en ese mismo fichero**: `useCatalogSearch` (paginación de servidor con
     `useInfiniteQuery`, `staleTime` de 24 h, **debounce de 250 ms** en el texto y no en los
-    chips), `useGame` (uno, solo pide si no se puede resolver ya), `useGamesBySlugs` (varios
-    en UNA petición) y `useMatchGames` (los juegos de una lista de partidas, de una tacada).
-    ⚠️ `remember` solo apunta lo que no estaba y devuelve el mismo mapa si no hay nada nuevo:
-    sin esa comparación, cada respuesta dispara un render que vuelve a apuntar lo mismo.
+    chips, porque tocar un chip ya es una decisión tomada), `useGame` (uno, solo pide si no
+    se puede resolver ya), `useGamesBySlugs` (varios en UNA petición) y `useMatchGames` (los
+    juegos de una lista de partidas, de una tacada).
+    ⚠️ `remember` solo apunta lo que no estaba y **devuelve el mismo mapa si no hay nada
+    nuevo**: sin esa comparación, cada respuesta dispara un render que vuelve a apuntar lo
+    mismo, y otro, y otro.
   - **`HomePage`**: la rejilla del catálogo y los resultados de búsqueda son ya la MISMA
     consulta al servidor (sin criterios, `search_catalog` devuelve el catálogo por
     popularidad). Lo que ya sale arriba —favoritos y juegos del grupo— se descuenta de la
     rejilla de abajo en el cliente, solo cuando no se está buscando.
   - **`LibraryPage`**: «En casa» y «Deseados» resuelven sus slugs con `useGamesBySlugs` y se
     siguen filtrando en memoria (son listas cortas); «Todos» es el catálogo por tandas.
-  - **`PlayerProfilePage`**: `LibraryShelf` recibe los juegos resueltos por lotes.
+  - **Un juego suelto, por `useGame`**: `GamePage`, `NewMatchPage`, `CustomGamePage` y
+    `MatchDetailPage`. **Por lotes, con `useMatchGames`**: `MatchesPage`, `PlayersPage`,
+    `HomePage` y `PlayerProfilePage`. Hoy no dispara ni una petición extra —el catálogo
+    entero todavía viaja en la app—, pero sin esto un juego de la cola larga (fase 4 en
+    adelante) saldría sin nombre. ⚠️ En `MatchDetailPage` la partida se busca **antes** de
+    los `return` tempranos: de ella sale el slug, y los hooks no pueden quedar detrás.
   - **`ShowMore`** admite las dos paginaciones: `hidden` (lista en memoria, se sabe cuántos
     quedan) y `more` (servidor, solo se sabe si queda algo). **`GameFinder`**: `total` pasa a
-    ser opcional y aparece «Más de N juegos» cuando quedan tandas — contar el catálogo
-    entero sería una consulta aparte sobre decenas de miles de filas para un paréntesis.
-  Lo que **falta** de la fase 3, por orden:
-  1. Arreglar los 2 tests (`findByRole`).
-  2. Pasar a `useGame` las pantallas de un solo juego: `GamePage`, `NewMatchPage`,
-     `CustomGamePage`, `MatchDetailPage`. Y `useMatchGames` en `MatchesPage` y
-     `PlayersPage`. Hoy usan `getGame` y **funcionan igual**, porque el catálogo entero
-     sigue viajando en la app; sin esto, un juego de la cola larga (fase 4 en adelante)
-     saldría sin nombre.
-  3. En `main.tsx`, **sacar las búsquedas de catálogo del `localStorage` persistido**
-     (`shouldDehydrateQuery`): son respuestas grandes y rehacibles, y pueden llenar la cuota.
-  4. `npm run lint && npm test && npm run build`, actualizar este fichero y fusionar.
-  ⚠️ Nada de esto se sube a `main` hasta que esté verde: un push a `main` despliega.
+    ser opcional y aparece «Más de N juegos» cuando quedan tandas — contar el catálogo entero
+    sería una consulta aparte sobre decenas de miles de filas para un paréntesis.
+  - **El catálogo NO se persiste en `localStorage`** (`shouldDehydrateQuery` en `main.tsx`):
+    cada búsqueda es una clave distinta con sus fichas dentro y son 5 MB para toda la app.
+    Volver a pedirlo es una consulta; recuperar partidas y biblioteca sin cobertura, no.
+  - **Probado en el navegador contra el Supabase de verdad** (`npm run dev`, sin sesión):
+    la portada trae 24 juegos por popularidad; escribir «catan» dispara **una sola** llamada
+    a `search_catalog` y responde «1 juego»; «Ver más juegos» trae la segunda tanda;
+    `/juegos/scythe` —que no tiene definición a mano— se resuelve por enlace directo; la
+    chuleta de Carcassonne llega aparte; y la caché persistida se quedó en **1 kB sin
+    ninguna clave `catalog`**. Todo en verde: lint 0, 161 tests, build OK.
 - **Escalar el catálogo: FASE 2 HECHA (2026-08-19). Toni ya ejecutó los dos ficheros en su editor.**
   La base de datos deja de ser una copia del catálogo y pasa a ser **el original**. Lo hecho:
   - **`supabase/schema.sql`**: columnas nuevas en `public.games` (`bgg_id`, `year`,
@@ -342,13 +341,12 @@ quedó a medias y lo siguiente que toca.
       filas de `catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Fases 3 a 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
-      aprobado por Toni; las fases 1 y 2 están hechas). En orden:
-      **(3)** `GamesContext` deja de exponer el array entero, paginación de servidor en
-      `HomePage`/`LibraryPage` y debounce de 250-300 ms en el buscador (hoy no hay, porque
-      busca en memoria; mañana sería una petición por tecla). **(4)** `scripts/ingest-bgg.ts`
-      con `SUPABASE_SERVICE_ROLE_KEY` y `<thumbnail>` en `bgg-api.ts`. **(5)** Edge Function
-      `resolve-game` + tabla `catalog_misses`.
+- [ ] **Fases 4 y 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
+      aprobado por Toni; las fases 1, 2 y 3 están hechas). En orden:
+      **(4)** `scripts/ingest-bgg.ts` con `SUPABASE_SERVICE_ROLE_KEY` y `<thumbnail>` en
+      `bgg-api.ts`. **(5)** Edge Function `resolve-game` + tabla `catalog_misses`.
+      Con la fase 4 llega el momento de **sacar `catalog.data.ts` del bundle**: ya solo sirve
+      de arranque en frío y de reserva del modo demostración.
       ⚠️ Antes de fijar el tamaño de portada en la ingesta, **comprobar con `HEAD` sobre una
       muestra** qué variante responde 200: las URLs de BGG son Thumbor **firmadas** y la firma
       cubre la transformación, así que cambiar `__original` por `__imagepage` puede dar 403.
@@ -358,6 +356,11 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-20** — Claude (terminal): fase 3 del plan de escalado (ver «Estado actual»). La
+  interfaz deja de tener el catálogo dentro: `GamesContext` resuelve por slug, el catálogo
+  llega por tandas desde `search_catalog` con 250 ms de espera y 24 h de caché, y las
+  búsquedas no se guardan en disco. Probado contra el Supabase de verdad, no solo en tests.
+  Todo en verde (161 tests, build OK).
 - **2026-08-19** — Claude (terminal): fase 2 del plan de escalado (ver «Estado actual»).
   Columnas nuevas en `public.games`, `pg_trgm` + índice GIN, `searchable()` gemela en SQL y
   la RPC `search_catalog`; `catalogGame`/`expandCatalogRow` para volver a montar un juego

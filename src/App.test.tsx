@@ -33,7 +33,7 @@ describe('App', () => {
 
     expect(await screen.findByRole('heading', { name: 'Nueva partida' })).toBeVisible()
     const games = await gameGrid()
-    expect(games.getByText('Catán')).toBeVisible()
+    expect(await games.findByText('Catán')).toBeVisible()
     expect(games.getByText('Carcassonne')).toBeVisible()
     expect(games.getByText('Camel Up')).toBeVisible()
 
@@ -52,8 +52,10 @@ describe('App', () => {
     fireEvent.click(within(players).getByRole('button', { name: '3' }))
 
     // Camel Up dura 20–30 min y admite de 3 a 8; Terraforming Mars es de otra tarde.
+    // El catálogo llega del servidor, así que se espera a la rejilla filtrada antes
+    // de comprobar quién no está en ella.
     const games = await gameGrid()
-    expect(games.getByText('Camel Up')).toBeVisible()
+    expect(await games.findByText('Camel Up')).toBeVisible()
     expect(games.queryByText('Terraforming Mars')).toBeNull()
     expect(games.queryByText('Patchwork')).toBeNull() // corto, pero solo para dos
 
@@ -65,7 +67,7 @@ describe('App', () => {
     renderApp()
 
     // Tocar el juego abre su ficha; «Crear partida» es lo que lleva al marcador.
-    fireEvent.click((await gameGrid()).getByText('Catán'))
+    fireEvent.click(await (await gameGrid()).findByText('Catán'))
     fireEvent.click(await screen.findByRole('link', { name: /Crear partida/ }))
 
     // Paso 1: los jugadores del grupo.
@@ -175,7 +177,7 @@ describe('App', () => {
     expect(screen.queryByRole('link', { name: /Reglas/ })).toBeNull()
 
     fireEvent.click(await screen.findByRole('link', { name: /Inicio/ }))
-    fireEvent.click((await gameGrid()).getByText('Carcassonne'))
+    fireEvent.click(await (await gameGrid()).findByText('Carcassonne'))
 
     // «Reglas» es la pestaña por defecto de la ficha.
     expect(await screen.findByText('Preparación')).toBeVisible()
@@ -186,7 +188,7 @@ describe('App', () => {
     renderApp()
 
     fireEvent.click(await screen.findByRole('link', { name: /Inicio/ }))
-    fireEvent.click((await gameGrid()).getByText('Carcassonne'))
+    fireEvent.click(await (await gameGrid()).findByText('Carcassonne'))
     fireEvent.click(await screen.findByRole('tab', { name: 'Estadísticas' }))
 
     expect(await screen.findByRole('heading', { name: 'Tus partidas' })).toBeVisible()
