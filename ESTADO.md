@@ -18,6 +18,32 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **CATÁLOGO INGESTADO: 17.972 juegos en Postgres (2026-08-20).** La ingesta de verdad ya
+  corrió: 23.269 fichas pedidas a BGG en 52 min, 17.886 escritas y 5.383 descartadas
+  (expansiones y fichas sin nombre), cero avisos. Con las 100 de la repesca y lo que ya
+  había, `public.games` tiene **17.972 juegos de catálogo, 17.944 con carátula de BGG y
+  ninguno sin `search_text`**. Los escritos a mano conservan su ficha entera: Catan sigue
+  con su icono, su hoja y su chuleta, y de BGG solo se le añadieron año, votos y portadas.
+  - ⚠️ **PENDIENTE DE TONI: ejecutar `scripts/data/search_catalog.sql` en el SQL Editor.**
+    Es `search_catalog` con el `order by` nuevo (abajo). Hasta que se ejecute, buscar
+    «cata» en producción **no devuelve Catan**. No borra ni migra nada: es un
+    `create or replace` de la función.
+  - **Por qué cambia el orden.** Ordenar por `similarity()` compara el texto ENTERO
+    —nombre + lema—, así que castiga los nombres largos: «catan economico negociacion»
+    puntuaba por debajo de «catatac». Ahora manda que **empiece por lo escrito** y, entre
+    esos, la popularidad. Empezar una palabra cualquiera cuenta igual que empezar la frase
+    («tokyo» → King of Tokyo, no Tokyo Highway). `similarity()` nunca filtró nada —eso lo
+    hace el `like` con el índice de trigramas—, así que no se pierde ningún resultado.
+    `searchGames` en `registry.ts` ordena igual: misma regla en los dos sitios, como
+    `compute_match_total`.
+  - **Dos fallos que destapó el ensayo y ya están arreglados**: las claves de la tabla de
+    categorías no eran los nombres reales de BGG (salía «Medical · Viajes» y «Movies / TV /
+    Radio theme»), ahora están **las 84** con su nombre exacto; y un `--dry-run` guardaba el
+    fichero de avance, con lo que la pasada de verdad se saltaba los juegos del ensayo —los
+    más populares—. Se recuperaron con `--restart --limit=100`.
+  - `scripts/data/ingest-bgg.progress.json` tiene 23.329 IDs y 17.972 slugs ya procesados:
+    volver a lanzar `npm run ingest:bgg` no repite trabajo. Para rehacerlo todo, `--restart`.
+
 - **Escalar el catálogo: FASE 4 HECHA (2026-08-20).** El catálogo sale del bundle y entra
   la ingesta masiva. Ya no hay ningún dato de juego en la app salvo los 24 escritos a mano.
   - **`catalog.data.ts` y `catalog.rules.ts` se mudan a `scripts/`.** Dejan de ser dato de
@@ -397,16 +423,21 @@ quedó a medias y lo siguiente que toca.
       ⚠️ **Invariante que no se puede romper:** `matches.game_slug` es FK a `games.slug`, así
       que la función tiene que **insertar antes de devolver**; si no, se puede pintar un juego
       con el que luego no se puede guardar una partida.
-- [ ] **Lanzar la ingesta de verdad**. El script está hecho y probado en seco, pero nadie ha
-      corrido las ~50 min contra el Supabase real: falta el CSV del volcado y la clave de
-      servicio (ver «Estado actual»). Hasta entonces el catálogo en producción son los 393
-      juegos de la semilla.
+- [ ] **Toni: ejecutar `scripts/data/search_catalog.sql`** en el SQL Editor de Supabase.
+      Mientras no se haga, el catálogo de 17.972 juegos está dentro pero se busca mal:
+      «cata» no devuelve Catan (ver «Estado actual»).
 - [ ] 10 warnings de oxlint tipo `react(only-export-components)` (fast-refresh): constantes
       o funciones exportadas junto a componentes en `AuthContext`, `GamesContext`,
       `GroupContext`, `LibraryContext`, `GameCover`, `ShowMore`. Cosmético.
 
 ## Bitácora
 
+- **2026-08-20** — Claude (terminal): **catálogo ingestado de verdad**. 52 min contra BGG y
+  Supabase: 17.972 juegos en `public.games`, 17.944 con carátula. El ensayo previo destapó
+  dos fallos que se arreglaron antes (categorías sin traducir en los lemas y un `--dry-run`
+  que guardaba el avance), y las primeras búsquedas reales destaparon otro: ordenar por
+  `similarity()` dejaba a Catan fuera de los tres primeros de «cata». ⚠️ Queda que Toni
+  ejecute `scripts/data/search_catalog.sql`. 191 tests en verde.
 - **2026-08-20** — Claude (terminal): fase 4 del plan de escalado (ver «Estado actual»). El
   catálogo sale del bundle —`catalog.data.ts` y `catalog.rules.ts` se mudan a `scripts/`, y
   en la app solo quedan los 24 escritos a mano— y entra `npm run ingest:bgg`, que siembra
