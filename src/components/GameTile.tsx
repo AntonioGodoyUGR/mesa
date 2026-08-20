@@ -9,10 +9,14 @@ import type { TileSize } from '../lib/tilesize'
  * Todo lo que pinta (portada, icono, color, nombre, número de jugadores) sale de la
  * definición: no conoce ningún juego en concreto.
  *
- * La caja es cuadrada porque las portadas se guardan cuadradas (512 px recortados al
- * centro, ver `scripts/fetch-covers.ts`): cualquier otra proporción se comería un
- * trozo de la carátula. El nombre va debajo y no encima, para que se lea igual sobre
- * una portada clara que sobre una oscura.
+ * La caja es cuadrada porque las portadas descargadas se guardan cuadradas (512 px
+ * recortados al centro, ver `scripts/fetch-covers.ts`). Las que enlazamos de BGG NO
+ * lo son —vienen en 200x150 y cada caja con su proporción—, así que la imagen va
+ * `absolute inset-0` dentro de la caja: con `h-full` a secas, un alto en porcentaje
+ * sobre un padre de altura automática se resuelve como `auto` y es la imagen la que
+ * estira la caja, que es lo que descuadraba la rejilla entera. El recorte lo hace
+ * `object-cover`. El nombre va debajo y no encima, para que se lea igual sobre una
+ * portada clara que sobre una oscura.
  *
  * Viene en tres tamaños (ver `lib/tilesize.ts`). Encogerla no es escalarla: a dos
  * columnas la portada mide 169 px y hay sitio para el nombre entero y la línea de
@@ -52,7 +56,7 @@ export function GameTile({
       style={{ '--game': game.theme.primary } as CSSProperties}
     >
       <span
-        className={`${size === 'small' ? 'game-rule-thin' : 'game-rule'} relative block aspect-square`}
+        className={`${size === 'small' ? 'game-rule-thin' : 'game-rule'} relative block aspect-square overflow-hidden`}
       >
         {cover.src ? (
           <img
@@ -60,7 +64,7 @@ export function GameTile({
             alt=""
             loading="lazy"
             onError={cover.onError}
-            className="h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
           <span className="game-wash flex h-full w-full items-center justify-center">

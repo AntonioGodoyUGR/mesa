@@ -43,6 +43,16 @@ quedó a medias y lo siguiente que toca.
     más populares—. Se recuperaron con `--restart --limit=100`.
   - `scripts/data/ingest-bgg.progress.json` tiene 23.329 IDs y 17.972 slugs ya procesados:
     volver a lanzar `npm run ingest:bgg` no repite trabajo. Para rehacerlo todo, `--restart`.
+  - **Y un tercer fallo, que solo se veía con el catálogo dentro: la rejilla se
+    descuadraba.** `GameTile` daba `h-full` a la imagen dentro de una caja `aspect-square`
+    de altura automática; un alto en porcentaje contra un padre de altura indefinida se
+    resuelve como `auto`, así que mandaba el alto natural de la imagen. Con las 369
+    portadas descargadas (512x512) coincidía por casualidad; las de BGG vienen en 200x150
+    y estiraban la tarjeta. Ahora la imagen va `absolute inset-0` y la caja recorta.
+  - **Probado en el navegador contra el Supabase de verdad**: «zombi» trae 24 juegos con
+    su carátula de BGG y la rejilla cuadrada, `/juegos/zombie-dice` —cola larga pura—
+    abre con portada, lema en español y «todavía no tiene chuleta», y escribir «carcass»
+    dispara **una sola** llamada a `search_catalog`.
 
 - **Escalar el catálogo: FASE 4 HECHA (2026-08-20).** El catálogo sale del bundle y entra
   la ingesta masiva. Ya no hay ningún dato de juego en la app salvo los 24 escritos a mano.
