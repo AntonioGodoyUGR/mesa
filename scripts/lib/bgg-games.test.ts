@@ -74,8 +74,28 @@ describe('lema e icono', () => {
     )
   })
 
+  // Están las 84 categorías que BGG usa hoy, así que esto solo pasa si añaden una nueva.
   it('una categoría sin traducir se queda como está, que es mejor que nada', () => {
-    expect(taglineOf(['Book'])).toBe('Book')
+    expect(taglineOf(['Steampunk'])).toBe('Steampunk')
+  })
+
+  // El fallo que se busca aquí es la clave mal escrita: `Movies` en vez de
+  // `Movies / TV / Radio theme` no casa con nada y saca el inglés a la tarjeta.
+  it('las categorías que más se repiten se traducen todas', () => {
+    for (const category of [
+      'Medical',
+      'Movies / TV / Radio theme',
+      'Murder/Mystery',
+      'Aviation / Flight',
+      'Industry / Manufacturing',
+      'Spies/Secret Agents',
+      'Novel-based',
+      'Action / Dexterity',
+      "Children's Game",
+      'Mature / Adult',
+    ]) {
+      expect(taglineOf([category]), category).not.toBe(category)
+    }
   })
 
   it('sin categorías queda un lema genérico, nunca vacío', () => {
