@@ -239,6 +239,40 @@ update public.games set
   end;
 
 -- -----------------------------------------------------------------------------
+-- Consultas que ya se le han preguntado a BoardGameGeek
+--
+-- El catálogo ingerido corta en 100 votos, así que por debajo de ese corte quedan
+-- unas 160.000 fichas de BGG que nadie ha pedido todavía. Cuando alguien busca una
+-- de ellas y no aparece, la función `resolve-game` va a BGG, la trae y la escribe:
+-- así el catálogo crece por donde la gente lo necesita, sin bajarse la cola larga
+-- entera «por si acaso».
+--
+-- Esta tabla es el freno de esa función, y hace falta por dos motivos:
+--
+--   · El límite de BGG (~1 petición cada 2 s) es del TOKEN, no de cada usuario.
+--     Diez personas buscando lo mismo son diez peticiones al mismo cubo. Con la
+--     consulta apuntada, la segunda ya no sale de aquí.
+--   · Lo que no existe en BGG tampoco existirá mañana. Sin memoria de los fallos,
+--     una sola búsqueda mal escrita repetida a diario gasta el cupo para siempre.
+--
+-- La clave es la consulta ya normalizada con `searchable()`, la misma que usa el
+-- buscador: «Catán» y «catan» son la misma pregunta. `found` dice cuántos juegos
+-- trajo —cero es un fallo, y es justo lo que hay que recordar— y `hits` cuántas
+-- veces se ha vuelto a pedir, que es lo que dice si merece la pena bajar el corte
+-- de votos en la próxima ingesta.
+--
+-- No guarda quién preguntó: ni cuenta, ni IP, ni nada. El texto buscado, la fecha
+-- y dos contadores. El límite por IP de la función vive en su memoria y se va con
+-- ella.
+-- -----------------------------------------------------------------------------
+create table if not exists public.catalog_misses (
+  query text primary key,
+  tried_at timestamptz not null default now(),
+  found int not null default 0,
+  hits int not null default 1
+);
+
+-- -----------------------------------------------------------------------------
 -- Biblioteca personal: qué juegos ha comprado cada uno y cuáles desea.
 --
 -- Cuelga de la CUENTA y no del grupo a propósito: la caja está en tu estantería
@@ -988,6 +1022,228 @@ grant execute on function public.search_catalog(
   text, int, int, int, text[], text[], uuid, text[]
 ) to anon, authenticated;
 
+-- -----------------------------------------------------------------------------
+-- El catálogo bajo demanda: traer de BoardGameGeek lo que no está
+--
+-- La ingesta corta en 100 votos porque por debajo hay ~160.000 fichas que casi
+-- nadie ha jugado. Pero «casi nadie» no es «nadie»: alguien buscará su juego raro
+-- y no lo encontrará. Cuando eso pasa, la función `resolve-game` —una Edge
+-- Function, en `supabase/functions/`— le pregunta a BGG, y estas dos funciones son
+-- lo que puede hacer con la respuesta.
+--
+-- Por qué desde el servidor y no desde el navegador: BGG no manda cabeceras CORS,
+-- exige un token que no puede salir en el bundle, y su límite de ~1 petición cada
+-- 2 s es del token entero. Y porque `matches.game_slug` es clave ajena a
+-- `games.slug`: un juego que no esté escrito aquí no se puede apuntar en una
+-- partida. Por eso la función INSERTA y solo entonces devuelve; si devolviera
+-- primero, se podría pintar un juego con el que después falla guardar la partida.
+--
+-- Las dos son `security definer` y ninguna se abre a `anon` ni a `authenticated`:
+-- escriben en el catálogo público, que es de todos, y a él solo se llega por la
+-- función, que es quien tiene el token y quien lleva la cuenta de lo preguntado.
+-- -----------------------------------------------------------------------------
+
+-- ¿Merece la pena preguntarle esto a BGG? Devuelve `true` una vez por consulta y
+-- semana. Es lo que impide que diez personas buscando lo mismo —o una insistiendo
+-- con algo que no existe— gasten un cupo que es de la aplicación entera.
+create or replace function public.claim_catalog_lookup(p_query text)
+returns boolean
+language plpgsql security definer set search_path = public as $$
+declare
+  v_key text;
+  v_last timestamptz;
+begin
+  -- La misma normalización que el buscador: «Catán» y «catan» son una sola
+  -- pregunta, y se apuntan como una sola.
+  v_key := public.searchable(coalesce(p_query, ''));
+
+  -- Dos letras las cumplen mil juegos: eso no es una búsqueda, es teclear.
+  if length(v_key) < 3 then
+    return false;
+  end if;
+
+  select tried_at into v_last from public.catalog_misses where query = v_key;
+
+  -- Ya se preguntó hace poco. Lo que trajera está en el catálogo desde entonces,
+  -- así que la respuesta la tiene ya `search_catalog`.
+  if v_last is not null and v_last > now() - interval '7 days' then
+    update public.catalog_misses set hits = hits + 1 where query = v_key;
+    return false;
+  end if;
+
+  insert into public.catalog_misses (query) values (v_key)
+  on conflict (query) do update
+    set tried_at = now(), hits = public.catalog_misses.hits + 1;
+
+  return true;
+end;
+$$;
+
+revoke execute on function public.claim_catalog_lookup(text) from public, anon, authenticated;
+grant execute on function public.claim_catalog_lookup(text) to service_role;
+
+-- -----------------------------------------------------------------------------
+-- Escribir en el catálogo lo que ha traído BGG y devolverlo listo para pintar.
+--
+-- Recibe las fichas ya traducidas por `supabase/functions/_shared/bgg-games.ts`,
+-- que es el mismo módulo que usa `npm run ingest:bgg`: un juego entra igual por
+-- los dos caminos. De la definición salen las columnas de lista y la hoja de
+-- puntuación, exactamente como en `save_custom_game`.
+--
+-- Devuelve las mismas columnas que `search_catalog`, y por el mismo motivo: al
+-- cliente le llega una fila de lista y `catalogGame()` reconstruye el resto.
+-- Devuelve también los juegos que ya estaban —BGG puede responder con uno que el
+-- buscador no encontró porque aquí se escribe distinto—, así que quien llama no
+-- tiene que distinguir entre «nuevo» y «ya lo teníamos».
+-- -----------------------------------------------------------------------------
+create or replace function public.resolve_catalog_games(p_query text, p_games jsonb)
+returns table (
+  slug text,
+  name text,
+  icon text,
+  tagline text,
+  theme jsonb,
+  min_players int,
+  max_players int,
+  min_time int,
+  max_time int,
+  difficulty text,
+  sheet_id text,
+  image_url text,
+  cover_thumb_url text,
+  group_id uuid,
+  definition jsonb
+)
+language plpgsql security definer set search_path = public as $$
+declare
+  v_game jsonb;
+  v_def jsonb;
+  v_name text;
+  v_bgg int;
+  v_slug text;
+  v_wanted text;
+  v_slugs text[] := '{}';
+begin
+  for v_game in select * from jsonb_array_elements(coalesce(p_games, '[]'::jsonb))
+  loop
+    v_def := v_game -> 'definition';
+    v_name := trim(coalesce(v_def ->> 'name', ''));
+    v_bgg := nullif(v_game ->> 'bgg_id', '')::int;
+
+    -- Una ficha sin nombre o sin hoja de puntuación no es un juego: se salta en
+    -- vez de escribir una fila que después no se podría ni puntuar.
+    continue when v_name = '' or coalesce(jsonb_array_length(v_def -> 'fields'), 0) < 1;
+
+    -- ¿Está ya, con otro nombre? El identificador de BGG es lo único estable: el
+    -- título cambia entre ediciones y el slug se calcula a partir de él.
+    v_slug := null;
+    if v_bgg is not null then
+      select g.slug into v_slug
+      from public.games g
+      where g.bgg_id = v_bgg and g.group_id is null
+      limit 1;
+    end if;
+
+    if v_slug is null then
+      -- Slug libre: el del título y, si está cogido, con el número de BGG detrás.
+      -- Es el mismo desempate que hace `freeSlug` en la ingesta. El prefijo `c-`
+      -- es de los juegos de grupo y lo prohíbe `games_custom_slug_prefix`.
+      v_wanted := v_game ->> 'slug';
+      continue when v_wanted is null or v_wanted = '' or v_wanted like 'c-%';
+
+      if exists (select 1 from public.games g where g.slug = v_wanted) then
+        v_wanted := v_wanted || '-' || coalesce(v_bgg::text, '');
+      end if;
+      continue when exists (select 1 from public.games g where g.slug = v_wanted);
+      v_slug := v_wanted;
+
+      insert into public.games (
+        slug, name, icon, tagline, theme, min_players, max_players,
+        score_label, score_label_short, total_mode, winner_rule, target_score,
+        sort_order, definition, sheet_id, min_time, max_time, difficulty,
+        bgg_id, year, popularity, cover_url, cover_thumb_url, search_text
+      ) values (
+        v_slug,
+        v_name,
+        coalesce(nullif(v_def ->> 'icon', ''), '🎲'),
+        nullif(v_def ->> 'tagline', ''),
+        coalesce(v_def -> 'theme', '{}'::jsonb),
+        coalesce((v_def ->> 'minPlayers')::int, 2),
+        coalesce((v_def ->> 'maxPlayers')::int, 8),
+        coalesce(nullif(v_def ->> 'scoreLabel', ''), 'Puntos'),
+        coalesce(nullif(v_def ->> 'scoreLabelShort', ''), 'Pts'),
+        coalesce(nullif(v_def ->> 'totalMode', ''), 'computed'),
+        coalesce(nullif(v_def ->> 'winnerRule', ''), 'highest'),
+        nullif(v_def ->> 'targetScore', '')::int,
+        -- Detrás de todo lo que el proyecto describe: entre iguales manda
+        -- `popularity` y esto solo desempata. Un juego de la cola larga tiene
+        -- pocos votos por definición, así que no se le cuela por delante a nadie.
+        10000,
+        v_def,
+        nullif(v_game ->> 'sheet_id', ''),
+        nullif(v_def -> 'playTime' ->> 'min', '')::int,
+        nullif(v_def -> 'playTime' ->> 'max', '')::int,
+        nullif(v_def ->> 'difficulty', ''),
+        v_bgg,
+        nullif(v_game ->> 'year', '')::int,
+        coalesce(nullif(v_game ->> 'popularity', '')::int, 0),
+        nullif(v_game ->> 'cover_url', ''),
+        nullif(v_game ->> 'cover_thumb_url', ''),
+        public.searchable(v_name || ' ' || coalesce(v_def ->> 'tagline', ''))
+      )
+      on conflict (slug) do nothing;
+
+      -- La hoja de puntuación, campo a campo. Sin ella `compute_match_total()`
+      -- devolvería cero en cuanto alguien apuntara una partida con este juego.
+      insert into public.game_score_fields (
+        game_slug, field_key, label, short, icon, field_type, points, is_total,
+        field_group, min_value, max_value, unique_per_match, show_in_summary,
+        hint, sort_order
+      )
+      select
+        v_slug,
+        f ->> 'key',
+        f ->> 'label',
+        nullif(f ->> 'short', ''),
+        coalesce(nullif(f ->> 'icon', ''), '🔢'),
+        f ->> 'type',
+        nullif(f ->> 'points', '')::numeric,
+        coalesce((f ->> 'isTotal')::boolean, false),
+        nullif(f ->> 'group', ''),
+        nullif(f ->> 'min', '')::numeric,
+        nullif(f ->> 'max', '')::numeric,
+        coalesce((f ->> 'uniquePerMatch')::boolean, false),
+        coalesce((f ->> 'showInSummary')::boolean, false),
+        nullif(f ->> 'hint', ''),
+        (ord - 1)::int
+      from jsonb_array_elements(v_def -> 'fields') with ordinality as t(f, ord)
+      on conflict (game_slug, field_key) do nothing;
+    end if;
+
+    v_slugs := v_slugs || v_slug;
+  end loop;
+
+  -- Cuántos trajo la consulta. Cero es un fallo, y es justo lo que hay que
+  -- recordar para no volver a preguntar lo mismo mañana.
+  update public.catalog_misses
+    set found = cardinality(v_slugs)
+    where query = public.searchable(coalesce(p_query, ''));
+
+  return query
+    select
+      g.slug, g.name, g.icon, g.tagline, g.theme,
+      g.min_players, g.max_players, g.min_time, g.max_time,
+      g.difficulty, g.sheet_id, g.image_url, g.cover_thumb_url, g.group_id,
+      null::jsonb
+    from public.games g
+    where g.slug = any (v_slugs)
+    order by g.popularity desc, g.name;
+end;
+$$;
+
+revoke execute on function public.resolve_catalog_games(text, jsonb) from public, anon, authenticated;
+grant execute on function public.resolve_catalog_games(text, jsonb) to service_role;
+
 -- =============================================================================
 -- Row Level Security — todo se recorta por pertenencia al grupo
 -- =============================================================================
@@ -1000,6 +1256,7 @@ alter table public.match_players enable row level security;
 alter table public.games enable row level security;
 alter table public.game_score_fields enable row level security;
 alter table public.game_library enable row level security;
+alter table public.catalog_misses enable row level security;
 
 -- Perfiles: cada uno gestiona el suyo; se leen los de tus compañeros de grupo.
 drop policy if exists profiles_select on public.profiles;
@@ -1116,6 +1373,11 @@ create policy game_score_fields_select on public.game_score_fields for select
         and (g.group_id is null or public.is_group_member(g.group_id))
     )
   );
+
+-- Consultas ya preguntadas a BGG: RLS activada y NINGUNA política, que es la
+-- forma de decir «aquí no entra nadie con la clave pública». La escribe la
+-- función `resolve-game` con la clave de servicio, que se salta la RLS, y no hay
+-- ni una pantalla que la lea: es contabilidad interna del catálogo.
 
 -- Biblioteca: privada de cada cuenta, en los cuatro sentidos. Ni siquiera los
 -- compañeros de grupo ven lo que tienes o lo que deseas.

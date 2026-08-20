@@ -63,6 +63,15 @@ export interface TableTrackerApi {
    * con `getGameBySlug`.
    */
   searchCatalog(query: CatalogQuery): Promise<GameDefinition[]>
+  /**
+   * El último recurso cuando el catálogo no tiene lo que se busca: preguntarle a
+   * BoardGameGeek, escribirlo en el catálogo y devolverlo ya listo para jugar.
+   *
+   * Es un extra, no un camino principal: si no hay red, si la función no está
+   * desplegada o si BGG no responde, devuelve una lista vacía y la pantalla se queda
+   * como estaba. Nunca lanza.
+   */
+  resolveGame(query: string): Promise<GameDefinition[]>
   /** Un juego con todo lo suyo, chuleta incluida. `null` si no existe. */
   getGameBySlug(slug: string): Promise<GameDefinition | null>
   /**
@@ -107,6 +116,9 @@ export const queryKeys = {
   // un día) y miles de personas buscando lo mismo comparten respuesta. El grupo va
   // dentro de la consulta porque sus juegos propios salen en la misma lista.
   catalog: (query: CatalogQuery) => ['catalog', query] as const,
+  // El rescate en BGG de una búsqueda sin resultados. Va aparte del catálogo porque
+  // es lento —habla con un servidor ajeno— y porque solo se pide cuando hace falta.
+  resolve: (query: string) => ['resolve-game', query] as const,
   game: (slug: string) => ['game', slug] as const,
   // Ordenados: la misma biblioteca pedida en otro orden es la misma consulta.
   gamesBySlugs: (slugs: string[]) => ['games-by-slug', [...slugs].sort()] as const,

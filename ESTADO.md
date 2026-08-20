@@ -18,6 +18,36 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **FASE 5 HECHA (código): el catálogo crece por donde se busca (2026-08-20).** Cuando el
+  buscador devuelve menos de tres juegos y hay al menos tres letras escritas, la app le
+  pregunta a BoardGameGeek por lo que falta, lo escribe en el catálogo y lo pinta. Es el
+  último trozo del plan de escalado: las cinco fases están completas.
+  - ⚠️ **PENDIENTE DE TONI, y son dos cosas:** ejecutar `scripts/data/resolve_game.sql` en
+    el SQL Editor **y** desplegar la Edge Function con la CLI de Supabase (las órdenes
+    exactas, en la cabecera de `supabase/functions/resolve-game/index.ts` y en el propio
+    SQL). Sin eso el código está inerte y la app se comporta exactamente igual que hoy.
+  - **Qué hay nuevo.** `supabase/functions/resolve-game/` (la función), `catalog_misses` +
+    `claim_catalog_lookup` + `resolve_catalog_games` en `supabase/schema.sql`, `resolveGame`
+    en las **dos** implementaciones de la API, `needsBggLookup` en `filters.ts` y el enganche
+    en `useCatalogSearch`.
+  - **Tres frenos, y hacen falta los tres.** El límite de BGG (~1 petición cada 2 s) es del
+    TOKEN, no de cada usuario: diez personas buscando a la vez son diez peticiones al mismo
+    cubo. Por eso (1) el cliente solo pregunta si de verdad falta algo (`needsBggLookup`),
+    (2) `claim_catalog_lookup` deja pasar cada consulta **una vez por semana** venga de quien
+    venga —y ese apunte se hace ANTES de ir a BGG, no después—, y (3) la función lleva un
+    contador por IP en su memoria, para el bucle accidental.
+  - **El código se comparte entre Node y Deno, no se duplica.** `supabase/functions/_shared/`
+    tiene el cliente de BGG y la traducción ficha → juego; `scripts/lib/` son ahora dos
+    envoltorios finos. Un juego sale idéntico por la ingesta y por la función. Ojo: el
+    módulo compartido importa `src/games/catalog.ts`, que está fuera de `supabase/`; la CLI
+    lo admite, pero con una versión vieja el `deploy` se queja de que no encuentra el módulo.
+  - **`resolveGame` es el único método de la API que se traga sus errores** en vez de llamar
+    a `fail()`. A propósito: es un rescate, no un camino. Si la función no está, si BGG está
+    caído o si toca el límite, la pantalla se queda como estaba y no enseña un error por algo
+    que nadie ha pedido.
+  - En modo demostración devuelve lista vacía: no hay token, y el catálogo son los 24 de
+    siempre. Los tests siguen pasando sin red (194).
+
 - **CATÁLOGO INGESTADO: 17.972 juegos en Postgres (2026-08-20).** La ingesta de verdad ya
   corrió: 23.269 fichas pedidas a BGG en 52 min, 17.886 escritas y 5.383 descartadas
   (expansiones y fichas sin nombre), cero avisos. Con las 100 de la repesca y lo que ya
@@ -425,14 +455,14 @@ quedó a medias y lo siguiente que toca.
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
       `CATALOG_RULES` por tandas, mismo formato. Precisión de la caja base ante todo.
-- [ ] **Fase 5 del plan de escalado** (`~/.claude/plans/teniendo-en-cuenta-como-concurrent-stallman.md`,
-      aprobado por Toni; las fases 1, 2, 3 y 4 están hechas): **crecimiento bajo demanda**.
-      Edge Function `resolve-game` —cuando `search_catalog` devuelve poco, consulta BGG con
-      el token del servidor, inserta las filas y las devuelve— y tabla `catalog_misses` para
-      no repetir búsquedas fallidas, con límite por IP.
-      ⚠️ **Invariante que no se puede romper:** `matches.game_slug` es FK a `games.slug`, así
-      que la función tiene que **insertar antes de devolver**; si no, se puede pintar un juego
-      con el que luego no se puede guardar una partida.
+- [ ] **Toni: poner en marcha el crecimiento bajo demanda** (el código ya está, ver «Estado
+      actual»). Son dos pasos y ninguno se puede hacer desde el terminal:
+      1. Ejecutar `scripts/data/resolve_game.sql` en el SQL Editor.
+      2. Desplegar la función, que **no** sale con el push a GitHub Pages:
+         `supabase login` → `supabase link --project-ref <ref>` →
+         `supabase secrets set BGG_API_TOKEN=…` → `supabase functions deploy resolve-game`.
+      Mientras tanto no se rompe nada: sin función desplegada, buscar un juego que no está
+      da lo mismo que hoy («ningún juego cumple lo que buscas»).
 - [ ] **Toni: ejecutar `scripts/data/search_catalog.sql`** en el SQL Editor de Supabase.
       Mientras no se haga, el catálogo de 17.972 juegos está dentro pero se busca mal:
       «cata» no devuelve Catan (ver «Estado actual»).
@@ -442,6 +472,12 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-20** — Claude (terminal): **fase 5, y con ella el plan de escalado entero**.
+  Crecimiento bajo demanda: Edge Function `resolve-game`, `catalog_misses` y sus dos
+  funciones de Postgres, `resolveGame` en las dos APIs y el enganche en `useCatalogSearch`.
+  El cliente de BGG y la traducción ficha → juego se mudan a `supabase/functions/_shared/`
+  para que Node y Deno usen el mismo código. ⚠️ Queda que Toni ejecute
+  `scripts/data/resolve_game.sql` y despliegue la función. 194 tests en verde.
 - **2026-08-20** — Claude (terminal): **catálogo ingestado de verdad**. 52 min contra BGG y
   Supabase: 17.972 juegos en `public.games`, 17.944 con carátula. El ensayo previo destapó
   dos fallos que se arreglaron antes (categorías sin traducir en los lemas y un `--dry-run`

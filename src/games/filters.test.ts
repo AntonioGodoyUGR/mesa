@@ -9,6 +9,7 @@ import {
   formatPlayTime,
   hasActiveFilters,
   matchesDuration,
+  needsBggLookup,
   toggleFilter,
   type GameFilters,
 } from './filters'
@@ -170,5 +171,25 @@ describe('texto', () => {
   it('difficultyLabel traduce la dificultad', () => {
     expect(difficultyLabel('easy')).toBe('Sencillo')
     expect(difficultyLabel(undefined)).toBeNull()
+  })
+})
+
+describe('needsBggLookup', () => {
+  // Cada «sí» de aquí es una petición a un servidor ajeno con un cupo compartido por
+  // toda la aplicación, así que lo que se fija es sobre todo cuándo NO se pregunta.
+  it('pregunta cuando se busca algo concreto y el catálogo se queda corto', () => {
+    expect(needsBggLookup('gloomhaven', 0)).toBe(true)
+    expect(needsBggLookup('gloomhaven', 2)).toBe(true)
+  })
+
+  it('no pregunta si ya hay resultados que enseñar', () => {
+    expect(needsBggLookup('catan', 3)).toBe(false)
+    expect(needsBggLookup('catan', 24)).toBe(false)
+  })
+
+  it('no pregunta mientras se está tecleando', () => {
+    expect(needsBggLookup('', 0)).toBe(false)
+    expect(needsBggLookup('ca', 0)).toBe(false)
+    expect(needsBggLookup('  a  ', 0)).toBe(false)
   })
 })

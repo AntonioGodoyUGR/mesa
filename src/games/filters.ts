@@ -54,6 +54,30 @@ export interface GameFilters {
  */
 export const CATALOG_PAGE = 24
 
+/**
+ * ¿Vale la pena ir a buscar este juego a BoardGameGeek?
+ *
+ * El catálogo trae los ~18.000 juegos con más de cien votos. Por debajo de ese corte
+ * hay muchísimos más, y quien busca su juego raro se merece encontrarlo — pero
+ * preguntar por ahí cuesta segundos y gasta un cupo que es de la aplicación entera
+ * (`supabase/functions/resolve-game`), así que se pregunta solo cuando tiene sentido:
+ *
+ *   · Con menos de tres letras no se está buscando nada concreto, se está tecleando.
+ *   · Con un puñado de resultados ya en pantalla, lo que se busca probablemente está
+ *     ahí: la ampliación sobra y molestaría reordenando la rejilla.
+ *   · Sin texto —solo filtros puestos— no hay nada que preguntar: BGG busca por
+ *     nombre, no por «a cuatro y de media hora».
+ *
+ * La misma decisión la vuelve a tomar Postgres antes de tocar la red
+ * (`claim_catalog_lookup`), que es quien sabe si ya se preguntó esta semana.
+ */
+export function needsBggLookup(query: string, found: number): boolean {
+  return query.trim().length >= 3 && found < LOOKUP_ENOUGH
+}
+
+/** Con estos resultados en pantalla ya no se molesta a BoardGameGeek. */
+const LOOKUP_ENOUGH = 3
+
 export const NO_FILTERS: GameFilters = {
   query: '',
   durations: [],

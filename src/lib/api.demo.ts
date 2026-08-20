@@ -427,6 +427,15 @@ export const demoApi: TableTrackerApi = {
     return delay(found.slice(offset, offset + (query.limit ?? CATALOG_PAGE)))
   },
 
+  async resolveGame() {
+    // En modo demostración no hay a quién preguntar: BoardGameGeek quiere un token
+    // que solo tiene el servidor, y aquí el catálogo son los 24 juegos que viajan en
+    // la app. Devolver la lista vacía es la respuesta honrada, y además es la misma
+    // que da la versión real cuando la función no está desplegada: la pantalla se
+    // comporta igual en los dos sitios.
+    return delay([])
+  },
+
   async getGameBySlug(slug) {
     const custom = db().customGames.find((game) => game.slug === slug)
     if (custom) return delay(custom)

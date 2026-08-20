@@ -216,6 +216,27 @@ export const supabaseApi: TableTrackerApi = {
     return ((data ?? []) as CatalogGameRow[]).map(catalogGame)
   },
 
+  async resolveGame(query) {
+    // La función `resolve-game` le pregunta a BoardGameGeek por lo que aquí no está,
+    // lo escribe en el catálogo y lo devuelve ya escrito —esa parte importa: un juego
+    // que no esté en `games` no se puede apuntar en una partida—.
+    //
+    // Es el único método de toda la interfaz que se traga sus errores en vez de
+    // llamar a `fail`. A propósito: esto es un rescate, no un camino. Si la función
+    // no está desplegada, si BGG está caído o si toca el límite, la pantalla tiene
+    // que quedarse exactamente como estaba —«ningún juego cumple lo que buscas»— y no
+    // enseñar un error por algo que la persona ni ha pedido.
+    const { data, error } = await supabase.functions.invoke('resolve-game', {
+      body: { query },
+    })
+    if (error) {
+      console.warn('No se ha podido preguntar a BoardGameGeek', error)
+      return []
+    }
+    const rows = (data as { games?: CatalogGameRow[] } | null)?.games ?? []
+    return rows.map(catalogGame)
+  },
+
   async getGameBySlug(slug) {
     // Aquí sí viaja la definición entera: es una fila sola y es la pantalla donde se
     // leen las reglas. `rules` tiene columna propia desde que el catálogo creció;

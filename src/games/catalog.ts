@@ -19,7 +19,10 @@
  * `definitions/` y se borra su fila de la semilla: el registro da prioridad a la
  * definición escrita a mano.
  */
-import type { GameDefinition, GameDifficulty, GameTheme, ScoreField } from './types'
+// La extensión no es un descuido: este fichero lo importa también la función
+// `resolve-game`, que corre en Deno, y allí los módulos se piden con su nombre
+// completo. A Vite y a TypeScript les da igual (`allowImportingTsExtensions`).
+import type { GameDefinition, GameDifficulty, GameTheme, ScoreField } from './types.ts'
 
 /** Cuál de las cinco hojas de aquí abajo usa un juego del catálogo. */
 export type SheetId = 'points' | 'lowest' | 'coop' | 'teams' | 'win'

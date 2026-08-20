@@ -10,7 +10,7 @@ import {
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { api, queryKeys } from '../lib/api'
 import { GAMES } from '../games/registry'
-import { CATALOG_PAGE, type GameFilters } from '../games/filters'
+import { CATALOG_PAGE, filterGames, needsBggLookup, type GameFilters } from '../games/filters'
 import { useGroup } from './GroupContext'
 import type { GameDefinition } from '../games/types'
 import type { CatalogQuery } from '../lib/types'
@@ -168,7 +168,36 @@ export function useCatalogSearch(
     enabled,
   })
 
-  const games = useMemo(() => catalog.data?.pages.flat() ?? [], [catalog.data])
+  const found = useMemo(() => catalog.data?.pages.flat() ?? [], [catalog.data])
+
+  /**
+   * El rescate: lo que el catálogo no tiene, se le pregunta a BoardGameGeek.
+   *
+   * Va después y aparte, nunca en vez de: primero se responde con lo que hay —que es
+   * instantáneo y es el 99 % de las veces— y solo si eso se queda corto sale la
+   * petición lenta. Se espera además a que el catálogo termine (`isFetching`), porque
+   * con resultados a medio llegar no se sabe todavía si hace falta.
+   */
+  const rescue = useQuery({
+    queryKey: queryKeys.resolve(query),
+    queryFn: () => api.resolveGame(query),
+    enabled: enabled && !catalog.isFetching && needsBggLookup(query, found.length),
+    staleTime: CATALOG_STALE,
+  })
+
+  const games = useMemo(() => {
+    if (!rescue.data?.length) return found
+
+    // Los filtros de pantalla se aplican aquí porque BGG no los conoce: busca por
+    // nombre y devuelve lo que encuentra. El texto se deja fuera a propósito —de eso
+    // se ha encargado ya BGG, y su criterio es mejor que un `includes`—, pero «a
+    // cuatro jugadores» o «menos de media hora» tienen que seguir cumpliéndose.
+    const known = new Set(found.map((game) => game.slug))
+    const extra = filterGames(rescue.data, { ...filters, query: '' }).filter(
+      (game) => !known.has(game.slug),
+    )
+    return extra.length > 0 ? [...found, ...extra] : found
+  }, [found, rescue.data, filters])
 
   // Lo que se ha pintado una vez se resuelve después sin volver a pedirlo: es lo que
   // hace que abrir la ficha de un juego recién buscado no espere a nadie.
@@ -178,7 +207,10 @@ export function useCatalogSearch(
 
   return {
     games,
-    loading: enabled && catalog.isLoading,
+    // El rescate cuenta como «buscando» solo mientras no haya nada que enseñar: con
+    // dos juegos ya en pantalla, taparlos con una ruedecita sería ir a peor. Sin
+    // ninguno, el aviso de «no hay nada» sería mentira todavía.
+    loading: enabled && (catalog.isLoading || (found.length === 0 && rescue.isFetching)),
     more: catalog.hasNextPage,
     loadingMore: catalog.isFetchingNextPage,
     showMore: () => {
