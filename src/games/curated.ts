@@ -40,6 +40,8 @@ import { cascadia } from './definitions/cascadia'
 import { everdell } from './definitions/everdell'
 import { dominion } from './definitions/dominion'
 import { terraformingMars } from './definitions/terraforming-mars'
+import { tzolkin } from './definitions/tzolkin'
+import { resistanceAvalon } from './definitions/resistance-avalon'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -68,4 +70,6 @@ export const CURATED_GAMES: GameDefinition[] = [
   everdell,
   dominion,
   terraformingMars,
+  tzolkin,
+  resistanceAvalon,
 ]
