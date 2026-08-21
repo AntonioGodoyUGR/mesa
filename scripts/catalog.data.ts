@@ -38,7 +38,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Los grandes eurogames
   // ---------------------------------------------------------------------------
-  ['brass-lancashire', 'Brass: Lancashire', '🧵', 'Algodón y deuda: el Brass original, más seco y más duro', 2, 4, 60, 120, 'hard', 'points'],
   ['scythe', 'Scythe', '⚙️', 'Mechas diésel y granjas en una Europa del Este alternativa', 1, 5, 90, 115, 'hard', 'points'],
   ['agricola', 'Agricola', '🚜', 'Una granja del siglo XVII y una familia a la que dar de comer', 1, 4, 60, 120, 'hard', 'points'],
   ['agricola-creatures', 'Agricola: All Creatures Big and Small', '🐖', 'Agricola a dos, solo con los animales y sin pasar hambre', 2, 2, 30, 30, 'medium', 'points'],
@@ -48,7 +47,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['a-feast-for-odin', 'A Feast for Odin', '🛡️', 'Vikingos: rellenar el tablero sin dejar un hueco es media partida', 1, 4, 60, 120, 'hard', 'points'],
   ['puerto-rico', 'Puerto Rico', '🌴', 'Elige rol, todos lo usan: el clásico que fundó los eurogames', 2, 5, 90, 150, 'hard', 'points'],
   ['puerto-rico-1897', 'Puerto Rico 1897', '🚢', 'El Puerto Rico de siempre, reeditado y reequilibrado', 2, 5, 90, 150, 'hard', 'points'],
-  ['great-western-trail', 'Great Western Trail', '🐄', 'Lleva el ganado a Kansas City y vuelve a empezar el camino', 2, 4, 75, 150, 'hard', 'points'],
   ['concordia', 'Concordia', '🏛️', 'Comercio romano sin azar: tus cartas son tus acciones', 2, 5, 90, 100, 'medium', 'points'],
   ['power-grid', 'Power Grid', '⚡', 'Subastas de centrales y una red eléctrica que alimentar', 2, 6, 120, 120, 'hard', 'points'],
   ['terra-mystica', 'Terra Mystica', '🧝', 'Catorce pueblos fantásticos que transforman el terreno a su gusto', 2, 5, 60, 150, 'hard', 'points'],
@@ -125,7 +123,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Aventuras, campañas y mazmorras
   // ---------------------------------------------------------------------------
-  ['frosthaven', 'Frosthaven', '❄️', 'La secuela: mismo motor de cartas, con un asentamiento que gestionar', 1, 4, 60, 120, 'hard', 'coop'],
   ['descent-journeys', 'Descent: Journeys in the Dark', '🕳️', 'Héroes contra un señor oscuro que juega con el otro bando', 1, 5, 120, 180, 'hard', 'teams'],
   ['heroquest', 'HeroQuest', '🧙', 'El clásico de los ochenta: cuatro héroes y un maestro de mazmorra', 2, 5, 60, 90, 'easy', 'teams'],
   ['massive-darkness', 'Massive Darkness', '🔦', 'Mazmorra a saco: monta la banda y arrasa con todo', 1, 6, 60, 120, 'medium', 'coop'],

@@ -59,6 +59,10 @@ import { spiritIsland } from './definitions/spirit-island'
 import { gloomhavenJawsOfTheLion } from './definitions/gloomhaven-jaws-of-the-lion'
 import { gaiaProject } from './definitions/gaia-project'
 import { throughTheAges } from './definitions/through-the-ages'
+import { lordOfTheRingsDuelForMiddleEarth } from './definitions/lord-of-the-rings-duel-for-middle-earth'
+import { frosthaven } from './definitions/frosthaven'
+import { greatWesternTrail } from './definitions/great-western-trail'
+import { brassLancashire } from './definitions/brass-lancashire'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -106,4 +110,8 @@ export const CURATED_GAMES: GameDefinition[] = [
   gloomhavenJawsOfTheLion,
   gaiaProject,
   throughTheAges,
+  lordOfTheRingsDuelForMiddleEarth,
+  frosthaven,
+  greatWesternTrail,
+  brassLancashire,
 ]
