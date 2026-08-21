@@ -38,9 +38,7 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Los grandes eurogames
   // ---------------------------------------------------------------------------
-  ['brass-birmingham', 'Brass: Birmingham', '🏭', 'Canales, raíles y cerveza en la Inglaterra industrial', 2, 4, 60, 120, 'hard', 'points'],
   ['brass-lancashire', 'Brass: Lancashire', '🧵', 'Algodón y deuda: el Brass original, más seco y más duro', 2, 4, 60, 120, 'hard', 'points'],
-  ['ark-nova', 'Ark Nova', '🦓', 'Diseña un zoo moderno y financia proyectos de conservación', 1, 4, 90, 150, 'hard', 'points'],
   ['scythe', 'Scythe', '⚙️', 'Mechas diésel y granjas en una Europa del Este alternativa', 1, 5, 90, 115, 'hard', 'points'],
   ['agricola', 'Agricola', '🚜', 'Una granja del siglo XVII y una familia a la que dar de comer', 1, 4, 60, 120, 'hard', 'points'],
   ['agricola-creatures', 'Agricola: All Creatures Big and Small', '🐖', 'Agricola a dos, solo con los animales y sin pasar hambre', 2, 2, 30, 30, 'medium', 'points'],
@@ -204,7 +202,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Conflicto, control de área y 4X
   // ---------------------------------------------------------------------------
-  ['twilight-struggle', 'Twilight Struggle', '☢️', 'La Guerra Fría a dos: cada carta ayuda también al enemigo', 2, 2, 120, 180, 'hard', 'points'],
   ['twilight-imperium', 'Twilight Imperium: Fourth Edition', '🌌', 'La ópera espacial de ocho horas, negociada punto por punto', 3, 6, 240, 480, 'hard', 'points'],
   ['eclipse-second-dawn', 'Eclipse: Second Dawn for the Galaxy', '🚀', '4X galáctico que cabe en una tarde y con naves personalizables', 2, 6, 60, 180, 'hard', 'points'],
   ['game-of-thrones', 'A Game of Thrones: The Board Game', '🐺', 'Órdenes ocultas y pactos que duran justo hasta que dejan de convenir', 3, 6, 120, 240, 'hard', 'win'],
@@ -257,7 +254,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Familiares y de mesa camilla
   // ---------------------------------------------------------------------------
-  ['dune-imperium', 'Dune: Imperium', '🏜️', 'Colocación de trabajadores y mazo, con intriga en Arrakis', 1, 4, 60, 120, 'hard', 'points'],
   ['dune-imperium-uprising', 'Dune: Imperium – Uprising', '🪱', 'La versión independiente: gusanos, contratos y modo a seis', 1, 6, 60, 120, 'hard', 'points'],
   ['dune', 'Dune', '👁️‍🗨️', 'El clásico del 79: alianzas, traiciones y profecías cumplidas', 2, 6, 120, 180, 'hard', 'win'],
   ['arnak-missing-expedition', 'Lost Ruins of Arnak: The Missing Expedition', '🧭', 'Nueva isla, nuevos guardianes y campaña para la expedición', 1, 4, 30, 120, 'hard', 'points'],

@@ -46,6 +46,10 @@ import { castlesOfBurgundy } from './definitions/castles-of-burgundy'
 import { viticulture } from './definitions/viticulture'
 import { lostRuinsArnak } from './definitions/lost-ruins-arnak'
 import { crokinole } from './definitions/crokinole'
+import { brassBirmingham } from './definitions/brass-birmingham'
+import { arkNova } from './definitions/ark-nova'
+import { duneImperium } from './definitions/dune-imperium'
+import { twilightStruggle } from './definitions/twilight-struggle'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -80,4 +84,8 @@ export const CURATED_GAMES: GameDefinition[] = [
   viticulture,
   lostRuinsArnak,
   crokinole,
+  brassBirmingham,
+  arkNova,
+  duneImperium,
+  twilightStruggle,
 ]
