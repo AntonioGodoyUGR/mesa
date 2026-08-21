@@ -50,6 +50,11 @@ import { brassBirmingham } from './definitions/brass-birmingham'
 import { arkNova } from './definitions/ark-nova'
 import { duneImperium } from './definitions/dune-imperium'
 import { twilightStruggle } from './definitions/twilight-struggle'
+import { pandemicLegacySeason1 } from './definitions/pandemic-legacy-season-1'
+import { gloomhaven } from './definitions/gloomhaven'
+import { twilightImperiumFourthEdition } from './definitions/twilight-imperium-fourth-edition'
+import { warOfTheRing } from './definitions/war-of-the-ring'
+import { starWarsRebellion } from './definitions/star-wars-rebellion'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -88,4 +93,9 @@ export const CURATED_GAMES: GameDefinition[] = [
   arkNova,
   duneImperium,
   twilightStruggle,
+  pandemicLegacySeason1,
+  gloomhaven,
+  twilightImperiumFourthEdition,
+  warOfTheRing,
+  starWarsRebellion,
 ]

@@ -127,7 +127,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Aventuras, campañas y mazmorras
   // ---------------------------------------------------------------------------
-  ['gloomhaven', 'Gloomhaven', '⚔️', 'La campaña de mazmorras que se juega durante un año', 1, 4, 60, 120, 'hard', 'coop'],
   ['gloomhaven-jaws', 'Gloomhaven: Jaws of the Lion', '🦁', 'La puerta de entrada a Gloomhaven: enseña a jugar escenario a escenario', 1, 4, 30, 120, 'medium', 'coop'],
   ['frosthaven', 'Frosthaven', '❄️', 'La secuela: mismo motor de cartas, con un asentamiento que gestionar', 1, 4, 60, 120, 'hard', 'coop'],
   ['descent-journeys', 'Descent: Journeys in the Dark', '🕳️', 'Héroes contra un señor oscuro que juega con el otro bando', 1, 5, 120, 180, 'hard', 'teams'],
@@ -161,7 +160,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // Terror, misterio y cooperativos
   // ---------------------------------------------------------------------------
   ['pandemic', 'Pandemic', '🦠', 'Cuatro brotes por el mundo y un equipo que llega tarde a todo', 2, 4, 45, 45, 'medium', 'coop'],
-  ['pandemic-legacy-1', 'Pandemic Legacy: Season 1', '🧬', 'Doce meses de campaña: la caja se escribe y ya no vuelve atrás', 2, 4, 60, 60, 'hard', 'coop'],
   ['pandemic-legacy-2', 'Pandemic Legacy: Season 2', '🧫', 'Setenta años después: quedan estaciones y muy poco suministro', 2, 4, 60, 60, 'hard', 'coop'],
   ['pandemic-legacy-0', 'Pandemic Legacy: Season 0', '🕵️‍♀️', 'Guerra Fría: espías, identidades falsas y un virus', 2, 4, 60, 60, 'hard', 'coop'],
   ['forbidden-island', 'Forbidden Island', '🗺️', 'La isla se hunde bajo vuestros pies: coged los tesoros y volad', 2, 4, 30, 30, 'easy', 'coop'],
@@ -195,17 +193,14 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['big-book-of-madness', 'The Big Book of Madness', '📕', 'Aprendices que han abierto el libro que no debían', 2, 5, 60, 90, 'medium', 'coop'],
   ['lotr-journeys', 'The Lord of the Rings: Journeys in Middle-earth', '🧝‍♂️', 'La Tierra Media guiada por una app, campaña incluida', 1, 5, 60, 120, 'medium', 'coop'],
   ['lotr-lcg', 'The Lord of the Rings: The Card Game', '💍', 'Juego de cartas cooperativo con mazos que te montas tú', 1, 4, 30, 90, 'hard', 'coop'],
-  ['war-of-the-ring', 'War of the Ring: Second Edition', '🌋', 'La Guerra del Anillo entera: ejércitos, dados y la Comunidad', 2, 4, 150, 180, 'hard', 'win'],
   ['harry-potter-hogwarts-battle', 'Harry Potter: Hogwarts Battle', '🦉', 'Deckbuilding cooperativo, un libro por año de Hogwarts', 2, 4, 30, 60, 'easy', 'coop'],
   ['harry-potter-death-eaters', 'Harry Potter: Death Eaters Rising', '⚡', 'Dados y mortífagos amenazando los lugares del mundo mágico', 2, 4, 45, 60, 'easy', 'coop'],
 
   // ---------------------------------------------------------------------------
   // Conflicto, control de área y 4X
   // ---------------------------------------------------------------------------
-  ['twilight-imperium', 'Twilight Imperium: Fourth Edition', '🌌', 'La ópera espacial de ocho horas, negociada punto por punto', 3, 6, 240, 480, 'hard', 'points'],
   ['eclipse-second-dawn', 'Eclipse: Second Dawn for the Galaxy', '🚀', '4X galáctico que cabe en una tarde y con naves personalizables', 2, 6, 60, 180, 'hard', 'points'],
   ['game-of-thrones', 'A Game of Thrones: The Board Game', '🐺', 'Órdenes ocultas y pactos que duran justo hasta que dejan de convenir', 3, 6, 120, 240, 'hard', 'win'],
-  ['star-wars-rebellion', 'Star Wars: Rebellion', '⭐', 'El Imperio busca la base rebelde; la Rebelión solo tiene que aguantar', 2, 4, 180, 240, 'hard', 'win'],
   ['star-wars-imperial-assault', 'Star Wars: Imperial Assault', '🤖', 'Campaña táctica: rebeldes contra un jugador imperial', 1, 5, 60, 120, 'hard', 'teams'],
   ['star-wars-outer-rim', 'Star Wars: Outer Rim', '🛸', 'Contrabandistas y cazarrecompensas por el Borde Exterior', 1, 4, 120, 180, 'medium', 'points'],
   ['star-wars-deckbuilding', 'Star Wars: The Deckbuilding Game', '⚔️', 'Duelo de mazos entre el Imperio y la Rebelión, en media hora', 2, 2, 20, 40, 'medium', 'win'],
