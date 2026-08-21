@@ -52,7 +52,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['concordia', 'Concordia', '🏛️', 'Comercio romano sin azar: tus cartas son tus acciones', 2, 5, 90, 100, 'medium', 'points'],
   ['power-grid', 'Power Grid', '⚡', 'Subastas de centrales y una red eléctrica que alimentar', 2, 6, 120, 120, 'hard', 'points'],
   ['terra-mystica', 'Terra Mystica', '🧝', 'Catorce pueblos fantásticos que transforman el terreno a su gusto', 2, 5, 60, 150, 'hard', 'points'],
-  ['gaia-project', 'Gaia Project', '🪐', 'Terra Mystica en la galaxia: coloniza planetas y avanza en tecnología', 1, 4, 60, 150, 'hard', 'points'],
   ['teotihuacan', 'Teotihuacan: City of Gods', '🌞', 'Dados-trabajadores que envejecen mientras levantas la pirámide', 1, 4, 60, 120, 'hard', 'points'],
   ['anachrony', 'Anachrony', '⌛', 'Pide recursos al futuro y devuélvelos antes de la paradoja', 1, 4, 30, 120, 'hard', 'points'],
   ['maracaibo', 'Maracaibo', '🏴‍☠️', 'Vuelta al Caribe con tres potencias coloniales y una campaña', 1, 4, 40, 160, 'hard', 'points'],
@@ -100,7 +99,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['the-red-cathedral', 'The Red Cathedral', '⛪', 'Gremios rusos construyendo la catedral de San Basilio', 1, 4, 60, 80, 'medium', 'points'],
   ['voyages-marco-polo', 'The Voyages of Marco Polo', '🐫', 'Ruta de la seda: tus dados salen como salen, apáñatelas', 2, 4, 40, 100, 'hard', 'points'],
   ['marco-polo-ii', 'Marco Polo II: In the Service of the Khan', '🗺️', 'La secuela: mismo motor de dados, mapa y contratos nuevos', 2, 4, 60, 120, 'hard', 'points'],
-  ['through-the-ages', 'Through the Ages: A New Story of Civilization', '🏛️', 'Una civilización de la antigüedad al siglo XX, en cartas', 2, 4, 120, 180, 'hard', 'points'],
   ['nations', 'Nations', '🌐', 'Civilizaciones simultáneas: crece sin quedarte sin comida', 1, 5, 40, 200, 'hard', 'points'],
   ['tapestry', 'Tapestry', '🧶', 'Avanza por cuatro vías civilizatorias al ritmo que quieras', 1, 5, 90, 120, 'medium', 'points'],
   ['sidereal-confluence', 'Sidereal Confluence', '🤝', 'Nueve razas alienígenas negociando todas a la vez, a gritos', 4, 9, 120, 180, 'hard', 'points'],
@@ -127,7 +125,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Aventuras, campañas y mazmorras
   // ---------------------------------------------------------------------------
-  ['gloomhaven-jaws', 'Gloomhaven: Jaws of the Lion', '🦁', 'La puerta de entrada a Gloomhaven: enseña a jugar escenario a escenario', 1, 4, 30, 120, 'medium', 'coop'],
   ['frosthaven', 'Frosthaven', '❄️', 'La secuela: mismo motor de cartas, con un asentamiento que gestionar', 1, 4, 60, 120, 'hard', 'coop'],
   ['descent-journeys', 'Descent: Journeys in the Dark', '🕳️', 'Héroes contra un señor oscuro que juega con el otro bando', 1, 5, 120, 180, 'hard', 'teams'],
   ['heroquest', 'HeroQuest', '🧙', 'El clásico de los ochenta: cuatro héroes y un maestro de mazmorra', 2, 5, 60, 90, 'easy', 'teams'],
@@ -185,7 +182,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['nemesis', 'Nemesis', '👽', 'Alien en una nave: objetivos secretos y nadie fiable', 1, 5, 90, 180, 'hard', 'teams'],
   ['nemesis-lockdown', 'Nemesis: Lockdown', '🔒', 'La misma pesadilla, en una base marciana con energía y ascensores', 1, 5, 90, 180, 'hard', 'teams'],
   ['the-loop', 'The Loop', '⏳', 'Un doctor que viaja en el tiempo y se clona sin parar', 1, 4, 45, 60, 'medium', 'coop'],
-  ['spirit-island', 'Spirit Island', '🌋', 'Espíritus de la isla echando a los colonos antes de que se asienten', 1, 4, 90, 120, 'hard', 'coop'],
   ['spirit-island-jagged-earth', 'Spirit Island: Jagged Earth', '🌏', 'La gran expansión: espíritus rarísimos y adversarios más duros', 1, 6, 90, 180, 'hard', 'coop'],
   ['aeons-end', "Aeon's End", '🌀', 'Deckbuilding sin barajar: el orden de tu mazo es información', 1, 4, 60, 60, 'medium', 'coop'],
   ['aeons-end-legacy', "Aeon's End: Legacy", '🗝️', 'Campaña: tu mago se construye carta a carta a lo largo de las partidas', 1, 4, 60, 90, 'hard', 'coop'],

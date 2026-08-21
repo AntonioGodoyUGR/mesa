@@ -55,6 +55,10 @@ import { gloomhaven } from './definitions/gloomhaven'
 import { twilightImperiumFourthEdition } from './definitions/twilight-imperium-fourth-edition'
 import { warOfTheRing } from './definitions/war-of-the-ring'
 import { starWarsRebellion } from './definitions/star-wars-rebellion'
+import { spiritIsland } from './definitions/spirit-island'
+import { gloomhavenJawsOfTheLion } from './definitions/gloomhaven-jaws-of-the-lion'
+import { gaiaProject } from './definitions/gaia-project'
+import { throughTheAges } from './definitions/through-the-ages'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -98,4 +102,8 @@ export const CURATED_GAMES: GameDefinition[] = [
   twilightImperiumFourthEdition,
   warOfTheRing,
   starWarsRebellion,
+  spiritIsland,
+  gloomhavenJawsOfTheLion,
+  gaiaProject,
+  throughTheAges,
 ]
