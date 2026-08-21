@@ -15,8 +15,9 @@ interface LogoProps {
   stacked?: boolean
   /**
    * Anima la entrada: las piezas de cada palabra convergen hacia el centro y el
-   * dado cae encima. Solo la portada de login lo usa; la cabecera va quieta.
-   * Los `@keyframes` viven en `index.css` y respetan `prefers-reduced-motion`.
+   * dado cae encima. La usan las portadas (login e inicio); la cabecera de
+   * navegación va quieta. Los `@keyframes` viven en `index.css` y respetan
+   * `prefers-reduced-motion`.
    */
   animated?: boolean
   className?: string

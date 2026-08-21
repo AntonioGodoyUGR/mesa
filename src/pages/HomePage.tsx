@@ -5,6 +5,7 @@ import { NO_FILTERS, hasActiveFilters, type GameFilters } from '../games/filters
 import { GameFinder } from '../components/GameFinder'
 import { GameGrid } from '../components/GameGrid'
 import { GridSizePicker } from '../components/GridSizePicker'
+import { Logo } from '../components/Logo'
 import { MatchCard } from '../components/MatchCard'
 import { ShowMore } from '../components/ShowMore'
 import { ErrorNote, Spinner } from '../components/ui'
@@ -98,6 +99,10 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="text-center text-[var(--color-brand)]">
+        <Logo stacked animated className="text-3xl sm:text-4xl" />
+      </div>
+
       <section className="flex flex-col gap-3">
         <div>
           <h1 className="display text-xl">{group ? 'Nueva partida' : 'Juegos'}</h1>
