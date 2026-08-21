@@ -18,7 +18,7 @@ export const greatWesternTrail: GameDefinition = {
   fields: [
     { key: 'buildings', label: 'Edificios propios', short: 'Edificios', icon: '🏚️', type: 'counter', points: 1, min: 0, showInSummary: true, hint: 'Suma los puntos impresos en tus edificios privados construidos por el camino' },
     { key: 'railroad', label: 'Estaciones y escudos de ciudad', short: 'Vía', icon: '🚂', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'PV de tus discos en estaciones de tren y en los escudos de las ciudades del ferrocarril (resta 6 si tienes un disco en Kansas City)' },
-    { key: 'objectives', label: 'Cartas de objetivo', short: 'Objetivos', icon: '🎯', type: 'number', showInSummary: true, hint: 'Suma neta de tus cartas de objetivo cumplidas, restando las incompletas' },
+    { key: 'objectives', label: 'Cartas de objetivo', short: 'Objetivos', icon: '🎯', type: 'number', points: 1, showInSummary: true, hint: 'Suma neta de tus cartas de objetivo cumplidas, restando las incompletas' },
     { key: 'bonuses', label: 'Bonos varios', short: 'Bonos', icon: '⭐', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Fichas de peligro, trabajadores en la 5.ª/6.ª casilla (4 c/u), casilla de disco despejada (3) y ficha del mercado laboral (2), todo sumado' },
     { key: 'money', label: 'Dinero final', short: 'Dinero', icon: '💵', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Anota ya convertido: 1 PV por cada 5 dólares que te sobren' },
   ],

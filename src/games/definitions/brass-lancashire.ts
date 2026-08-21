@@ -16,9 +16,10 @@ export const brassLancashire: GameDefinition = {
   winnerRule: 'highest',
 
   fields: [
-    { key: 'canal_era', label: 'Puntos de la Era del Canal', short: 'Canal', icon: '🛶', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Suma de industrias volteadas y enlaces de canal conectados al final de la primera mitad' },
-    { key: 'rail_era', label: 'Puntos de la Era del Ferrocarril', short: 'Ferrocarril', icon: '🚂', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Suma de industrias volteadas y enlaces de vía conectados al final de la segunda mitad' },
-    { key: 'money', label: 'Libras al final', short: 'Libras', icon: '💷', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Anota ya convertido: 1 PV por cada 10 libras que te sobren al final de la partida' },
+    { key: 'canal_era', label: 'Puntos de la Era del Canal', short: 'Canal', icon: '🛶', type: 'number', points: 1, min: 0, max: 200, showInSummary: true, hint: 'Enlaces de canal conectados + losetas de industria volteadas, contados solo al final de la Era del Canal (los canales desaparecen después)' },
+    { key: 'rail_era', label: 'Puntos de la Era del Ferrocarril', short: 'Ferrocarril', icon: '🚂', type: 'number', points: 1, min: 0, max: 200, showInSummary: true, hint: 'Enlaces de vía conectados + losetas de industria volteadas, contados solo al final de la Era del Ferrocarril' },
+    { key: 'money', label: 'Dinero final', short: 'Dinero', icon: '💷', type: 'number', points: 1, min: 0, showInSummary: true, hint: 'Anota ya convertido: 1 PV por cada 10 libras que te sobren al final de la partida' },
+    { key: 'income_level', label: 'Nivel de ingresos final (desempate)', short: 'Ingresos', icon: '📈', type: 'number', min: -10, max: 30, hint: 'Informativo: en caso de empate a puntos gana quien tenga más nivel de ingresos, y si persiste, quien tenga más dinero' },
   ],
 
   rules: {
@@ -47,10 +48,10 @@ export const brassLancashire: GameDefinition = {
     scoring: [
       { what: 'Industria volteada (se vende toda su producción, se construye el muelle, o se completa la cervecería)', points: 'los PV impresos en la ficha' },
       { what: 'Enlace de canal o vía conectado a al menos una industria', points: 'los PV que indique cada enlace' },
-      { what: 'Libras sobrantes al final de cada Era', points: '1 PV por cada 10 libras' },
+      { what: 'Libras sobrantes al final de la partida', points: '1 PV por cada 10 libras' },
     ],
     endCondition:
-      'La partida se juega en dos mitades: la Era del Canal y la Era del Ferrocarril. Al final de cada una se cuentan puntos por industrias volteadas y enlaces conectados; al pasar a la Era del Ferrocarril se retiran todos los canales del tablero (las industrias se quedan). Se suman los puntos de ambas Eras y gana quien tenga más; en caso de empate, quien tenga más dinero.',
+      'La partida se juega en dos mitades: la Era del Canal y la Era del Ferrocarril. Al final de cada una se cuentan puntos por industrias volteadas y enlaces conectados; al pasar a la Era del Ferrocarril se retiran todos los canales del tablero (las industrias se quedan). Al final de la partida se suman los puntos de ambas Eras más 1 PV por cada 10 libras sobrantes; gana quien tenga más. En caso de empate decide primero el nivel de ingresos más alto y, si persiste, quien tenga más dinero.',
     reminders: [
       'Un canal o vía sin ninguna industria conectada en sus dos extremos no da puntos: construidlos pensando en qué conectan, no solo en llegar lejos.',
       'Desarrollar retira fichas de tu reserva para poder construir industrias de nivel superior; no vende ni voltea nada por sí solo.',
