@@ -42,6 +42,10 @@ import { dominion } from './definitions/dominion'
 import { terraformingMars } from './definitions/terraforming-mars'
 import { tzolkin } from './definitions/tzolkin'
 import { resistanceAvalon } from './definitions/resistance-avalon'
+import { castlesOfBurgundy } from './definitions/castles-of-burgundy'
+import { viticulture } from './definitions/viticulture'
+import { lostRuinsArnak } from './definitions/lost-ruins-arnak'
+import { crokinole } from './definitions/crokinole'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -72,4 +76,8 @@ export const CURATED_GAMES: GameDefinition[] = [
   terraformingMars,
   tzolkin,
   resistanceAvalon,
+  castlesOfBurgundy,
+  viticulture,
+  lostRuinsArnak,
+  crokinole,
 ]
