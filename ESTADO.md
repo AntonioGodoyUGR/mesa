@@ -18,6 +18,68 @@ quedó a medias y lo siguiente que toca.
 
 ## Estado actual
 
+- **ESPEJO DE CARÁTULAS, PASO 1 HECHO: los 17.944 originales están en disco
+  (2026-08-20).** `npm run covers:original` (`scripts/fetch-originals.ts`) corrió entero:
+  **17.904 descargadas de 17.904, cero fallos, 8,57 GB** (14.413 jpg, 3.529 png, 2 gif).
+  Verificado después: el manifiesto y el disco cuadran fichero a fichero, ni un byte de
+  desajuste, y las **17.944 abren con `sharp`** — ninguna es una página de error colada
+  con `200 OK`. Doce imágenes las comparten dos juegos (ediciones distintas de lo mismo).
+  Baja los originales tal como los sirve BGG. **Ojo: esto no toca la app.** La
+  app sigue pintando el enlace a `cf.geekdo-images.com` exactamente igual que ayer; esto
+  es solo la copia en local. Cómo se le sirven luego —espejo propio, CDN o nada— está sin
+  decidir a propósito.
+  - **Por qué el original y no una miniatura.** El original es el archivo y las derivadas
+    se regeneran. El tamaño al que se pinta una portada se cambia diez veces; volver a
+    bajarse 8,6 GB de BGG, no.
+  - **Los números, ya reales y no estimados.** El original medio son **501 kB**, no los
+    402 kB que daba la muestra de 30: se descarga por popularidad y el arte de los juegos
+    top pesa más de la media. Total **8,57 GB**.
+  - **Aviso para el paso 2: no todos los originales dan para 512 px.** El 16,1 % (2.886)
+    tienen el lado corto por debajo de 512 px, y el 2,0 % (366) por debajo de 256. Una
+    derivada de 256 px es segura; para la de 512 hace falta `withoutEnlargement` o se
+    escalará hacia arriba una de cada seis.
+  - **Lo que costaría cada derivada** (medido sobre 30 portadas por la tubería de
+    `npm run covers`, WebP cuadrado q82):
+    512 px = 47,3 kB (829 MB), 320 px = 21,9 kB (384 MB), 256 px = 15,1 kB (265 MB),
+    200 px = 10,2 kB (179 MB). El par 256+512 son 1,09 GB, que
+    cabe en el plan gratuito de Cloudflare R2 (10 GB y egreso cero) pero no en el de
+    Supabase Storage (1 GB, y 5 GB/mes de egreso).
+  - **Dónde caen:** `scripts/data/covers-original/` y el manifiesto
+    `scripts/data/covers-original.manifest.json` (slug → URL, fichero, bytes, sha256).
+    Está todo en `.gitignore`: no viaja por git, es una copia local.
+  - **Reanudable**, y ya no hace falta volver a lanzarlo salvo que BGG cambie portadas:
+    relanzarlo solo baja lo que falte. Vuelve a bajar una si BGG le cambió la URL o si el
+    fichero desapareció del disco.
+  - **Lo siguiente, cuando Toni decida:** generar las derivadas desde `scripts/data/` (ya
+    sin red) y elegir dónde alojarlas. La app **no está tocada**: sigue enlazando a
+    `cf.geekdo-images.com` igual que antes.
+  - Lo puro está en `scripts/lib/originals.ts` y se testea sin red (13 tests): qué
+    extensión le toca al fichero, si lo que llegó es una imagen de verdad —una página de
+    error llega con `200 OK` y se guardaría igual— y qué queda por bajar.
+
+- **TRES COSAS QUE DESTAPÓ MIRAR LAS PORTADAS, y siguen sin arreglar:**
+  1. **El service worker no cachea ni una portada del catálogo.** La regla de
+     `vite.config.ts` es `/\/covers\/[^/]+\.webp$/`: ruta local y `.webp`. Las de BGG
+     son otro dominio y acaban en `.jpg`/`.png`. Las 17.944 quedan fuera de la PWA y no
+     hay portadas sin red. Además `maxEntries: 500` desaloja en cuanto se pasa de 500.
+  2. **La ficha de un juego de cola larga se baja el original.** En `api.supabase.ts:262`
+     la cascada es `coverUrl(slug) ?? game.imageUrl ?? data.cover_url ?? data.cover_thumb_url`,
+     y `cover_url` es `thing.image` sin redimensionar: 402 kB de media, con picos de 2 MB,
+     para pintar un cuadrado. En la rejilla no pasa (`catalog.ts:352` usa la miniatura).
+     Arreglo de una línea: poner la miniatura antes que el original.
+  3. **De las 369 portadas de `public/covers/`, ~345 ya no las mira la rejilla.**
+     `CURATED_GAMES` bajó a 24 con la fase 4 y `expandCatalogRow` no consulta `COVERS`;
+     solo la ficha individual sigue prefiriéndolas. Son ~19 MB en el despliegue casi sin
+     uso. `npm run covers` los podaría solo (tiene borrado de huérfanos), pero no se ha
+     vuelto a lanzar desde la mudanza.
+
+- **Sobre republicar esto, para que quede escrito.** Las imágenes las sirve BGG pero no
+  son suyas: las suben los usuarios y los derechos son de editoriales e ilustradores, así
+  que BGG tiene licencia para mostrarlas y no puede cedérnosla. Los datos factuales no
+  tienen copyright, pero en la UE existe el derecho *sui generis* de base de datos, que
+  protege la inversión en reunirla. Copia para servir a nuestros propios usuarios: riesgo
+  bajo. API pública o dataset republicado: decisión aparte, y no tomada.
+
 - **FASE 5 HECHA (código): el catálogo crece por donde se busca (2026-08-20).** Cuando el
   buscador devuelve menos de tres juegos y hay al menos tres letras escritas, la app le
   pregunta a BoardGameGeek por lo que falta, lo escribe en el catálogo y lo pinta. Es el
@@ -467,6 +529,14 @@ quedó a medias y lo siguiente que toca.
 - **2026-08-20** — Toni: los dos SQL ejecutados y `resolve-game` desplegada desde el panel
   de Supabase. El crecimiento bajo demanda está vivo en producción. Ojo con lo de arriba:
   lo desplegado es el empaquetado de un fichero, no el código del repo.
+- **2026-08-20** — Claude (terminal): **espejo de carátulas, paso 1**. `npm run
+  covers:original` baja los originales de las 17.944 portadas a `scripts/data/`, con
+  manifiesto y reanudación; lo puro en `scripts/lib/originals.ts` con 13 tests. Medidos
+  los tamaños reales sobre 30 portadas (402 kB el original, 1,09 GB el par 256+512 px en
+  WebP). Corrió entera: 17.904 de 17.904, cero fallos, 8,57 GB verificados. No cambia
+  nada de la app: es la copia local, y dónde alojarlas se decide luego.
+  De paso quedan apuntados tres fallos vistos al trazar las portadas (service worker
+  ciego al catálogo, la ficha bajándose el original, y 345 webp locales sin uso).
 - **2026-08-20** — Claude (terminal): **fase 5, y con ella el plan de escalado entero**.
   Crecimiento bajo demanda: Edge Function `resolve-game`, `catalog_misses` y sus dos
   funciones de Postgres, `resolveGame` en las dos APIs y el enganche en `useCatalogSearch`.

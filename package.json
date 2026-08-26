@@ -15,6 +15,7 @@
     "bundle:function": "tsx scripts/bundle-function.ts",
     "ids": "tsx scripts/bgg-ids.ts",
     "covers": "tsx scripts/fetch-covers.ts",
+    "covers:original": "tsx scripts/fetch-originals.ts",
     "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
