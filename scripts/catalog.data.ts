@@ -194,7 +194,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['root-riverfolk', 'Root: The Riverfolk Expansion', '🦦', 'Nutrias mercaderes y lagartos fanáticos para el bosque', 2, 6, 60, 90, 'hard', 'points'],
   ['vast-crystal-caverns', 'Vast: The Crystal Caverns', '💎', 'Caballero, dragón, goblins y hasta la propia cueva, con reglas propias', 1, 5, 60, 120, 'hard', 'win'],
   ['oath', 'Oath', '🏵️', 'Crónica de un imperio: cada partida deja el mundo cambiado para la siguiente', 1, 6, 45, 180, 'hard', 'win'],
-  ['pax-pamir', 'Pax Pamir: Second Edition', '🐎', 'Afganistán del XIX: cambia de bando antes de que se cuente el poder', 1, 5, 45, 120, 'hard', 'points'],
   ['pax-renaissance', 'Pax Renaissance', '🎭', 'Banqueros renacentistas comprando reinos y religiones', 1, 4, 60, 120, 'hard', 'points'],
   ['john-company', 'John Company: Second Edition', '🍵', 'La Compañía de las Indias: los cargos se reparten discutiendo', 1, 6, 120, 240, 'hard', 'points'],
   ['risk', 'Risk', '🌍', 'Conquistar el mundo a dados, discutiendo en Kamchatka', 2, 6, 120, 180, 'medium', 'win'],

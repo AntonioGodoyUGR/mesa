@@ -93,6 +93,7 @@ import { foodChainMagnate } from './definitions/food-chain-magnate'
 import { underwaterCities } from './definitions/underwater-cities'
 import { harmonies } from './definitions/harmonies'
 import { cthulhuDeathMayDie } from './definitions/cthulhu-death-may-die'
+import { paxPamir } from './definitions/pax-pamir'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -174,4 +175,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   underwaterCities,
   harmonies,
   cthulhuDeathMayDie,
+  paxPamir,
 ]
