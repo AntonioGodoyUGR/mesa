@@ -88,6 +88,7 @@ import { theCrewMissionDeepSea } from './definitions/the-crew-mission-deep-sea'
 import { heatPedalToTheMetal } from './definitions/heat-pedal-to-the-metal'
 import { clankCatacombs } from './definitions/clank-catacombs'
 import { marvelChampions } from './definitions/marvel-champions'
+import { ticketToRideLegacyLegendsWest } from './definitions/ticket-to-ride-legacy-legends-west'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -164,4 +165,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   heatPedalToTheMetal,
   clankCatacombs,
   marvelChampions,
+  ticketToRideLegacyLegendsWest,
 ]
