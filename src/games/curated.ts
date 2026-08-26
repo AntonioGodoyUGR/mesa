@@ -63,6 +63,12 @@ import { lordOfTheRingsDuelForMiddleEarth } from './definitions/lord-of-the-ring
 import { frosthaven } from './definitions/frosthaven'
 import { greatWesternTrail } from './definitions/great-western-trail'
 import { brassLancashire } from './definitions/brass-lancashire'
+// Top-100 BGG (oleada Gustavo)
+import { duneImperiumUprising } from './definitions/dune-imperium-uprising'
+import { seti } from './definitions/seti'
+import { slayTheSpire } from './definitions/slay-the-spire'
+import { eclipseSecondDawn } from './definitions/eclipse-second-dawn'
+import { nemesis } from './definitions/nemesis'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -114,4 +120,10 @@ export const CURATED_GAMES: GameDefinition[] = [
   frosthaven,
   greatWesternTrail,
   brassLancashire,
+  // Top-100 BGG (oleada Gustavo)
+  duneImperiumUprising,
+  seti,
+  slayTheSpire,
+  eclipseSecondDawn,
+  nemesis,
 ]

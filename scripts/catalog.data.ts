@@ -176,7 +176,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['betrayal-legacy', 'Betrayal Legacy', '📜', 'Trece capítulos de la misma casa y de vuestras familias', 3, 5, 60, 90, 'medium', 'teams'],
   ['mysterium', 'Mysterium', '👻', 'Un fantasma reparte sueños ilustrados y no puede hablar', 2, 7, 42, 42, 'easy', 'coop'],
   ['mysterium-park', 'Mysterium Park', '🎡', 'El mismo fantasma, en una feria y en media hora', 2, 6, 30, 30, 'easy', 'coop'],
-  ['nemesis', 'Nemesis', '👽', 'Alien en una nave: objetivos secretos y nadie fiable', 1, 5, 90, 180, 'hard', 'teams'],
   ['nemesis-lockdown', 'Nemesis: Lockdown', '🔒', 'La misma pesadilla, en una base marciana con energía y ascensores', 1, 5, 90, 180, 'hard', 'teams'],
   ['the-loop', 'The Loop', '⏳', 'Un doctor que viaja en el tiempo y se clona sin parar', 1, 4, 45, 60, 'medium', 'coop'],
   ['spirit-island-jagged-earth', 'Spirit Island: Jagged Earth', '🌏', 'La gran expansión: espíritus rarísimos y adversarios más duros', 1, 6, 90, 180, 'hard', 'coop'],
@@ -192,7 +191,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Conflicto, control de área y 4X
   // ---------------------------------------------------------------------------
-  ['eclipse-second-dawn', 'Eclipse: Second Dawn for the Galaxy', '🚀', '4X galáctico que cabe en una tarde y con naves personalizables', 2, 6, 60, 180, 'hard', 'points'],
   ['game-of-thrones', 'A Game of Thrones: The Board Game', '🐺', 'Órdenes ocultas y pactos que duran justo hasta que dejan de convenir', 3, 6, 120, 240, 'hard', 'win'],
   ['star-wars-imperial-assault', 'Star Wars: Imperial Assault', '🤖', 'Campaña táctica: rebeldes contra un jugador imperial', 1, 5, 60, 120, 'hard', 'teams'],
   ['star-wars-outer-rim', 'Star Wars: Outer Rim', '🛸', 'Contrabandistas y cazarrecompensas por el Borde Exterior', 1, 4, 120, 180, 'medium', 'points'],
@@ -242,7 +240,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Familiares y de mesa camilla
   // ---------------------------------------------------------------------------
-  ['dune-imperium-uprising', 'Dune: Imperium – Uprising', '🪱', 'La versión independiente: gusanos, contratos y modo a seis', 1, 6, 60, 120, 'hard', 'points'],
   ['dune', 'Dune', '👁️‍🗨️', 'El clásico del 79: alianzas, traiciones y profecías cumplidas', 2, 6, 120, 180, 'hard', 'win'],
   ['arnak-missing-expedition', 'Lost Ruins of Arnak: The Missing Expedition', '🧭', 'Nueva isla, nuevos guardianes y campaña para la expedición', 1, 4, 30, 120, 'hard', 'points'],
   ['clank', 'Clank!', '🐉', 'Roba en la cueva del dragón y sal antes de hacer demasiado ruido', 2, 4, 30, 60, 'medium', 'points'],
