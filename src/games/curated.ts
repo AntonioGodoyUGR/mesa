@@ -69,6 +69,11 @@ import { seti } from './definitions/seti'
 import { slayTheSpire } from './definitions/slay-the-spire'
 import { eclipseSecondDawn } from './definitions/eclipse-second-dawn'
 import { nemesis } from './definitions/nemesis'
+import { scythe } from './definitions/scythe'
+import { aFeastForOdin } from './definitions/a-feast-for-odin'
+import { clankLegacy } from './definitions/clank-legacy'
+import { concordia } from './definitions/concordia'
+import { greatWesternTrailSecondEdition } from './definitions/great-western-trail-second-edition'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -126,4 +131,9 @@ export const CURATED_GAMES: GameDefinition[] = [
   slayTheSpire,
   eclipseSecondDawn,
   nemesis,
+  scythe,
+  aFeastForOdin,
+  clankLegacy,
+  concordia,
+  greatWesternTrailSecondEdition,
 ]

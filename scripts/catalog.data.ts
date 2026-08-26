@@ -38,16 +38,13 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Los grandes eurogames
   // ---------------------------------------------------------------------------
-  ['scythe', 'Scythe', '⚙️', 'Mechas diésel y granjas en una Europa del Este alternativa', 1, 5, 90, 115, 'hard', 'points'],
   ['agricola', 'Agricola', '🚜', 'Una granja del siglo XVII y una familia a la que dar de comer', 1, 4, 60, 120, 'hard', 'points'],
   ['agricola-creatures', 'Agricola: All Creatures Big and Small', '🐖', 'Agricola a dos, solo con los animales y sin pasar hambre', 2, 2, 30, 30, 'medium', 'points'],
   ['caverna', 'Caverna: The Cave Farmers', '⛏️', 'Enanos que excavan la montaña, siembran y salen de expedición', 1, 7, 30, 210, 'hard', 'points'],
   ['le-havre', 'Le Havre', '⚓', 'Barcos, edificios y un puerto que no para de crecer', 1, 5, 60, 200, 'hard', 'points'],
   ['ora-et-labora', 'Ora et Labora', '⛪', 'Un monasterio medieval, sus tierras y su rueda de producción', 1, 4, 60, 180, 'hard', 'points'],
-  ['a-feast-for-odin', 'A Feast for Odin', '🛡️', 'Vikingos: rellenar el tablero sin dejar un hueco es media partida', 1, 4, 60, 120, 'hard', 'points'],
   ['puerto-rico', 'Puerto Rico', '🌴', 'Elige rol, todos lo usan: el clásico que fundó los eurogames', 2, 5, 90, 150, 'hard', 'points'],
   ['puerto-rico-1897', 'Puerto Rico 1897', '🚢', 'El Puerto Rico de siempre, reeditado y reequilibrado', 2, 5, 90, 150, 'hard', 'points'],
-  ['concordia', 'Concordia', '🏛️', 'Comercio romano sin azar: tus cartas son tus acciones', 2, 5, 90, 100, 'medium', 'points'],
   ['power-grid', 'Power Grid', '⚡', 'Subastas de centrales y una red eléctrica que alimentar', 2, 6, 120, 120, 'hard', 'points'],
   ['terra-mystica', 'Terra Mystica', '🧝', 'Catorce pueblos fantásticos que transforman el terreno a su gusto', 2, 5, 60, 150, 'hard', 'points'],
   ['teotihuacan', 'Teotihuacan: City of Gods', '🌞', 'Dados-trabajadores que envejecen mientras levantas la pirámide', 1, 4, 60, 120, 'hard', 'points'],
@@ -245,7 +242,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['clank', 'Clank!', '🐉', 'Roba en la cueva del dragón y sal antes de hacer demasiado ruido', 2, 4, 30, 60, 'medium', 'points'],
   ['clank-catacombs', 'Clank!: Catacombs', '🕯️', 'La mazmorra se construye con losetas conforme entráis', 2, 4, 60, 60, 'medium', 'points'],
   ['clank-in-space', 'Clank! In! Space!', '🛸', 'El mismo saqueo, ahora en la nave de un señor del crimen', 2, 4, 60, 60, 'medium', 'points'],
-  ['clank-legacy', 'Clank! Legacy: Acquisitions Incorporated', '📦', 'Campaña con pegatinas: la caja se llena de vuestras historias', 2, 4, 60, 120, 'medium', 'points'],
   ['heat-pedal-to-the-metal', 'Heat: Pedal to the Metal', '🏎️', 'Carreras con marchas y calor: pasarse de vueltas se paga', 1, 6, 30, 60, 'medium', 'win'],
   ['quacks-quedlinburg', 'The Quacks of Quedlinburg', '🧪', 'Saca ingredientes de la bolsa hasta que la marmita reviente', 2, 4, 45, 45, 'easy', 'points'],
   ['isle-of-cats', 'The Isle of Cats', '🐈', 'Rescata gatos en polinomios y colócalos sin dejar huecos', 1, 4, 60, 90, 'medium', 'points'],
