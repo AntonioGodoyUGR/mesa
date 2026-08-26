@@ -78,7 +78,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['obsession', 'Obsession', '🎩', 'Alta sociedad victoriana: reforma tu casa y organiza fiestas', 1, 4, 45, 90, 'hard', 'points'],
   ['the-white-castle', 'The White Castle', '🏯', 'Tres puentes, dados de colores y una hora larga de decisiones', 1, 4, 45, 80, 'medium', 'points'],
   ['kutna-hora', 'Kutná Hora: The City of Silver', '🥈', 'La plata de Bohemia y una ciudad cuyo mercado se mueve solo', 2, 4, 60, 120, 'hard', 'points'],
-  ['hegemony', 'Hegemony: Lead Your Class to Victory', '⚖️', 'Clase obrera, clase media, capitalistas y Estado en la misma mesa', 2, 4, 90, 180, 'hard', 'points'],
   ['distilled', 'Distilled', '🥃', 'Destila ron, whisky o ginebra y envejécelo en barrica', 1, 4, 60, 120, 'medium', 'points'],
   ['expeditions', 'Expeditions', '🤖', 'La secuela de Scythe: mechas, expediciones y cartas mejorables', 1, 5, 60, 90, 'hard', 'points'],
   ['revive', 'Revive', '🧊', 'Deshielo poscolapso: cinco tribus buscan la ciudad enterrada', 1, 4, 60, 120, 'hard', 'points'],

@@ -82,6 +82,7 @@ import { terraMystica } from './definitions/terra-mystica'
 import { tooManyBones } from './definitions/too-many-bones'
 import { mageKnight } from './definitions/mage-knight'
 import { barrage } from './definitions/barrage'
+import { hegemony } from './definitions/hegemony'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -152,4 +153,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   tooManyBones,
   mageKnight,
   barrage,
+  hegemony,
 ]
