@@ -78,6 +78,7 @@ import { skyTeam } from './definitions/sky-team'
 import { arkhamHorrorLcg } from './definitions/arkham-horror-lcg'
 import { root } from './definitions/root'
 import { orleans } from './definitions/orleans'
+import { terraMystica } from './definitions/terra-mystica'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -144,4 +145,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   arkhamHorrorLcg,
   root,
   orleans,
+  terraMystica,
 ]
