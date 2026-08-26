@@ -232,7 +232,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['dune', 'Dune', '👁️‍🗨️', 'El clásico del 79: alianzas, traiciones y profecías cumplidas', 2, 6, 120, 180, 'hard', 'win'],
   ['arnak-missing-expedition', 'Lost Ruins of Arnak: The Missing Expedition', '🧭', 'Nueva isla, nuevos guardianes y campaña para la expedición', 1, 4, 30, 120, 'hard', 'points'],
   ['clank', 'Clank!', '🐉', 'Roba en la cueva del dragón y sal antes de hacer demasiado ruido', 2, 4, 30, 60, 'medium', 'points'],
-  ['clank-catacombs', 'Clank!: Catacombs', '🕯️', 'La mazmorra se construye con losetas conforme entráis', 2, 4, 60, 60, 'medium', 'points'],
   ['clank-in-space', 'Clank! In! Space!', '🛸', 'El mismo saqueo, ahora en la nave de un señor del crimen', 2, 4, 60, 60, 'medium', 'points'],
   ['quacks-quedlinburg', 'The Quacks of Quedlinburg', '🧪', 'Saca ingredientes de la bolsa hasta que la marmita reviente', 2, 4, 45, 45, 'easy', 'points'],
   ['isle-of-cats', 'The Isle of Cats', '🐈', 'Rescata gatos en polinomios y colócalos sin dejar huecos', 1, 4, 60, 90, 'medium', 'points'],
