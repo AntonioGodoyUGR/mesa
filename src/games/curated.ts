@@ -97,6 +97,7 @@ import { paxPamir } from './definitions/pax-pamir'
 import { ageOfInnovation } from './definitions/age-of-innovation'
 import { puertoRico } from './definitions/puerto-rico'
 import { onMars } from './definitions/on-mars'
+import { pandemicLegacySeason0 } from './definitions/pandemic-legacy-0'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -182,4 +183,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   ageOfInnovation,
   puertoRico,
   onMars,
+  pandemicLegacySeason0,
 ]

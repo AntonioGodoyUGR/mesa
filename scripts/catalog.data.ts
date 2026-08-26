@@ -142,7 +142,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   ['pandemic', 'Pandemic', '🦠', 'Cuatro brotes por el mundo y un equipo que llega tarde a todo', 2, 4, 45, 45, 'medium', 'coop'],
   ['pandemic-legacy-2', 'Pandemic Legacy: Season 2', '🧫', 'Setenta años después: quedan estaciones y muy poco suministro', 2, 4, 60, 60, 'hard', 'coop'],
-  ['pandemic-legacy-0', 'Pandemic Legacy: Season 0', '🕵️‍♀️', 'Guerra Fría: espías, identidades falsas y un virus', 2, 4, 60, 60, 'hard', 'coop'],
   ['forbidden-island', 'Forbidden Island', '🗺️', 'La isla se hunde bajo vuestros pies: coged los tesoros y volad', 2, 4, 30, 30, 'easy', 'coop'],
   ['forbidden-desert', 'Forbidden Desert', '🌵', 'Sed, tormenta de arena y una nave que hay que montar', 2, 5, 45, 45, 'easy', 'coop'],
   ['forbidden-sky', 'Forbidden Sky', '⛈️', 'Una plataforma en la tormenta y un circuito eléctrico de verdad', 2, 5, 60, 60, 'medium', 'coop'],
