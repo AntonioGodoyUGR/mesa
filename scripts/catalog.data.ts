@@ -72,7 +72,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['vinhos', 'Vinhos: Deluxe Edition', '🍷', 'Bodegas portuguesas, enólogos y ferias del vino', 1, 4, 60, 150, 'hard', 'points'],
   ['escape-plan', 'Escape Plan', '💰', 'Atraco resuelto: ahora hay que salir de la ciudad con el botín', 1, 5, 60, 120, 'hard', 'points'],
   ['carnegie', 'Carnegie', '🏢', 'Un imperio empresarial americano departamento a departamento', 1, 4, 60, 120, 'hard', 'points'],
-  ['barrage', 'Barrage', '💧', 'Presas en los Alpes: quien coge el agua primero, la vende', 1, 4, 60, 120, 'hard', 'points'],
   ['nucleum', 'Nucleum', '⚛️', 'Sajonia electrificada a base de carbón, uranio y raíles', 1, 4, 60, 150, 'hard', 'points'],
   ['voidfall', 'Voidfall', '🌑', 'Civilizaciones galácticas sin azar y con muchísimo cálculo', 1, 4, 100, 200, 'hard', 'points'],
   ['hadrians-wall', "Hadrian's Wall", '🧱', 'Rellena tu hoja levantando la muralla romana antes que nadie', 1, 6, 45, 60, 'hard', 'points'],
