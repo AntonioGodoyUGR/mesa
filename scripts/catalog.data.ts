@@ -255,7 +255,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['meadow', 'Meadow', '🦌', 'Cartas de naturaleza ilustradas y requisitos que encajar', 1, 4, 60, 90, 'medium', 'points'],
   ['verdant', 'Verdant', '🪴', 'Coloca plantas junto a la ventana con la luz que piden', 1, 5, 30, 45, 'easy', 'points'],
   ['flamecraft', 'Flamecraft', '🐲', 'Dragoncitos artesanos abasteciendo las tiendas del pueblo', 1, 5, 60, 60, 'easy', 'points'],
-  ['harmonies', 'Harmonies', '🌈', 'Fichas de colores apiladas para construir hábitats', 1, 4, 30, 45, 'easy', 'points'],
   ['living-forest', 'Living Forest', '🌳', 'Un bosque que arde mientras montas tu mazo de animales', 2, 4, 40, 40, 'medium', 'points'],
   ['photosynthesis', 'Photosynthesis', '🌲', 'Árboles que crecen a la luz y le hacen sombra al vecino', 2, 4, 30, 60, 'medium', 'points'],
   ['creature-comforts', 'Creature Comforts', '🦡', 'Animalitos preparando el invierno con dados comunes', 1, 5, 45, 60, 'easy', 'points'],
