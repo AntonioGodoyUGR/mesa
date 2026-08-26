@@ -77,6 +77,7 @@ import { greatWesternTrailSecondEdition } from './definitions/great-western-trai
 import { skyTeam } from './definitions/sky-team'
 import { arkhamHorrorLcg } from './definitions/arkham-horror-lcg'
 import { root } from './definitions/root'
+import { orleans } from './definitions/orleans'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -142,4 +143,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   skyTeam,
   arkhamHorrorLcg,
   root,
+  orleans,
 ]
