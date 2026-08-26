@@ -87,6 +87,7 @@ import { kanbanEv } from './definitions/kanban-ev'
 import { theCrewMissionDeepSea } from './definitions/the-crew-mission-deep-sea'
 import { heatPedalToTheMetal } from './definitions/heat-pedal-to-the-metal'
 import { clankCatacombs } from './definitions/clank-catacombs'
+import { marvelChampions } from './definitions/marvel-champions'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -162,4 +163,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   theCrewMissionDeepSea,
   heatPedalToTheMetal,
   clankCatacombs,
+  marvelChampions,
 ]

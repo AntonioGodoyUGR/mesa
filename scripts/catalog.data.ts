@@ -374,7 +374,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['hero-realms', 'Hero Realms', '🛡️', 'Star Realms en fantasía, con personajes y campañas', 2, 4, 20, 30, 'easy', 'win'],
   ['ascension', 'Ascension', '🌅', 'Deckbuilding clásico: centro de mesa, runas y poder', 1, 4, 30, 30, 'easy', 'points'],
   ['legendary-marvel', 'Legendary: A Marvel Deck Building Game', '🦸', 'Héroes Marvel contra un villano con su plan', 1, 5, 45, 60, 'medium', 'coop'],
-  ['marvel-champions', 'Marvel Champions: The Card Game', '🛡️', 'Un héroe, su alter ego y un villano que ataca todos los turnos', 1, 4, 45, 90, 'medium', 'coop'],
   ['marvel-united', 'Marvel United', '🦹', 'Cooperativo ligero de miniaturas: cada héroe extiende la línea del turno', 1, 4, 40, 40, 'easy', 'coop'],
   ['marvel-united-xmen', 'Marvel United: X-Men', '❌', 'La caja mutante: mismo juego, la Patrulla X al completo', 1, 4, 40, 40, 'easy', 'coop'],
   ['dice-forge', 'Dice Forge', '⚒️', 'Deckbuilding con caras de dado que se cambian físicamente', 2, 4, 45, 45, 'easy', 'points'],
