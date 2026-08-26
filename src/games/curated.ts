@@ -80,6 +80,7 @@ import { root } from './definitions/root'
 import { orleans } from './definitions/orleans'
 import { terraMystica } from './definitions/terra-mystica'
 import { tooManyBones } from './definitions/too-many-bones'
+import { mageKnight } from './definitions/mage-knight'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -148,4 +149,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   orleans,
   terraMystica,
   tooManyBones,
+  mageKnight,
 ]
