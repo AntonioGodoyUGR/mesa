@@ -83,6 +83,7 @@ import { tooManyBones } from './definitions/too-many-bones'
 import { mageKnight } from './definitions/mage-knight'
 import { barrage } from './definitions/barrage'
 import { hegemony } from './definitions/hegemony'
+import { kanbanEv } from './definitions/kanban-ev'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -154,4 +155,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   mageKnight,
   barrage,
   hegemony,
+  kanbanEv,
 ]

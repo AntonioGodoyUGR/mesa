@@ -65,7 +65,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['food-chain-magnate', 'Food Chain Magnate', '🍔', 'Monta un organigrama de comida rápida y arruina al vecino', 2, 5, 120, 240, 'hard', 'points'],
   ['indonesia', 'Indonesia', '🛶', 'Fusiones empresariales y rutas de mercancías en el archipiélago', 2, 5, 180, 300, 'hard', 'points'],
   ['the-gallerist', 'The Gallerist', '🖼️', 'Descubre artistas, infla su precio y llena tu galería', 1, 4, 60, 150, 'hard', 'points'],
-  ['kanban-ev', 'Kanban EV', '🚗', 'Una fábrica de coches eléctricos y una jefa que exige resultados', 1, 4, 60, 120, 'hard', 'points'],
   ['lisboa', 'Lisboa', '🌊', 'Reconstruir Lisboa tras el terremoto de 1755', 1, 4, 60, 180, 'hard', 'points'],
   ['on-mars', 'On Mars', '🔴', 'Colonia marciana entre la órbita y la superficie', 1, 4, 90, 150, 'hard', 'points'],
   ['weather-machine', 'Weather Machine', '🌦️', 'Arregla el clima que estropeó tu propio invento', 1, 4, 60, 180, 'hard', 'points'],
