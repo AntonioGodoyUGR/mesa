@@ -95,6 +95,7 @@ import { harmonies } from './definitions/harmonies'
 import { cthulhuDeathMayDie } from './definitions/cthulhu-death-may-die'
 import { paxPamir } from './definitions/pax-pamir'
 import { ageOfInnovation } from './definitions/age-of-innovation'
+import { puertoRico } from './definitions/puerto-rico'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -178,4 +179,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   cthulhuDeathMayDie,
   paxPamir,
   ageOfInnovation,
+  puertoRico,
 ]

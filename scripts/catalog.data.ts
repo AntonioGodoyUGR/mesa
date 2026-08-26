@@ -43,7 +43,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['caverna', 'Caverna: The Cave Farmers', '⛏️', 'Enanos que excavan la montaña, siembran y salen de expedición', 1, 7, 30, 210, 'hard', 'points'],
   ['le-havre', 'Le Havre', '⚓', 'Barcos, edificios y un puerto que no para de crecer', 1, 5, 60, 200, 'hard', 'points'],
   ['ora-et-labora', 'Ora et Labora', '⛪', 'Un monasterio medieval, sus tierras y su rueda de producción', 1, 4, 60, 180, 'hard', 'points'],
-  ['puerto-rico', 'Puerto Rico', '🌴', 'Elige rol, todos lo usan: el clásico que fundó los eurogames', 2, 5, 90, 150, 'hard', 'points'],
   ['puerto-rico-1897', 'Puerto Rico 1897', '🚢', 'El Puerto Rico de siempre, reeditado y reequilibrado', 2, 5, 90, 150, 'hard', 'points'],
   ['power-grid', 'Power Grid', '⚡', 'Subastas de centrales y una red eléctrica que alimentar', 2, 6, 120, 120, 'hard', 'points'],
   ['teotihuacan', 'Teotihuacan: City of Gods', '🌞', 'Dados-trabajadores que envejecen mientras levantas la pirámide', 1, 4, 60, 120, 'hard', 'points'],
