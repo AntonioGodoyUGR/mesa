@@ -46,7 +46,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['puerto-rico-1897', 'Puerto Rico 1897', '🚢', 'El Puerto Rico de siempre, reeditado y reequilibrado', 2, 5, 90, 150, 'hard', 'points'],
   ['power-grid', 'Power Grid', '⚡', 'Subastas de centrales y una red eléctrica que alimentar', 2, 6, 120, 120, 'hard', 'points'],
   ['teotihuacan', 'Teotihuacan: City of Gods', '🌞', 'Dados-trabajadores que envejecen mientras levantas la pirámide', 1, 4, 60, 120, 'hard', 'points'],
-  ['anachrony', 'Anachrony', '⌛', 'Pide recursos al futuro y devuélvelos antes de la paradoja', 1, 4, 30, 120, 'hard', 'points'],
   ['maracaibo', 'Maracaibo', '🏴‍☠️', 'Vuelta al Caribe con tres potencias coloniales y una campaña', 1, 4, 40, 160, 'hard', 'points'],
   ['clans-of-caledonia', 'Clans of Caledonia', '🥃', 'Clanes escoceses que producen, exportan y destilan whisky', 1, 4, 30, 120, 'hard', 'points'],
   ['hansa-teutonica', 'Hansa Teutonica', '🧭', 'Rutas comerciales hanseáticas y mejoras que se pisan entre sí', 2, 5, 45, 90, 'medium', 'points'],

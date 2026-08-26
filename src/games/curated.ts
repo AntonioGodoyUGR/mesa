@@ -98,6 +98,7 @@ import { ageOfInnovation } from './definitions/age-of-innovation'
 import { puertoRico } from './definitions/puerto-rico'
 import { onMars } from './definitions/on-mars'
 import { pandemicLegacySeason0 } from './definitions/pandemic-legacy-0'
+import { anachrony } from './definitions/anachrony'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -184,4 +185,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   puertoRico,
   onMars,
   pandemicLegacySeason0,
+  anachrony,
 ]
