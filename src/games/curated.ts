@@ -84,6 +84,7 @@ import { mageKnight } from './definitions/mage-knight'
 import { barrage } from './definitions/barrage'
 import { hegemony } from './definitions/hegemony'
 import { kanbanEv } from './definitions/kanban-ev'
+import { theCrewMissionDeepSea } from './definitions/the-crew-mission-deep-sea'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -156,4 +157,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   barrage,
   hegemony,
   kanbanEv,
+  theCrewMissionDeepSea,
 ]
