@@ -89,6 +89,7 @@ import { heatPedalToTheMetal } from './definitions/heat-pedal-to-the-metal'
 import { clankCatacombs } from './definitions/clank-catacombs'
 import { marvelChampions } from './definitions/marvel-champions'
 import { ticketToRideLegacyLegendsWest } from './definitions/ticket-to-ride-legacy-legends-west'
+import { foodChainMagnate } from './definitions/food-chain-magnate'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -166,4 +167,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   clankCatacombs,
   marvelChampions,
   ticketToRideLegacyLegendsWest,
+  foodChainMagnate,
 ]
