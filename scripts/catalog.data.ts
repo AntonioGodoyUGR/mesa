@@ -127,7 +127,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['warhammer-quest-silver-tower', 'Warhammer Quest: Silver Tower', '🗼', 'Mazmorra caótica de habitaciones cambiantes', 1, 4, 60, 120, 'medium', 'coop'],
   ['space-hulk', 'Space Hulk', '🚀', 'Marines espaciales contra genestealers en pasillos estrechos', 2, 2, 60, 90, 'medium', 'win'],
   ['kingdom-death-monster', 'Kingdom Death: Monster', '💀', 'Supervivencia brutal: cada monstruo cazado deja cicatrices', 1, 4, 60, 180, 'hard', 'coop'],
-  ['too-many-bones', 'Too Many Bones', '🦴', 'Dados-personaje que suben de nivel escaramuza tras escaramuza', 1, 4, 60, 120, 'hard', 'coop'],
   ['mage-knight', 'Mage Knight', '🧙‍♂️', 'Explora y conquista un mapa entero tú solo, con muchísimas reglas', 1, 4, 60, 240, 'hard', 'points'],
   ['oathsworn', 'Oathsworn: Into the Deepwood', '🐺', 'Campaña narrativa con combates de mazo y libro ilustrado', 1, 4, 90, 150, 'hard', 'coop'],
   ['sleeping-gods', 'Sleeping Gods', '⛵', 'Un barco perdido en un atlas ilustrado, capítulo a capítulo', 1, 4, 60, 120, 'hard', 'coop'],

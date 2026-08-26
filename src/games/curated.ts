@@ -79,6 +79,7 @@ import { arkhamHorrorLcg } from './definitions/arkham-horror-lcg'
 import { root } from './definitions/root'
 import { orleans } from './definitions/orleans'
 import { terraMystica } from './definitions/terra-mystica'
+import { tooManyBones } from './definitions/too-many-bones'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -146,4 +147,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   root,
   orleans,
   terraMystica,
+  tooManyBones,
 ]
