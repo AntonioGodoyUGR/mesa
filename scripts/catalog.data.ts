@@ -155,7 +155,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['eldritch-horror', 'Eldritch Horror', '👁️', 'Arkham Horror a escala mundial y con menos reglas', 1, 8, 120, 240, 'hard', 'coop'],
   ['mansions-of-madness', 'Mansions of Madness: Second Edition', '🏚️', 'Mansión encantada con una app que hace de guardián', 1, 5, 120, 180, 'hard', 'coop'],
   ['elder-sign', 'Elder Sign', '🎲', 'El Arkham de bolsillo: dados contra los Primigenios', 1, 8, 60, 90, 'easy', 'coop'],
-  ['cthulhu-death-may-die', 'Cthulhu: Death May Die', '🐙', 'No hay que sobrevivir cuerdo: hay que matar al Primigenio', 1, 5, 60, 90, 'medium', 'coop'],
   ['cthulhu-wars', 'Cthulhu Wars', '🦑', 'Facciones primigenias peleando por el mundo con miniaturas enormes', 2, 4, 90, 120, 'hard', 'points'],
   ['zombicide', 'Zombicide (2ª edición)', '🧟‍♂️', 'Supervivientes, ruido y hordas que crecen cuando disparas', 1, 6, 60, 60, 'easy', 'coop'],
   ['zombicide-black-plague', 'Zombicide: Black Plague', '⚰️', 'El mismo Zombicide, pero medieval y con magia', 1, 6, 60, 60, 'medium', 'coop'],

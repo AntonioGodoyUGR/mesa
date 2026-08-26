@@ -92,6 +92,7 @@ import { ticketToRideLegacyLegendsWest } from './definitions/ticket-to-ride-lega
 import { foodChainMagnate } from './definitions/food-chain-magnate'
 import { underwaterCities } from './definitions/underwater-cities'
 import { harmonies } from './definitions/harmonies'
+import { cthulhuDeathMayDie } from './definitions/cthulhu-death-may-die'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -172,4 +173,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   foodChainMagnate,
   underwaterCities,
   harmonies,
+  cthulhuDeathMayDie,
 ]
