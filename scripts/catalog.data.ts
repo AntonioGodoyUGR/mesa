@@ -160,7 +160,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['horrified-american', 'Horrified: American Monsters', '👣', 'Bigfoot, el Chupacabras y compañía por carreteras secundarias', 1, 5, 60, 60, 'easy', 'coop'],
   ['horrified-greek', 'Horrified: Greek Monsters', '🐍', 'Medusa, el Minotauro y las Sirenas en el mismo tablero', 1, 5, 60, 60, 'easy', 'coop'],
   ['arkham-horror', 'Arkham Horror', '🔮', 'La ciudad de Lovecraft y unos investigadores que van justos', 1, 6, 120, 180, 'hard', 'coop'],
-  ['arkham-horror-lcg', 'Arkham Horror: The Card Game', '🕯️', 'Campaña de cartas: tu investigador arrastra sus traumas', 1, 4, 60, 120, 'hard', 'coop'],
   ['eldritch-horror', 'Eldritch Horror', '👁️', 'Arkham Horror a escala mundial y con menos reglas', 1, 8, 120, 240, 'hard', 'coop'],
   ['mansions-of-madness', 'Mansions of Madness: Second Edition', '🏚️', 'Mansión encantada con una app que hace de guardián', 1, 5, 120, 180, 'hard', 'coop'],
   ['elder-sign', 'Elder Sign', '🎲', 'El Arkham de bolsillo: dados contra los Primigenios', 1, 8, 60, 90, 'easy', 'coop'],
