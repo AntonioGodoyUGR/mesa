@@ -63,7 +63,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['indonesia', 'Indonesia', '🛶', 'Fusiones empresariales y rutas de mercancías en el archipiélago', 2, 5, 180, 300, 'hard', 'points'],
   ['the-gallerist', 'The Gallerist', '🖼️', 'Descubre artistas, infla su precio y llena tu galería', 1, 4, 60, 150, 'hard', 'points'],
   ['lisboa', 'Lisboa', '🌊', 'Reconstruir Lisboa tras el terremoto de 1755', 1, 4, 60, 180, 'hard', 'points'],
-  ['on-mars', 'On Mars', '🔴', 'Colonia marciana entre la órbita y la superficie', 1, 4, 90, 150, 'hard', 'points'],
   ['weather-machine', 'Weather Machine', '🌦️', 'Arregla el clima que estropeó tu propio invento', 1, 4, 60, 180, 'hard', 'points'],
   ['vinhos', 'Vinhos: Deluxe Edition', '🍷', 'Bodegas portuguesas, enólogos y ferias del vino', 1, 4, 60, 150, 'hard', 'points'],
   ['escape-plan', 'Escape Plan', '💰', 'Atraco resuelto: ahora hay que salir de la ciudad con el botín', 1, 5, 60, 120, 'hard', 'points'],

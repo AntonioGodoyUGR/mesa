@@ -96,6 +96,7 @@ import { cthulhuDeathMayDie } from './definitions/cthulhu-death-may-die'
 import { paxPamir } from './definitions/pax-pamir'
 import { ageOfInnovation } from './definitions/age-of-innovation'
 import { puertoRico } from './definitions/puerto-rico'
+import { onMars } from './definitions/on-mars'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -180,4 +181,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   paxPamir,
   ageOfInnovation,
   puertoRico,
+  onMars,
 ]
