@@ -76,6 +76,7 @@ import { concordia } from './definitions/concordia'
 import { greatWesternTrailSecondEdition } from './definitions/great-western-trail-second-edition'
 import { skyTeam } from './definitions/sky-team'
 import { arkhamHorrorLcg } from './definitions/arkham-horror-lcg'
+import { root } from './definitions/root'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -140,4 +141,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   greatWesternTrailSecondEdition,
   skyTeam,
   arkhamHorrorLcg,
+  root,
 ]

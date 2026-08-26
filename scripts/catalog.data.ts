@@ -200,7 +200,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['chaos-in-the-old-world', 'Chaos in the Old World', '👺', 'Cuatro dioses del Caos corrompiendo el Viejo Mundo, cada uno a su manera', 3, 4, 60, 120, 'hard', 'points'],
   ['lords-of-hellas', 'Lords of Hellas', '🏛️', 'Grecia con monstruos, monumentos y héroes que corren por el mapa', 1, 4, 60, 90, 'medium', 'win'],
   ['blood-bowl', 'Blood Bowl', '🏈', 'Fútbol americano fantástico donde matar al rival es táctica', 2, 2, 60, 120, 'medium', 'points'],
-  ['root', 'Root', '🦊', 'Bosque en guerra: cada facción juega a un juego distinto', 2, 4, 60, 90, 'hard', 'points'],
   ['root-riverfolk', 'Root: The Riverfolk Expansion', '🦦', 'Nutrias mercaderes y lagartos fanáticos para el bosque', 2, 6, 60, 90, 'hard', 'points'],
   ['vast-crystal-caverns', 'Vast: The Crystal Caverns', '💎', 'Caballero, dragón, goblins y hasta la propia cueva, con reglas propias', 1, 5, 60, 120, 'hard', 'win'],
   ['oath', 'Oath', '🏵️', 'Crónica de un imperio: cada partida deja el mundo cambiado para la siguiente', 1, 6, 45, 180, 'hard', 'win'],
