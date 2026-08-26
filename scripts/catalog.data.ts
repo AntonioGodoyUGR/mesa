@@ -61,7 +61,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['alhambra', 'Alhambra', '🏯', 'Compra edificios con la moneda exacta y levanta tu palacio', 2, 6, 45, 60, 'easy', 'points'],
   ['viticulture-tuscany', 'Viticulture: Tuscany Essential Edition', '🏘️', 'La expansión imprescindible: más edificios, más estaciones', 1, 6, 60, 100, 'hard', 'points'],
   ['champions-of-midgard', 'Champions of Midgard', '🐲', 'Un puerto vikingo que contrata guerreros para matar monstruos', 2, 4, 60, 90, 'medium', 'points'],
-  ['underwater-cities', 'Underwater Cities', '🐠', 'Coloca la carta que va con el color de la acción, bajo el mar', 1, 4, 80, 150, 'hard', 'points'],
   ['indonesia', 'Indonesia', '🛶', 'Fusiones empresariales y rutas de mercancías en el archipiélago', 2, 5, 180, 300, 'hard', 'points'],
   ['the-gallerist', 'The Gallerist', '🖼️', 'Descubre artistas, infla su precio y llena tu galería', 1, 4, 60, 150, 'hard', 'points'],
   ['lisboa', 'Lisboa', '🌊', 'Reconstruir Lisboa tras el terremoto de 1755', 1, 4, 60, 180, 'hard', 'points'],

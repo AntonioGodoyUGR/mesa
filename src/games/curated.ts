@@ -90,6 +90,7 @@ import { clankCatacombs } from './definitions/clank-catacombs'
 import { marvelChampions } from './definitions/marvel-champions'
 import { ticketToRideLegacyLegendsWest } from './definitions/ticket-to-ride-legacy-legends-west'
 import { foodChainMagnate } from './definitions/food-chain-magnate'
+import { underwaterCities } from './definitions/underwater-cities'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -168,4 +169,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   marvelChampions,
   ticketToRideLegacyLegendsWest,
   foodChainMagnate,
+  underwaterCities,
 ]
