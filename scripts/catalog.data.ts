@@ -234,7 +234,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['clank', 'Clank!', '🐉', 'Roba en la cueva del dragón y sal antes de hacer demasiado ruido', 2, 4, 30, 60, 'medium', 'points'],
   ['clank-catacombs', 'Clank!: Catacombs', '🕯️', 'La mazmorra se construye con losetas conforme entráis', 2, 4, 60, 60, 'medium', 'points'],
   ['clank-in-space', 'Clank! In! Space!', '🛸', 'El mismo saqueo, ahora en la nave de un señor del crimen', 2, 4, 60, 60, 'medium', 'points'],
-  ['heat-pedal-to-the-metal', 'Heat: Pedal to the Metal', '🏎️', 'Carreras con marchas y calor: pasarse de vueltas se paga', 1, 6, 30, 60, 'medium', 'win'],
   ['quacks-quedlinburg', 'The Quacks of Quedlinburg', '🧪', 'Saca ingredientes de la bolsa hasta que la marmita reviente', 2, 4, 45, 45, 'easy', 'points'],
   ['isle-of-cats', 'The Isle of Cats', '🐈', 'Rescata gatos en polinomios y colócalos sin dejar huecos', 1, 4, 60, 90, 'medium', 'points'],
   ['jaipur', 'Jaipur', '🐫', 'Duelo de mercaderes: vende en lotes grandes y corre por los bonus', 2, 2, 30, 30, 'easy', 'points'],
