@@ -74,6 +74,7 @@ import { aFeastForOdin } from './definitions/a-feast-for-odin'
 import { clankLegacy } from './definitions/clank-legacy'
 import { concordia } from './definitions/concordia'
 import { greatWesternTrailSecondEdition } from './definitions/great-western-trail-second-edition'
+import { skyTeam } from './definitions/sky-team'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -136,4 +137,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   clankLegacy,
   concordia,
   greatWesternTrailSecondEdition,
+  skyTeam,
 ]
