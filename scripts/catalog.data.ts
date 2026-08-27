@@ -38,7 +38,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   // Los grandes eurogames
   // ---------------------------------------------------------------------------
-  ['agricola', 'Agricola', '🚜', 'Una granja del siglo XVII y una familia a la que dar de comer', 1, 4, 60, 120, 'hard', 'points'],
   ['agricola-creatures', 'Agricola: All Creatures Big and Small', '🐖', 'Agricola a dos, solo con los animales y sin pasar hambre', 2, 2, 30, 30, 'medium', 'points'],
   ['le-havre', 'Le Havre', '⚓', 'Barcos, edificios y un puerto que no para de crecer', 1, 5, 60, 200, 'hard', 'points'],
   ['ora-et-labora', 'Ora et Labora', '⛪', 'Un monasterio medieval, sus tierras y su rueda de producción', 1, 4, 60, 180, 'hard', 'points'],
