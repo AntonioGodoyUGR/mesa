@@ -521,6 +521,11 @@ quedó a medias y lo siguiente que toca.
       saltado a propósito el puesto 63, *The Lord of the Rings: Fate of the Fellowship*
       (2024, cooperativo narrativo de estructura muy particular; no había confianza
       suficiente para no inventarse reglas, así que se dejó pendiente en vez de arriesgar).
+      También saltado *Great Western Trail: New Zealand* (2023): sus mecánicas propias
+      (ovejas/lana, barcos entre las dos islas, ficha kiwi) difieren bastante de la base y
+      de la 2.ª edición, y esta sesión no tuvo acceso a búsqueda web para verificarlas —
+      no había confianza suficiente para escribir su chuleta sin arriesgarse a inventar
+      reglas. Pendiente para una tanda con acceso a fuentes.
 - [ ] **Chuletas del catálogo, oleadas siguientes**: quedan sin chuleta el resto de las
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
@@ -531,6 +536,11 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: sesión dedicada a *Great Western Trail: New Zealand*, saltada a
+  propósito. Sin acceso a búsqueda web en esta sesión y sin confianza suficiente en el
+  detalle de sus mecánicas propias (ovejas, barcos, ficha kiwi) frente a la base y la 2.ª
+  edición, no se escribió la chuleta para no arriesgarse a inventar reglas. Sin commit;
+  queda anotado en «Pendiente».
 - **2026-08-27** — Gustavo: chuletas top-100 BGG, tanda de diez (puestos 64–72 más el
   rescate de un huérfano). Rescatado *Caverna: The Cave Farmers*, que se había quedado a
   medias en un intento anterior (fichero ya escrito, import y borrado de fila en
