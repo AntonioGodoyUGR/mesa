@@ -516,6 +516,11 @@ quedó a medias y lo siguiente que toca.
 
 ## Pendiente / ideas (sin prioridad asignada)
 
+- [ ] **Chuletas top-100 BGG, siguiente tanda**: van los puestos 1–72 con chuleta propia
+      (última tanda: 64–72, ver bitácora 2026-08-27). Falta el resto del top-100 y queda
+      saltado a propósito el puesto 63, *The Lord of the Rings: Fate of the Fellowship*
+      (2024, cooperativo narrativo de estructura muy particular; no había confianza
+      suficiente para no inventarse reglas, así que se dejó pendiente en vez de arriesgar).
 - [ ] **Chuletas del catálogo, oleadas siguientes**: quedan sin chuleta el resto de las
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
@@ -526,6 +531,19 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: chuletas top-100 BGG, tanda de diez (puestos 64–72 más el
+  rescate de un huérfano). Rescatado *Caverna: The Cave Farmers*, que se había quedado a
+  medias en un intento anterior (fichero ya escrito, import y borrado de fila en
+  `catalog.data.ts` sin commitear); verificado contra la plantilla y commiteado tal cual.
+  Añadidos de cero: *Oathsworn: Into the Deepwood*, *Agricola*, *Blood on the Clocktower*,
+  *Blood Rage*, *Obsession*, *Grand Austria Hotel*, *Lisboa*, *Endeavor: Deep Sea* y
+  *The White Castle*. Diez commits, uno por juego, cada uno con `npm run lint && npm test
+  && npm run build` en verde (207 tests, build OK) antes de commitear. Saltado a propósito
+  el puesto 63, *The Lord of the Rings: Fate of the Fellowship* (2024, demasiado reciente y
+  con una estructura narrativa de elección de camino poco documentada para reconstruirla
+  con confianza); queda anotado en «Pendiente» en vez de inventarse las reglas. Quedan
+  pendientes el resto de juegos del top-100 para tandas futuras — esta se para aquí a
+  propósito, con margen de sobra sin gastar.
 - **2026-08-20** — Toni: los dos SQL ejecutados y `resolve-game` desplegada desde el panel
   de Supabase. El crecimiento bajo demanda está vivo en producción. Ojo con lo de arriba:
   lo desplegado es el empaquetado de un fichero, no el código del repo.
