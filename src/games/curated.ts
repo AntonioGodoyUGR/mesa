@@ -100,6 +100,7 @@ import { onMars } from './definitions/on-mars'
 import { pandemicLegacySeason0 } from './definitions/pandemic-legacy-0'
 import { anachrony } from './definitions/anachrony'
 import { caverna } from './definitions/caverna'
+import { oathsworn } from './definitions/oathsworn'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -188,4 +189,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   pandemicLegacySeason0,
   anachrony,
   caverna,
+  oathsworn,
 ]
