@@ -106,6 +106,7 @@ import { bloodOnTheClocktower } from './definitions/blood-on-the-clocktower'
 import { bloodRage } from './definitions/blood-rage'
 import { obsession } from './definitions/obsession'
 import { grandAustriaHotel } from './definitions/grand-austria-hotel'
+import { lisboa } from './definitions/lisboa'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -200,4 +201,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   bloodRage,
   obsession,
   grandAustriaHotel,
+  lisboa,
 ]
