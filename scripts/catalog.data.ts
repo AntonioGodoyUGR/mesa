@@ -298,7 +298,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['secret-hitler', 'Secret Hitler', '🎩', 'Se aprueban leyes a ciegas y el gobierno se llena de fascistas', 5, 10, 45, 45, 'medium', 'teams'],
   ['one-night-ultimate-werewolf', 'One Night Ultimate Werewolf', '🐺', 'Una sola noche, un solo linchamiento, ninguna eliminación', 3, 10, 10, 10, 'easy', 'teams'],
   ['werewords', 'Werewords', '🗣️', 'Adivinad la palabra en cuatro minutos, con un lobo dando pistas falsas', 4, 10, 10, 10, 'easy', 'teams'],
-  ['blood-on-the-clocktower', 'Blood on the Clocktower', '🔔', 'Hombres lobo donde los muertos siguen jugando y el narrador miente', 5, 20, 30, 120, 'hard', 'teams'],
   ['spyfall', 'Spyfall', '📍', 'Todos saben dónde estamos menos uno, y no puede notarse', 3, 8, 15, 15, 'easy', 'teams'],
   ['spyfall-2', 'Spyfall 2', '🕶️', 'Más localizaciones, más jugadores y hasta dos espías', 3, 12, 15, 15, 'easy', 'teams'],
   ['the-chameleon', 'The Chameleon', '🦎', 'Di una palabra que encaje sin tener ni idea del tema', 3, 8, 15, 20, 'easy', 'teams'],

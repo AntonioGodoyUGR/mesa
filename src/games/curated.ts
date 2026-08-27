@@ -102,6 +102,7 @@ import { anachrony } from './definitions/anachrony'
 import { caverna } from './definitions/caverna'
 import { oathsworn } from './definitions/oathsworn'
 import { agricola } from './definitions/agricola'
+import { bloodOnTheClocktower } from './definitions/blood-on-the-clocktower'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -192,4 +193,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   caverna,
   oathsworn,
   agricola,
+  bloodOnTheClocktower,
 ]
