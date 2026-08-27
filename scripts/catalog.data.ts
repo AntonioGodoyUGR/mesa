@@ -67,7 +67,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['nucleum', 'Nucleum', '⚛️', 'Sajonia electrificada a base de carbón, uranio y raíles', 1, 4, 60, 150, 'hard', 'points'],
   ['voidfall', 'Voidfall', '🌑', 'Civilizaciones galácticas sin azar y con muchísimo cálculo', 1, 4, 100, 200, 'hard', 'points'],
   ['hadrians-wall', "Hadrian's Wall", '🧱', 'Rellena tu hoja levantando la muralla romana antes que nadie', 1, 6, 45, 60, 'hard', 'points'],
-  ['obsession', 'Obsession', '🎩', 'Alta sociedad victoriana: reforma tu casa y organiza fiestas', 1, 4, 45, 90, 'hard', 'points'],
   ['the-white-castle', 'The White Castle', '🏯', 'Tres puentes, dados de colores y una hora larga de decisiones', 1, 4, 45, 80, 'medium', 'points'],
   ['kutna-hora', 'Kutná Hora: The City of Silver', '🥈', 'La plata de Bohemia y una ciudad cuyo mercado se mueve solo', 2, 4, 60, 120, 'hard', 'points'],
   ['distilled', 'Distilled', '🥃', 'Destila ron, whisky o ginebra y envejécelo en barrica', 1, 4, 60, 120, 'medium', 'points'],
