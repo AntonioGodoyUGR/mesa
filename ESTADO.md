@@ -521,6 +521,11 @@ quedó a medias y lo siguiente que toca.
       saltado a propósito el puesto 63, *The Lord of the Rings: Fate of the Fellowship*
       (2024, cooperativo narrativo de estructura muy particular; no había confianza
       suficiente para no inventarse reglas, así que se dejó pendiente en vez de arriesgar).
+      También saltado *Clans of Caledonia* (2017): la producción por terreno, el mercado
+      dinámico y la red comercial se conocían con confianza razonable, pero los poderes
+      específicos de cada clan y el detalle exacto de puntuación de la red comercial/
+      contratos no; esta sesión no tuvo acceso a búsqueda web para verificarlos. Pendiente
+      para una tanda con acceso a fuentes.
       También saltado *Great Western Trail: New Zealand* (2023): sus mecánicas propias
       (ovejas/lana, barcos entre las dos islas, ficha kiwi) difieren bastante de la base y
       de la 2.ª edición, y esta sesión no tuvo acceso a búsqueda web para verificarlas —
@@ -542,6 +547,12 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: sesión dedicada a *Clans of Caledonia*, saltada a propósito.
+  Sin acceso a búsqueda web en esta sesión y sin confianza suficiente en el detalle exacto
+  de los poderes propios de cada clan ni en la puntuación de la red comercial/contratos
+  (la producción por terreno y el mercado con precios decrecientes sí se conocían bien), no
+  se escribió la chuleta para no arriesgarse a inventar reglas. Sin commit de código; queda
+  anotado en «Pendiente».
 - **2026-08-27** — Gustavo: chuleta top-100 BGG para *Power Grid*. Subasta de centrales,
   compra de recursos con precio dinámico, construcción de red y fase de burocracia
   descritas con las mecánicas que domino con confianza; el umbral exacto de ciudades que
