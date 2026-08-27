@@ -532,6 +532,15 @@ quedó a medias y lo siguiente que toca.
       dado personalizado y el detalle preciso de la estructura de turno/acciones no; esta
       sesión no tuvo acceso a búsqueda web para verificarlos. Pendiente para una tanda con
       acceso a fuentes.
+      También saltado *Voidfall* (2022): con acceso a búsqueda web esta sesión, se
+      confirmaron el marco general (14 Casas asimétricas, cartas de foco con 2 de 3
+      acciones, cinco recursos, producción por gremios × población de sector) y que la
+      condición de victoria son puntos de agenda, pero el combate lo describen los propios
+      reseñistas como tan "arcano" que necesitó una app auxiliar oficial (fases de
+      aproximación y salva sin detalle público fiable), y ni las tres pistas de civilización
+      ni el desglose exacto de las cartas de agenda se pudieron verificar con la precisión
+      necesaria para no arriesgarse a inventar reglas. Pendiente para una tanda con acceso
+      al PDF del reglamento oficial.
       También saltado *Great Western Trail: New Zealand* (2023): sus mecánicas propias
       (ovejas/lana, barcos entre las dos islas, ficha kiwi) difieren bastante de la base y
       de la 2.ª edición, y esta sesión no tuvo acceso a búsqueda web para verificarlas —
@@ -553,6 +562,14 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: sesión dedicada a *Voidfall*, saltada a propósito. Con
+  búsqueda web disponible se confirmó el marco general (14 Casas asimétricas, cartas de
+  foco con 2 de 3 acciones, cinco recursos, producción por gremios × población, victoria
+  por puntos de agenda), pero el combate es descrito por los propios reseñistas como tan
+  "arcano" que la editorial sacó una app auxiliar oficial, y ni el detalle de las tres
+  pistas de civilización ni el desglose exacto de las cartas de agenda se pudieron
+  verificar con confianza. No se escribió la chuleta para no arriesgarse a inventar
+  reglas. Sin commit de código; queda anotado en «Pendiente».
 - **2026-08-27** — Gustavo: sesión dedicada a *Mansions of Madness: Second Edition*,
   saltada a propósito. Sin acceso a búsqueda web en esta sesión y sin confianza
   suficiente en las caras exactas del dado personalizado ni en el detalle preciso de la
