@@ -107,6 +107,7 @@ import { bloodRage } from './definitions/blood-rage'
 import { obsession } from './definitions/obsession'
 import { grandAustriaHotel } from './definitions/grand-austria-hotel'
 import { lisboa } from './definitions/lisboa'
+import { endeavorDeepSea } from './definitions/endeavor-deep-sea'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -202,4 +203,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   obsession,
   grandAustriaHotel,
   lisboa,
+  endeavorDeepSea,
 ]
