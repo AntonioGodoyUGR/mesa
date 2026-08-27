@@ -76,7 +76,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['darwins-journey', "Darwin's Journey", '🐢', 'Galápagos: forma a tus trabajadores antes de mandarlos a explorar', 1, 4, 60, 120, 'hard', 'points'],
   ['newton', 'Newton', '🔭', 'Ciencia del XVII: viaja, estudia y publica antes que tus colegas', 1, 4, 90, 120, 'hard', 'points'],
   ['trickerion', 'Trickerion: Legends of Illusion', '🎩', 'Magos de vodevil que ensayan trucos y llenan el teatro', 2, 4, 90, 180, 'hard', 'points'],
-  ['grand-austria-hotel', 'Grand Austria Hotel', '☕', 'Un café vienés: sirve al cliente exacto y prepara su habitación', 2, 4, 60, 120, 'hard', 'points'],
   ['lorenzo-il-magnifico', 'Lorenzo il Magnifico', '⛲', 'Renacimiento florentino con dados comunes y mucha carta', 2, 4, 60, 120, 'hard', 'points'],
   ['coimbra', 'Coimbra', '🎓', 'Subasta tus dados por el favor de las familias portuguesas', 2, 4, 60, 75, 'medium', 'points'],
   ['the-red-cathedral', 'The Red Cathedral', '⛪', 'Gremios rusos construyendo la catedral de San Basilio', 1, 4, 60, 80, 'medium', 'points'],

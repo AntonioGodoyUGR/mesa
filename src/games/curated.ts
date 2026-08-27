@@ -105,6 +105,7 @@ import { agricola } from './definitions/agricola'
 import { bloodOnTheClocktower } from './definitions/blood-on-the-clocktower'
 import { bloodRage } from './definitions/blood-rage'
 import { obsession } from './definitions/obsession'
+import { grandAustriaHotel } from './definitions/grand-austria-hotel'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -198,4 +199,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   bloodOnTheClocktower,
   bloodRage,
   obsession,
+  grandAustriaHotel,
 ]
