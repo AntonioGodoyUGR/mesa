@@ -542,6 +542,14 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: chuleta top-100 BGG para *Power Grid*. Subasta de centrales,
+  compra de recursos con precio dinámico, construcción de red y fase de burocracia
+  descritas con las mecánicas que domino con confianza; el umbral exacto de ciudades que
+  dispara el final (varía según jugadores y mapa) se dejó descrito en términos generales
+  en vez de inventar una cifra concreta. Fichero nuevo `src/games/definitions/power-grid.ts`,
+  enganchado en `curated.ts` y borrada su fila de `scripts/catalog.data.ts`. `npm run lint
+  && npm test && npm run build` en verde (207 tests, build OK) antes de commitear.
+
 - **2026-08-27** — Gustavo: chuleta top-100 BGG para *Sleeping Gods*. Con acceso a
   búsqueda web esta sesión, se verificó la estructura de turno (acción de barco, evento,
   dos acciones), el sistema de combate sin dados, gestión de tripulación (salud, fatiga,

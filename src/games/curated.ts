@@ -110,6 +110,7 @@ import { grandAustriaHotel } from './definitions/grand-austria-hotel'
 import { lisboa } from './definitions/lisboa'
 import { endeavorDeepSea } from './definitions/endeavor-deep-sea'
 import { theWhiteCastle } from './definitions/the-white-castle'
+import { powerGrid } from './definitions/power-grid'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -207,5 +208,6 @@ export const CURATED_GAMES: GameDefinition[] = [
   lisboa,
   endeavorDeepSea,
   theWhiteCastle,
+  powerGrid,
   sleepingGods,
 ]
