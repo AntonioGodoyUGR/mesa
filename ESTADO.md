@@ -542,6 +542,14 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: chuleta top-100 BGG para *Sleeping Gods*. Con acceso a
+  búsqueda web esta sesión, se verificó la estructura de turno (acción de barco, evento,
+  dos acciones), el sistema de combate sin dados, gestión de tripulación (salud, fatiga,
+  habilidades) y el desglose de puntuación final (finales, tótems, cartas de aventura,
+  misiones, niveles, derrotas) contra varias fuentes de reglas. Fichero nuevo
+  `src/games/definitions/sleeping-gods.ts`, enganchado en `curated.ts` y borrada su fila
+  de `scripts/catalog.data.ts`. `npm run lint && npm test && npm run build` en verde (207
+  tests, build OK) antes de commitear.
 - **2026-08-27** — Gustavo: sesión dedicada a *Pandemic Legacy: Season 2*, saltada a
   propósito. Sin acceso a búsqueda web en esta sesión y sin confianza suficiente en el
   detalle exacto de sus mecánicas propias (estados de ciudad estable/inestable/colapsada,

@@ -101,6 +101,7 @@ import { pandemicLegacySeason0 } from './definitions/pandemic-legacy-0'
 import { anachrony } from './definitions/anachrony'
 import { caverna } from './definitions/caverna'
 import { oathsworn } from './definitions/oathsworn'
+import { sleepingGods } from './definitions/sleeping-gods'
 import { agricola } from './definitions/agricola'
 import { bloodOnTheClocktower } from './definitions/blood-on-the-clocktower'
 import { bloodRage } from './definitions/blood-rage'
@@ -206,4 +207,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   lisboa,
   endeavorDeepSea,
   theWhiteCastle,
+  sleepingGods,
 ]
