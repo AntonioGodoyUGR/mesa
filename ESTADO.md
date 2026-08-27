@@ -526,6 +526,12 @@ quedó a medias y lo siguiente que toca.
       de la 2.ª edición, y esta sesión no tuvo acceso a búsqueda web para verificarlas —
       no había confianza suficiente para escribir su chuleta sin arriesgarse a inventar
       reglas. Pendiente para una tanda con acceso a fuentes.
+      También saltado *Pandemic Legacy: Season 2*: sus mecánicas propias (ciudades con
+      estados estable/inestable/colapsada, navegación en barco entre regiones,
+      campamentos, cartas rediseñadas frente al Pandemic clásico) son bastante distintas
+      de las de Season 1 y esta sesión no tuvo acceso a búsqueda web para verificar el
+      detalle exacto — no había confianza suficiente para no arriesgarse a inventar
+      reglas. Pendiente para una tanda con acceso a fuentes.
 - [ ] **Chuletas del catálogo, oleadas siguientes**: quedan sin chuleta el resto de las
       filas de `scripts/catalog.data.ts` (cientos: los grandes eurogames, campañas/mazmorras,
       terror, wargames, deckbuilders, familiares…). Escalar añadiendo entradas a
@@ -536,6 +542,12 @@ quedó a medias y lo siguiente que toca.
 
 ## Bitácora
 
+- **2026-08-27** — Gustavo: sesión dedicada a *Pandemic Legacy: Season 2*, saltada a
+  propósito. Sin acceso a búsqueda web en esta sesión y sin confianza suficiente en el
+  detalle exacto de sus mecánicas propias (estados de ciudad estable/inestable/colapsada,
+  barcos, campamentos, cartas rediseñadas frente a Season 1), no se escribió la chuleta
+  para no arriesgarse a inventar reglas. Sin commit de código; queda anotado en
+  «Pendiente».
 - **2026-08-27** — Gustavo: sesión dedicada a *Great Western Trail: New Zealand*, saltada a
   propósito. Sin acceso a búsqueda web en esta sesión y sin confianza suficiente en el
   detalle de sus mecánicas propias (ovejas, barcos, ficha kiwi) frente a la base y la 2.ª
