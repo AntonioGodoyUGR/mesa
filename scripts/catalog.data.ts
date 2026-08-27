@@ -180,7 +180,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['inis', 'Inis', '🍀', 'Cartas que rotan: tres formas de ganar y todas cuestan sangre', 2, 4, 60, 90, 'hard', 'points'],
   ['ankh-gods-egypt', 'Ankh: Gods of Egypt', '🪶', 'Dioses egipcios que se fusionan cuando el panteón se queda corto', 2, 5, 90, 90, 'hard', 'points'],
   ['rising-sun', 'Rising Sun', '⛩️', 'Japón mitológico: se negocia antes de cada guerra, y se puede mentir', 3, 5, 90, 120, 'hard', 'points'],
-  ['blood-rage', 'Blood Rage', '🪓', 'Vikingos en el Ragnarök: morir bien puntúa más que sobrevivir', 2, 4, 60, 90, 'medium', 'points'],
   ['chaos-in-the-old-world', 'Chaos in the Old World', '👺', 'Cuatro dioses del Caos corrompiendo el Viejo Mundo, cada uno a su manera', 3, 4, 60, 120, 'hard', 'points'],
   ['lords-of-hellas', 'Lords of Hellas', '🏛️', 'Grecia con monstruos, monumentos y héroes que corren por el mapa', 1, 4, 60, 90, 'medium', 'win'],
   ['blood-bowl', 'Blood Bowl', '🏈', 'Fútbol americano fantástico donde matar al rival es táctica', 2, 2, 60, 120, 'medium', 'points'],
