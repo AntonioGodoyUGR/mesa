@@ -565,6 +565,16 @@ quedó a medias y lo siguiente que toca.
   (la producción por terreno y el mercado con precios decrecientes sí se conocían bien), no
   se escribió la chuleta para no arriesgarse a inventar reglas. Sin commit de código; queda
   anotado en «Pendiente».
+- **2026-08-27** — Gustavo: chuleta top-100 BGG para *The Quacks of Quedlinburg*.
+  Reutilizado el contenido ya verificado que existía en `scripts/catalog.rules.ts`
+  (push-your-luck sacando ingredientes de la bolsa a la marmita, límite de 7 en calabazas
+  blancas antes de explotar, elegir puntos O monedas si explota, compra de ingredientes al
+  final del turno) para escribir el fichero nuevo `src/games/definitions/quacks-quedlinburg.ts`
+  siguiendo la plantilla de `power-grid.ts`; enganchado en `curated.ts` y borrada su fila de
+  `scripts/catalog.data.ts`. Se dejó fuera a propósito el desglose exacto de puntos de
+  "posición del ratón"/track de rubíes por no tener confianza suficiente en la cifra exacta.
+  `npm run lint && npm test && npm run build` en verde (207 tests, build OK) antes de
+  commitear.
 - **2026-08-27** — Gustavo: chuleta top-100 BGG para *Power Grid*. Subasta de centrales,
   compra de recursos con precio dinámico, construcción de red y fase de burocracia
   descritas con las mecánicas que domino con confianza; el umbral exacto de ciudades que

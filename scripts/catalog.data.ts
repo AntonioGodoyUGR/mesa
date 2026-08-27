@@ -215,7 +215,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   ['arnak-missing-expedition', 'Lost Ruins of Arnak: The Missing Expedition', '🧭', 'Nueva isla, nuevos guardianes y campaña para la expedición', 1, 4, 30, 120, 'hard', 'points'],
   ['clank', 'Clank!', '🐉', 'Roba en la cueva del dragón y sal antes de hacer demasiado ruido', 2, 4, 30, 60, 'medium', 'points'],
   ['clank-in-space', 'Clank! In! Space!', '🛸', 'El mismo saqueo, ahora en la nave de un señor del crimen', 2, 4, 60, 60, 'medium', 'points'],
-  ['quacks-quedlinburg', 'The Quacks of Quedlinburg', '🧪', 'Saca ingredientes de la bolsa hasta que la marmita reviente', 2, 4, 45, 45, 'easy', 'points'],
   ['isle-of-cats', 'The Isle of Cats', '🐈', 'Rescata gatos en polinomios y colócalos sin dejar huecos', 1, 4, 60, 90, 'medium', 'points'],
   ['jaipur', 'Jaipur', '🐫', 'Duelo de mercaderes: vende en lotes grandes y corre por los bonus', 2, 2, 30, 30, 'easy', 'points'],
   ['tokaido', 'Tokaido', '🎌', 'Viaje sin prisa por Japón: quien va último, elige', 2, 5, 45, 45, 'easy', 'points'],

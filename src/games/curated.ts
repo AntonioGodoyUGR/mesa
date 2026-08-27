@@ -111,6 +111,7 @@ import { lisboa } from './definitions/lisboa'
 import { endeavorDeepSea } from './definitions/endeavor-deep-sea'
 import { theWhiteCastle } from './definitions/the-white-castle'
 import { powerGrid } from './definitions/power-grid'
+import { quacksQuedlinburg } from './definitions/quacks-quedlinburg'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -210,4 +211,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   theWhiteCastle,
   powerGrid,
   sleepingGods,
+  quacksQuedlinburg,
 ]
