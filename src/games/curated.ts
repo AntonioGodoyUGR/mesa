@@ -99,6 +99,7 @@ import { puertoRico } from './definitions/puerto-rico'
 import { onMars } from './definitions/on-mars'
 import { pandemicLegacySeason0 } from './definitions/pandemic-legacy-0'
 import { anachrony } from './definitions/anachrony'
+import { caverna } from './definitions/caverna'
 
 export const CURATED_GAMES: GameDefinition[] = [
   // Clásicos
@@ -186,4 +187,5 @@ export const CURATED_GAMES: GameDefinition[] = [
   onMars,
   pandemicLegacySeason0,
   anachrony,
+  caverna,
 ]

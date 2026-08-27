@@ -40,7 +40,6 @@ export const CATALOG_ROWS: CatalogRow[] = [
   // ---------------------------------------------------------------------------
   ['agricola', 'Agricola', '🚜', 'Una granja del siglo XVII y una familia a la que dar de comer', 1, 4, 60, 120, 'hard', 'points'],
   ['agricola-creatures', 'Agricola: All Creatures Big and Small', '🐖', 'Agricola a dos, solo con los animales y sin pasar hambre', 2, 2, 30, 30, 'medium', 'points'],
-  ['caverna', 'Caverna: The Cave Farmers', '⛏️', 'Enanos que excavan la montaña, siembran y salen de expedición', 1, 7, 30, 210, 'hard', 'points'],
   ['le-havre', 'Le Havre', '⚓', 'Barcos, edificios y un puerto que no para de crecer', 1, 5, 60, 200, 'hard', 'points'],
   ['ora-et-labora', 'Ora et Labora', '⛪', 'Un monasterio medieval, sus tierras y su rueda de producción', 1, 4, 60, 180, 'hard', 'points'],
   ['puerto-rico-1897', 'Puerto Rico 1897', '🚢', 'El Puerto Rico de siempre, reeditado y reequilibrado', 2, 5, 90, 150, 'hard', 'points'],
